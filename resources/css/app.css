@@ -1,0 +1,485 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-sans: 'Inter', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-serif: 'Source Serif 4', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+
+    /* Light mode colors */
+    --color-bg: #FAFAFA;
+    --color-surface: #FFFFFF;
+    --color-border: #E5E7EB;
+    --color-text: #111827;
+    --color-text-muted: #6B7280;
+    --color-accent: #2563EB;
+    --color-accent-bg: rgba(37,99,235,0.10);
+    --color-on-accent: #FFFFFF;
+
+    /* Status colors */
+    --color-success: #059669;
+    --color-warning: #D97706;
+    --color-error: #DC2626;
+
+    /* Spacing */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+
+    /* Content width */
+    --width-content: 720px;
+    --width-wide: 1200px;
+}
+
+/* ===== Dark mode overrides ===== */
+.dark {
+    --color-bg: #0F1115;
+    --color-surface: #171B23;
+    --color-border: #232834;
+    --color-text: #E5E7EB;
+    --color-text-muted: #9CA3AF;
+    --color-accent: #60A5FA;
+    --color-accent-bg: rgba(96,165,250,0.14);
+    --color-on-accent: #0B0F14;
+    --color-success: #34D399;
+    --color-warning: #FBBF24;
+    --color-error: #F87171;
+}
+
+/* ===== Base styles ===== */
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    line-height: 1.7;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ===== Reading progress bar ===== */
+.reading-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-accent), #818CF8);
+    z-index: 100;
+    transition: width 0.1s linear;
+}
+
+/* ===== Prose / Article styles ===== */
+.prose-article {
+    max-width: var(--width-content);
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: var(--color-text);
+}
+
+.prose-article h1,
+.prose-article h2,
+.prose-article h3,
+.prose-article h4 {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    line-height: 1.3;
+    margin-top: 2em;
+    margin-bottom: 0.75em;
+    color: var(--color-text);
+    scroll-margin-top: 80px;
+}
+
+.prose-article h1 { font-size: 2rem; }
+.prose-article h2 { font-size: 1.5rem; }
+.prose-article h3 { font-size: 1.25rem; }
+
+.prose-article p {
+    margin-bottom: 1em;
+}
+
+.prose-article p:empty {
+    display: none;
+}
+
+/* Paragraphs inside list items should not add list spacing twice. */
+.prose-article li > p:last-child {
+    margin-bottom: 0;
+}
+
+/* Tighten the gap between a lead-in paragraph and the list that follows it. */
+.prose-article p:has(+ ul),
+.prose-article p:has(+ ol) {
+    margin-bottom: 0.5em;
+}
+
+.prose-article a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: opacity 0.2s;
+}
+
+.prose-article a:hover {
+    opacity: 0.8;
+}
+
+.prose-article img {
+    border-radius: var(--radius-md);
+    margin: 1.5em 0;
+    max-width: 100%;
+}
+
+/* Only force responsive height when the author did not set an explicit one. */
+.prose-article img:not([height]):not([style*="height"]) {
+    height: auto;
+}
+
+.prose-article figure {
+    margin: 2em 0;
+}
+
+.prose-article figcaption {
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    margin-top: 0.5em;
+    font-family: var(--font-sans);
+}
+
+.prose-article blockquote {
+    border-left: 3px solid var(--color-accent);
+    padding-left: 1.25em;
+    margin: 1.5em 0;
+    color: var(--color-text-muted);
+    font-style: italic;
+}
+
+.prose-article ul,
+.prose-article ol {
+    padding-left: 1.5em;
+    margin-bottom: 1.5em;
+}
+
+/* Tailwind preflight removes list markers, so restore them for article content. */
+.prose-article ul {
+    list-style-type: disc;
+}
+
+.prose-article ol {
+    list-style-type: decimal;
+}
+
+.prose-article ul ul {
+    list-style-type: circle;
+}
+
+.prose-article ul ul ul {
+    list-style-type: square;
+}
+
+.prose-article ol ol {
+    list-style-type: lower-alpha;
+}
+
+.prose-article ol ol ol {
+    list-style-type: lower-roman;
+}
+
+.prose-article li {
+    margin-bottom: 0.5em;
+}
+
+/* Tighten the gap between a list and the heading that follows it. */
+.prose-article :is(ul, ol):has(+ :is(h1, h2, h3, h4)) {
+    margin-bottom: 0.5em;
+}
+
+.prose-article :is(ul, ol) + :is(h1, h2, h3, h4) {
+    margin-top: 1em;
+}
+
+.prose-article code {
+    font-family: var(--font-mono);
+    background-color: var(--color-accent-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    font-size: 0.875em;
+}
+
+.prose-article pre {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 1.25em;
+    overflow-x: auto;
+    margin: 1.5em 0;
+    position: relative;
+}
+
+.prose-article pre code {
+    background: none;
+    padding: 0;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+/* hljs theme (bundled via app.js) must not override article code block styling */
+html .prose-article pre code.hljs {
+    background: none;
+    padding: 0;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+.prose-article table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5em 0;
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+}
+
+.prose-article th,
+.prose-article td {
+    border: 1px solid var(--color-border);
+    padding: 0.75em 1em;
+    text-align: left;
+}
+
+.prose-article th {
+    background-color: var(--color-accent-bg);
+    font-weight: 600;
+}
+
+/* ===== Admin article editor ===== */
+.article-editor .ProseMirror img {
+    max-width: 100%;
+    border-radius: var(--radius-md);
+}
+
+.article-editor .ProseMirror img.ProseMirror-selectednode {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+.article-editor .ProseMirror img:not([height]):not([style*="height"]) {
+    height: auto;
+}
+
+/* ===== Callout blocks ===== */
+.callout {
+    border-radius: var(--radius-md);
+    padding: 1em 1.25em;
+    margin: 1.5em 0;
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    display: flex;
+    gap: 0.75em;
+    align-items: flex-start;
+}
+
+.callout-info {
+    background-color: var(--color-accent-bg);
+    border-left: 3px solid var(--color-accent);
+}
+
+.callout-warning {
+    background-color: rgba(217, 119, 6, 0.1);
+    border-left: 3px solid var(--color-warning);
+}
+
+.callout-tip {
+    background-color: rgba(5, 150, 105, 0.1);
+    border-left: 3px solid var(--color-success);
+}
+
+.callout-danger {
+    background-color: rgba(220, 38, 38, 0.1);
+    border-left: 3px solid var(--color-error);
+}
+
+/* ===== Code block copy button ===== */
+.code-block-wrapper {
+    position: relative;
+}
+
+.copy-button {
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    padding: 0.35em 0.6em;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s, background-color 0.2s;
+}
+
+.code-block-wrapper:hover .copy-button {
+    opacity: 1;
+}
+
+.copy-button:hover {
+    background-color: var(--color-accent-bg);
+    color: var(--color-accent);
+}
+
+/* ===== Heading anchor links ===== */
+.heading-anchor {
+    opacity: 0;
+    margin-left: 0.5em;
+    color: var(--color-accent);
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+h1:hover .heading-anchor,
+h2:hover .heading-anchor,
+h3:hover .heading-anchor,
+h4:hover .heading-anchor {
+    opacity: 1;
+}
+
+/* ===== Animations ===== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse-subtle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-slide-down {
+    animation: slideDown 0.3s ease-out forwards;
+}
+
+/* ===== Staggered animation ===== */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+.stagger-6 { animation-delay: 0.6s; }
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-muted);
+}
+
+/* ===== Toast ===== */
+.toast-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.toast {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    animation: slideDown 0.3s ease-out;
+    font-size: 0.875rem;
+    max-width: 360px;
+}
+
+.toast-success { border-left: 3px solid var(--color-success); }
+.toast-error { border-left: 3px solid var(--color-error); }
+.toast-warning { border-left: 3px solid var(--color-warning); }
+.toast-info { border-left: 3px solid var(--color-accent); }
+
+/* ===== Admin specific ===== */
+.admin-sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background-color: var(--color-surface);
+    border-right: 1px solid var(--color-border);
+    transition: transform 0.3s ease;
+}
+
+@media (max-width: 1024px) {
+    .admin-sidebar {
+        position: fixed;
+        z-index: 50;
+        transform: translateX(-100%);
+    }
+    .admin-sidebar.open {
+        transform: translateX(0);
+    }
+}
+
+/* ===== Focus styles ===== */
+:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+/* ===== Selection ===== */
+::selection {
+    background-color: var(--color-accent-bg);
+    color: var(--color-accent);
+}
