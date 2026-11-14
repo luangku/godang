@@ -41,11 +41,11 @@
 
 Godang adalah aplikasi blog dengan dua “wajah”:
 
-| Bagian | Teknologi | URL | Karakter |
-|---|---|---|---|
+| Bagian       | Teknologi                      | URL                          | Karakter                                              |
+| ------------ | ------------------------------ | ---------------------------- | ----------------------------------------------------- |
 | Situs publik | Laravel Blade + Tailwind CSS 4 | `/`, `/blog`, `/about`, dst. | Server-side rendering, SEO-friendly, bahasa Indonesia |
-| Panel admin | React 19 SPA di dalam Laravel | `/admin/...` | Client-side routing, terautentikasi sesi |
-| API | Laravel JSON API | `/api/...` | Dipakai admin SPA, sekaligus tersedia publik |
+| Panel admin  | React 19 SPA di dalam Laravel  | `/admin/...`                 | Client-side routing, terautentikasi sesi              |
+| API          | Laravel JSON API               | `/api/...`                   | Dipakai admin SPA, sekaligus tersedia publik          |
 
 Fitur utama:
 
@@ -73,56 +73,56 @@ Dokumen pendukung di root:
 
 ### Backend (PHP)
 
-| Paket | Versi terpasang | Peran |
-|---|---|---|
-| PHP | `^8.4.1` (runtime lingkungan: 8.5.12) | Bahasa backend |
-| `laravel/framework` | 13.37.0 | Framework utama |
-| `laravel/sanctum` | 4.3.3 | Autentikasi SPA berbasis sesi |
-| `intervention/image` | 4.4.0 | Konversi dan resize gambar (driver GD) |
-| `laravel/tinker` | 3.0.2 | REPL |
-| `laravel/pint` | 1.32.1 | Formatter PHP |
-| `phpunit/phpunit` | 12.5.40 | Test runner |
-| `laravel/boost` | 2.10.3 | MCP/alat bantu pengembangan (dev) |
-| `laravel/pail` | 1.2.7 | Log viewer (dev) |
-| `laravel/pao` | 1.1.5 | Output test ramah agen (dev) |
+| Paket                | Versi terpasang                       | Peran                                  |
+| -------------------- | ------------------------------------- | -------------------------------------- |
+| PHP                  | `^8.4.1` (runtime lingkungan: 8.5.12) | Bahasa backend                         |
+| `laravel/framework`  | 13.37.0                               | Framework utama                        |
+| `laravel/sanctum`    | 4.3.3                                 | Autentikasi SPA berbasis sesi          |
+| `intervention/image` | 4.4.0                                 | Konversi dan resize gambar (driver GD) |
+| `laravel/tinker`     | 3.0.2                                 | REPL                                   |
+| `laravel/pint`       | 1.32.1                                | Formatter PHP                          |
+| `phpunit/phpunit`    | 12.5.40                               | Test runner                            |
+| `laravel/boost`      | 2.10.3                                | MCP/alat bantu pengembangan (dev)      |
+| `laravel/pail`       | 1.2.7                                 | Log viewer (dev)                       |
+| `laravel/pao`        | 1.1.5                                 | Output test ramah agen (dev)           |
 
 > Transitive dependency: `symfony/mime` 8.1.10 (patch keamanan CVE-2026-45070). Jalankan `composer audit` setelah mengubah dependency.
 
 ### Frontend (JavaScript)
 
-| Paket | Versi | Peran |
-|---|---|---|
-| React / React DOM | 19.3.1 | UI admin |
-| Vite | 8.3.4 | Bundler |
-| Tailwind CSS | 4.3.3 | Styling (via `@tailwindcss/vite`) |
-| `@tanstack/react-query` | 5.104.4 | Data fetching dan cache admin |
-| `react-router-dom` | 7.18.4 | Routing SPA |
-| `zustand` | 5.0.15 | State global (auth) |
-| `axios` | 1.20.0 | HTTP client admin (`follow-redirects` 1.16.2) |
-| `react-hook-form` + `zod` | 7.90 / **4.6.7** | Form dan validasi |
-| `@hookform/resolvers` | 5.9.2 | Resolver zod untuk react-hook-form |
-| `highlight.js` | 11.12.0 | Syntax highlighting artikel publik dan pratinjau admin (Apache dimuat on-demand) |
-| `laravel-vite-plugin` | 3.2.0 | Integrasi Vite–Laravel |
-| `@vitejs/plugin-react` | 6.1.2 | Plugin React untuk Vite |
-| `fontaine` | 0.8.2 (dev) | Metrik fallback font untuk `laravel-vite-plugin/fonts` |
-| `concurrently` | 10.0.6 | Menjalankan proses dev di Windows |
-| `sharp` / `png-to-ico` | 0.35.5 / 3.0.2 | Perkakas pembuatan favicon/ikon (dev) |
-| `@laravel/multiplex` | 0.4.5 (opsional, belum terpasang) | Runner `artisan dev` di Linux/macOS; di Windows `artisan dev` memakai `concurrently` |
+| Paket                     | Versi                             | Peran                                                                                |
+| ------------------------- | --------------------------------- | ------------------------------------------------------------------------------------ |
+| React / React DOM         | 19.3.1                            | UI admin                                                                             |
+| Vite                      | 8.3.4                             | Bundler                                                                              |
+| Tailwind CSS              | 4.3.3                             | Styling (via `@tailwindcss/vite`)                                                    |
+| `@tanstack/react-query`   | 5.104.4                           | Data fetching dan cache admin                                                        |
+| `react-router-dom`        | 7.18.4                            | Routing SPA                                                                          |
+| `zustand`                 | 5.0.15                            | State global (auth)                                                                  |
+| `axios`                   | 1.20.0                            | HTTP client admin (`follow-redirects` 1.16.2)                                        |
+| `react-hook-form` + `zod` | 7.90 / **4.6.7**                  | Form dan validasi                                                                    |
+| `@hookform/resolvers`     | 5.9.2                             | Resolver zod untuk react-hook-form                                                   |
+| `highlight.js`            | 11.12.0                           | Syntax highlighting artikel publik dan pratinjau admin (Apache dimuat on-demand)     |
+| `laravel-vite-plugin`     | 3.2.0                             | Integrasi Vite–Laravel                                                               |
+| `@vitejs/plugin-react`    | 6.1.2                             | Plugin React untuk Vite                                                              |
+| `fontaine`                | 0.8.2 (dev)                       | Metrik fallback font untuk `laravel-vite-plugin/fonts`                               |
+| `concurrently`            | 10.0.6                            | Menjalankan proses dev di Windows                                                    |
+| `sharp` / `png-to-ico`    | 0.35.5 / 3.0.2                    | Perkakas pembuatan favicon/ikon (dev)                                                |
+| `@laravel/multiplex`      | 0.4.5 (opsional, belum terpasang) | Runner `artisan dev` di Linux/macOS; di Windows `artisan dev` memakai `concurrently` |
 
 ### Infrastruktur lokal (dari `.env`)
 
-| Konfigurasi | Nilai |
-|---|---|
-| `APP_URL` | `http://blog.test` |
-| `DB_CONNECTION` | `mysql` (database `blog`) |
-| `SESSION_DRIVER` | `database` |
-| `QUEUE_CONNECTION` | `database` |
-| `CACHE_STORE` | `database` |
-| `MAIL_MAILER` | `log` |
-| `FILESYSTEM_DISK` | `local` — **tetapi kode media selalu memakai disk `public` secara eksplisit** |
-| `SANCTUM_STATEFUL_DOMAINS` | `blog.test,localhost,localhost:8000` |
+| Konfigurasi                | Nilai                                                                         |
+| -------------------------- | ----------------------------------------------------------------------------- |
+| `APP_URL`                  | `http://godang.test`                                                          |
+| `DB_CONNECTION`            | `mysql` (database `blog`)                                                     |
+| `SESSION_DRIVER`           | `database`                                                                    |
+| `QUEUE_CONNECTION`         | `database`                                                                    |
+| `CACHE_STORE`              | `database`                                                                    |
+| `MAIL_MAILER`              | `log`                                                                         |
+| `FILESYSTEM_DISK`          | `local` — **tetapi kode media selalu memakai disk `public` secara eksplisit** |
+| `SANCTUM_STATEFUL_DOMAINS` | `godang.test,localhost,localhost:8000`                                        |
 
-> `.env.example` sudah memakai `APP_URL=http://blog.test` dan database `blog`. Saat setup baru, sesuaikan `APP_URL`, `DB_DATABASE`, dan `SANCTUM_STATEFUL_DOMAINS` dengan domain lokal yang dipakai.
+> `.env.example` sudah memakai `APP_URL=http://godang.test` dan database `blog`. Saat setup baru, sesuaikan `APP_URL`, `DB_DATABASE`, dan `SANCTUM_STATEFUL_DOMAINS` dengan domain lokal yang dipakai.
 
 ---
 
@@ -389,56 +389,56 @@ Total route aplikasi (tanpa vendor): **67 route**.
 
 ### 6.1 Route web publik dan shell
 
-| Method | URI | Name | Handler | Keterangan |
-|---|---|---|---|---|
-| GET | `/` | `home` | `PublicController@landing` | Beranda |
-| GET | `/blog` | `blog.index` | `PublicController@blogIndex` | Daftar artikel + filter |
-| GET | `/blog/{slug}` | `blog.show` | `PublicController@blogShow` | Detail artikel |
-| GET | `/about` | `about` | `PublicController@about` | Halaman statis |
-| GET | `/category/{slug}` | `category.show` | `PublicController@category` | Arsip kategori |
-| GET | `/tag/{slug}` | `tag.show` | `PublicController@tag` | Arsip tag |
-| GET | `/feed.xml` | `seo.feed` | `SeoController@feed` | RSS 20 artikel terbaru; judul & deskripsi dari settings |
-| GET | `/admin/login` | `admin.login` | Closure | Shell SPA, publik; middleware `ShareSiteSettings` |
-| GET | `/admin/reset-password` | `password.reset` | Closure | Shell SPA halaman reset password, publik; middleware `ShareSiteSettings` |
-| GET | `/admin/{path?}` | `admin` | Closure | Shell SPA, middleware `auth` + `admin` + `ShareSiteSettings` |
-| GET | `/storage/{path}` | `storage.file` | `StorageFileController` | Fallback penyajian file media |
-| GET | `/sitemap.xml` | `seo.sitemap` | `SeoController@sitemap` | Sitemap XML |
-| GET | `/robots.txt` | `seo.robots` | `SeoController@robots` | Instruksi crawler |
-| GET | `/{legacyLocale}/{path?}` | `legacy.locale` | Closure | Redirect 301 `/id/*` dan `/en/*` ke URL root; locale lain `404` |
+| Method | URI                       | Name             | Handler                      | Keterangan                                                               |
+| ------ | ------------------------- | ---------------- | ---------------------------- | ------------------------------------------------------------------------ |
+| GET    | `/`                       | `home`           | `PublicController@landing`   | Beranda                                                                  |
+| GET    | `/blog`                   | `blog.index`     | `PublicController@blogIndex` | Daftar artikel + filter                                                  |
+| GET    | `/blog/{slug}`            | `blog.show`      | `PublicController@blogShow`  | Detail artikel                                                           |
+| GET    | `/about`                  | `about`          | `PublicController@about`     | Halaman statis                                                           |
+| GET    | `/category/{slug}`        | `category.show`  | `PublicController@category`  | Arsip kategori                                                           |
+| GET    | `/tag/{slug}`             | `tag.show`       | `PublicController@tag`       | Arsip tag                                                                |
+| GET    | `/feed.xml`               | `seo.feed`       | `SeoController@feed`         | RSS 20 artikel terbaru; judul & deskripsi dari settings                  |
+| GET    | `/admin/login`            | `admin.login`    | Closure                      | Shell SPA, publik; middleware `ShareSiteSettings`                        |
+| GET    | `/admin/reset-password`   | `password.reset` | Closure                      | Shell SPA halaman reset password, publik; middleware `ShareSiteSettings` |
+| GET    | `/admin/{path?}`          | `admin`          | Closure                      | Shell SPA, middleware `auth` + `admin` + `ShareSiteSettings`             |
+| GET    | `/storage/{path}`         | `storage.file`   | `StorageFileController`      | Fallback penyajian file media                                            |
+| GET    | `/sitemap.xml`            | `seo.sitemap`    | `SeoController@sitemap`      | Sitemap XML                                                              |
+| GET    | `/robots.txt`             | `seo.robots`     | `SeoController@robots`       | Instruksi crawler                                                        |
+| GET    | `/{legacyLocale}/{path?}` | `legacy.locale`  | Closure                      | Redirect 301 `/id/*` dan `/en/*` ke URL root; locale lain `404`          |
 
 Halaman publik dan `feed.xml` memakai middleware `ShareSiteSettings` yang membagikan `$site` ke view; `/sitemap.xml`, `/robots.txt`, dan `/storage/{path}` tidak memerlukannya. Route redirect legacy didaftarkan paling akhir agar tidak menabrak route nyata.
 
 ### 6.2 Route admin SPA (React Router)
 
-| Path | Komponen | Fungsi |
-|---|---|---|
-| `/admin/login` | `Login` | Form login |
-| `/admin/reset-password` | `ResetPassword` | Form reset password dengan token dari email |
-| `/admin` | `Dashboard` | Statistik dan aktivitas terbaru |
-| `/admin/posts` | `Posts` | Daftar artikel, filter, bulk action |
-| `/admin/posts/trash` | `Trash` | Artikel terhapus, restore / hapus permanen |
-| `/admin/posts/create` | `PostForm` | Buat artikel |
-| `/admin/posts/:id/edit` | `PostForm` | Edit artikel |
-| `/admin/posts/:id/view` | `PostView` | Pratinjau artikel bergaya blog (Daftar Isi + moderasi komentar) |
-| `/admin/comments` | `Comments` | Moderasi komentar |
-| `/admin/categories` | `Categories` | CRUD kategori |
-| `/admin/tags` | `Tags` | CRUD tag |
-| `/admin/media` | `Media` | Unggah, cari, filter folder/kategori, kategori kustom, salin URL, trash |
-| `/admin/media/trash` | `MediaTrash` | Media terhapus, restore / hapus permanen massal |
-| `/admin/settings` | `Settings` | Pengaturan situs (tab Umum, Profil & About, Komentar) |
-| `*` | — | Redirect ke `/admin` |
+| Path                    | Komponen        | Fungsi                                                                  |
+| ----------------------- | --------------- | ----------------------------------------------------------------------- |
+| `/admin/login`          | `Login`         | Form login                                                              |
+| `/admin/reset-password` | `ResetPassword` | Form reset password dengan token dari email                             |
+| `/admin`                | `Dashboard`     | Statistik dan aktivitas terbaru                                         |
+| `/admin/posts`          | `Posts`         | Daftar artikel, filter, bulk action                                     |
+| `/admin/posts/trash`    | `Trash`         | Artikel terhapus, restore / hapus permanen                              |
+| `/admin/posts/create`   | `PostForm`      | Buat artikel                                                            |
+| `/admin/posts/:id/edit` | `PostForm`      | Edit artikel                                                            |
+| `/admin/posts/:id/view` | `PostView`      | Pratinjau artikel bergaya blog (Daftar Isi + moderasi komentar)         |
+| `/admin/comments`       | `Comments`      | Moderasi komentar                                                       |
+| `/admin/categories`     | `Categories`    | CRUD kategori                                                           |
+| `/admin/tags`           | `Tags`          | CRUD tag                                                                |
+| `/admin/media`          | `Media`         | Unggah, cari, filter folder/kategori, kategori kustom, salin URL, trash |
+| `/admin/media/trash`    | `MediaTrash`    | Media terhapus, restore / hapus permanen massal                         |
+| `/admin/settings`       | `Settings`      | Pengaturan situs (tab Umum, Profil & About, Komentar)                   |
+| `*`                     | —               | Redirect ke `/admin`                                                    |
 
 ### 6.3 API publik
 
-| Method | URI | Name | Keterangan |
-|---|---|---|---|
-| GET | `/api/posts` | `api.posts.index` | Artikel published; filter `q`, `category`, `tag`, `per_page` |
-| GET | `/api/posts/{slug}` | `api.posts.show` | Detail artikel published berdasarkan slug |
-| GET | `/api/posts/{post}/comments` | `api.comments.index` | Komentar approved (root + replies) |
-| POST | `/api/posts/{post}/comments` | `api.comments.store` | Kirim komentar; throttle `6,1` |
-| GET | `/api/categories` | `api.categories.index` | Semua kategori + jumlah artikel published |
-| GET | `/api/tags` | `api.tags.index` | Semua tag + jumlah artikel published |
-| GET | `/api/site/settings` | `api.site.settings` | Pengaturan publik untuk branding login/admin (site_title, site_logo, site_logo_dark, site_logo_alt) |
+| Method | URI                          | Name                   | Keterangan                                                                                          |
+| ------ | ---------------------------- | ---------------------- | --------------------------------------------------------------------------------------------------- |
+| GET    | `/api/posts`                 | `api.posts.index`      | Artikel published; filter `q`, `category`, `tag`, `per_page`                                        |
+| GET    | `/api/posts/{slug}`          | `api.posts.show`       | Detail artikel published berdasarkan slug                                                           |
+| GET    | `/api/posts/{post}/comments` | `api.comments.index`   | Komentar approved (root + replies)                                                                  |
+| POST   | `/api/posts/{post}/comments` | `api.comments.store`   | Kirim komentar; throttle `6,1`                                                                      |
+| GET    | `/api/categories`            | `api.categories.index` | Semua kategori + jumlah artikel published                                                           |
+| GET    | `/api/tags`                  | `api.tags.index`       | Semua tag + jumlah artikel published                                                                |
+| GET    | `/api/site/settings`         | `api.site.settings`    | Pengaturan publik untuk branding login/admin (site_title, site_logo, site_logo_dark, site_logo_alt) |
 
 Catatan: `{post}` pada komentar di-resolve sebagai **ID** (route model binding), sedangkan `{slug}` pada artikel adalah slug.
 
@@ -446,13 +446,13 @@ Slug artikel unik secara global karena hanya ada satu bahasa.
 
 ### 6.4 API autentikasi
 
-| Method | URI | Name | Middleware | Keterangan |
-|---|---|---|---|---|
-| POST | `/api/auth/login` | `api.auth.login` | `throttle:login` | Login admin (email + password, wajib token Turnstile bila dikonfigurasi) |
-| POST | `/api/auth/forgot-password` | `api.auth.forgot-password` | — | Kirim link reset password (Password Broker) |
-| POST | `/api/auth/reset-password` | `api.auth.reset-password` | — | Reset password dengan token |
-| POST | `/api/auth/logout` | `api.auth.logout` | `auth:sanctum` | Logout |
-| GET | `/api/auth/me` | `api.auth.me` | `auth:sanctum` | User aktif |
+| Method | URI                         | Name                       | Middleware       | Keterangan                                                               |
+| ------ | --------------------------- | -------------------------- | ---------------- | ------------------------------------------------------------------------ |
+| POST   | `/api/auth/login`           | `api.auth.login`           | `throttle:login` | Login admin (email + password, wajib token Turnstile bila dikonfigurasi) |
+| POST   | `/api/auth/forgot-password` | `api.auth.forgot-password` | —                | Kirim link reset password (Password Broker)                              |
+| POST   | `/api/auth/reset-password`  | `api.auth.reset-password`  | —                | Reset password dengan token                                              |
+| POST   | `/api/auth/logout`          | `api.auth.logout`          | `auth:sanctum`   | Logout                                                                   |
+| GET    | `/api/auth/me`              | `api.auth.me`              | `auth:sanctum`   | User aktif                                                               |
 
 Rate limiter `login`: **5 percobaan/menit**, key = `email + IP`.
 
@@ -460,41 +460,41 @@ Rate limiter `login`: **5 percobaan/menit**, key = `email + IP`.
 
 Semua route di bawah middleware `auth:sanctum` + `admin`, prefix `/api/admin`, name prefix `api.admin.`.
 
-| Method | URI | Aksi |
-|---|---|---|
-| GET | `/dashboard` | Statistik dashboard |
-| GET | `/posts` | Daftar semua artikel (termasuk draft; `trashed=1` untuk trash) |
-| POST | `/posts` | Buat artikel |
-| GET | `/posts/{post}` | Detail artikel (termasuk yang soft-deleted) |
-| PUT/PATCH | `/posts/{post}` | Update artikel |
-| DELETE | `/posts/{post}` | Soft delete (`?force=1` untuk permanen) |
-| POST | `/posts/bulk-delete` | Hapus massal (`force` opsional) |
-| POST | `/posts/{post}/restore` | Restore artikel dari trash |
-| GET/POST | `/categories` | List / buat kategori |
-| GET/PUT/DELETE | `/categories/{category}` | Detail / update / hapus kategori |
-| GET/POST | `/tags` | List / buat tag |
-| GET/PUT/DELETE | `/tags/{tag}` | Detail / update / hapus tag |
-| GET | `/comments` | List komentar (default hanya root) |
-| POST | `/comments` | Komentar baru sebagai admin |
-| PATCH | `/comments/{comment}` | Approve |
-| PUT | `/comments/{comment}` | Edit isi komentar |
-| PATCH | `/comments/{comment}/spam` | Tandai spam (beserta balasannya) |
-| POST | `/comments/{comment}/reply` | Balas sebagai admin |
-| DELETE | `/comments/{comment}` | Hapus komentar + balasannya |
-| POST | `/comments/bulk-delete` | Hapus massal |
-| GET | `/media` | List media dengan filter `type` (`image` default / `file`), `trashed`, `unused`, `folder`/`other`, `category`/`none`, `q`, `sort`, `per_page` 1–50; respons menyertakan `usage_count`, `usage_labels`, `folders`, `categories`, `uncategorized_count`, `unused_count`, `type` (data gambar dan file tidak pernah tercampur) |
-| POST | `/media` | Upload media: `type=image` (default) → maks. 5 MB, WebP asli ≤1600 px + thumbnail ≤480 px; `type=file` → maks. 10 MB, ekstensi/MIME dari allowlist, disimpan apa adanya di `files/` |
-| PATCH | `/media/{media}` | Ubah `alt_text` dan/atau kategori media |
-| DELETE | `/media/{media}` | Pindahkan media ke sampah (soft delete) |
-| POST | `/media/{media}/restore` | Pulihkan media dari sampah |
-| DELETE | `/media/{media}/force` | Hapus permanen; **409** + `usage` bila masih direferensikan |
-| POST | `/media/bulk-delete` | Pindahkan banyak media ke sampah |
-| POST | `/media/bulk-restore` | Pulihkan banyak media |
-| POST | `/media/bulk-force-delete` | Hapus permanen massal; **409** + `blocked` bila ada yang masih dipakai |
-| GET/POST | `/media-categories` | List / buat kategori media |
-| PATCH/DELETE | `/media-categories/{mediaCategory}` | Ubah / hapus kategori media |
-| GET | `/settings` | Ambil semua settings |
-| PUT | `/settings` | Update batch settings |
+| Method         | URI                                 | Aksi                                                                                                                                                                                                                                                                                                                        |
+| -------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET            | `/dashboard`                        | Statistik dashboard                                                                                                                                                                                                                                                                                                         |
+| GET            | `/posts`                            | Daftar semua artikel (termasuk draft; `trashed=1` untuk trash)                                                                                                                                                                                                                                                              |
+| POST           | `/posts`                            | Buat artikel                                                                                                                                                                                                                                                                                                                |
+| GET            | `/posts/{post}`                     | Detail artikel (termasuk yang soft-deleted)                                                                                                                                                                                                                                                                                 |
+| PUT/PATCH      | `/posts/{post}`                     | Update artikel                                                                                                                                                                                                                                                                                                              |
+| DELETE         | `/posts/{post}`                     | Soft delete (`?force=1` untuk permanen)                                                                                                                                                                                                                                                                                     |
+| POST           | `/posts/bulk-delete`                | Hapus massal (`force` opsional)                                                                                                                                                                                                                                                                                             |
+| POST           | `/posts/{post}/restore`             | Restore artikel dari trash                                                                                                                                                                                                                                                                                                  |
+| GET/POST       | `/categories`                       | List / buat kategori                                                                                                                                                                                                                                                                                                        |
+| GET/PUT/DELETE | `/categories/{category}`            | Detail / update / hapus kategori                                                                                                                                                                                                                                                                                            |
+| GET/POST       | `/tags`                             | List / buat tag                                                                                                                                                                                                                                                                                                             |
+| GET/PUT/DELETE | `/tags/{tag}`                       | Detail / update / hapus tag                                                                                                                                                                                                                                                                                                 |
+| GET            | `/comments`                         | List komentar (default hanya root)                                                                                                                                                                                                                                                                                          |
+| POST           | `/comments`                         | Komentar baru sebagai admin                                                                                                                                                                                                                                                                                                 |
+| PATCH          | `/comments/{comment}`               | Approve                                                                                                                                                                                                                                                                                                                     |
+| PUT            | `/comments/{comment}`               | Edit isi komentar                                                                                                                                                                                                                                                                                                           |
+| PATCH          | `/comments/{comment}/spam`          | Tandai spam (beserta balasannya)                                                                                                                                                                                                                                                                                            |
+| POST           | `/comments/{comment}/reply`         | Balas sebagai admin                                                                                                                                                                                                                                                                                                         |
+| DELETE         | `/comments/{comment}`               | Hapus komentar + balasannya                                                                                                                                                                                                                                                                                                 |
+| POST           | `/comments/bulk-delete`             | Hapus massal                                                                                                                                                                                                                                                                                                                |
+| GET            | `/media`                            | List media dengan filter `type` (`image` default / `file`), `trashed`, `unused`, `folder`/`other`, `category`/`none`, `q`, `sort`, `per_page` 1–50; respons menyertakan `usage_count`, `usage_labels`, `folders`, `categories`, `uncategorized_count`, `unused_count`, `type` (data gambar dan file tidak pernah tercampur) |
+| POST           | `/media`                            | Upload media: `type=image` (default) → maks. 5 MB, WebP asli ≤1600 px + thumbnail ≤480 px; `type=file` → maks. 10 MB, ekstensi/MIME dari allowlist, disimpan apa adanya di `files/`                                                                                                                                         |
+| PATCH          | `/media/{media}`                    | Ubah `alt_text` dan/atau kategori media                                                                                                                                                                                                                                                                                     |
+| DELETE         | `/media/{media}`                    | Pindahkan media ke sampah (soft delete)                                                                                                                                                                                                                                                                                     |
+| POST           | `/media/{media}/restore`            | Pulihkan media dari sampah                                                                                                                                                                                                                                                                                                  |
+| DELETE         | `/media/{media}/force`              | Hapus permanen; **409** + `usage` bila masih direferensikan                                                                                                                                                                                                                                                                 |
+| POST           | `/media/bulk-delete`                | Pindahkan banyak media ke sampah                                                                                                                                                                                                                                                                                            |
+| POST           | `/media/bulk-restore`               | Pulihkan banyak media                                                                                                                                                                                                                                                                                                       |
+| POST           | `/media/bulk-force-delete`          | Hapus permanen massal; **409** + `blocked` bila ada yang masih dipakai                                                                                                                                                                                                                                                      |
+| GET/POST       | `/media-categories`                 | List / buat kategori media                                                                                                                                                                                                                                                                                                  |
+| PATCH/DELETE   | `/media-categories/{mediaCategory}` | Ubah / hapus kategori media                                                                                                                                                                                                                                                                                                 |
+| GET            | `/settings`                         | Ambil semua settings                                                                                                                                                                                                                                                                                                        |
+| PUT            | `/settings`                         | Update batch settings                                                                                                                                                                                                                                                                                                       |
 
 Catatan komentar admin: `POST /comments` dan `POST /comments/{comment}/reply` menyimpan `name = Setting::authorName()` (nama author dari Settings) dengan `is_author = true`, dan komentar langsung `approved`. `PUT /comments/{comment}` hanya mengubah `body`.
 
@@ -502,25 +502,25 @@ Catatan komentar admin: `POST /comments` dan `POST /comments/{comment}/reply` me
 
 ## 7. Peta Controller
 
-| Controller | Tanggung jawab | Model utama |
-|---|---|---|
-| `PublicController` | Render 6 halaman publik + filter/paginasi | `Post`, `Category`, `Tag` |
-| `SeoController` | Sitemap, robots, RSS | `Post`, `Category`, `Tag` |
-| `StorageFileController` | Sajikan file `uploads/`, `cover/`, `avatar/`, dan `files/` bila symlink tidak tersedia | `Storage` |
-| `Api\AuthController` | Login/logout/me, forgot/reset password berbasis sesi | `User` |
-| `Api\SiteController` | Pengaturan publik untuk branding login/admin | `Setting` |
-| `Api\PostController` | API artikel publik | `Post` |
-| `Api\CommentController` | List & kirim komentar publik, notifikasi | `Comment`, `Setting`, `User` |
-| `Api\CategoryController` | List kategori publik | `Category` |
-| `Api\TagController` | List tag publik | `Tag` |
-| `Api\Admin\DashboardController` | Agregasi statistik | `Post`, `Comment` |
-| `Api\Admin\PostController` | CRUD, restore, force delete, bulk delete | `Post`, `Tag` |
-| `Api\Admin\CommentController` | Moderasi dan balasan admin | `Comment` |
-| `Api\Admin\CategoryController` | CRUD kategori | `Category` |
-| `Api\Admin\TagController` | CRUD tag | `Tag` |
-| `Api\Admin\MediaController` | Upload gambar (WebP + thumbnail) dan file non-gambar (allowlist, maks. 10 MB), list per `type` dengan filter/usage, update metadata, trash/restore/force-delete, kategori | `Media`, `MediaCategory`, `Post`, `Setting` |
-| `Api\Admin\MediaCategoryController` | CRUD kategori media kustom | `MediaCategory` |
-| `Api\Admin\SettingController` | Baca/tulis settings: whitelist key, validasi URL/boolean/panjang | `Setting` |
+| Controller                          | Tanggung jawab                                                                                                                                                            | Model utama                                 |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| `PublicController`                  | Render 6 halaman publik + filter/paginasi                                                                                                                                 | `Post`, `Category`, `Tag`                   |
+| `SeoController`                     | Sitemap, robots, RSS                                                                                                                                                      | `Post`, `Category`, `Tag`                   |
+| `StorageFileController`             | Sajikan file `uploads/`, `cover/`, `avatar/`, dan `files/` bila symlink tidak tersedia                                                                                    | `Storage`                                   |
+| `Api\AuthController`                | Login/logout/me, forgot/reset password berbasis sesi                                                                                                                      | `User`                                      |
+| `Api\SiteController`                | Pengaturan publik untuk branding login/admin                                                                                                                              | `Setting`                                   |
+| `Api\PostController`                | API artikel publik                                                                                                                                                        | `Post`                                      |
+| `Api\CommentController`             | List & kirim komentar publik, notifikasi                                                                                                                                  | `Comment`, `Setting`, `User`                |
+| `Api\CategoryController`            | List kategori publik                                                                                                                                                      | `Category`                                  |
+| `Api\TagController`                 | List tag publik                                                                                                                                                           | `Tag`                                       |
+| `Api\Admin\DashboardController`     | Agregasi statistik                                                                                                                                                        | `Post`, `Comment`                           |
+| `Api\Admin\PostController`          | CRUD, restore, force delete, bulk delete                                                                                                                                  | `Post`, `Tag`                               |
+| `Api\Admin\CommentController`       | Moderasi dan balasan admin                                                                                                                                                | `Comment`                                   |
+| `Api\Admin\CategoryController`      | CRUD kategori                                                                                                                                                             | `Category`                                  |
+| `Api\Admin\TagController`           | CRUD tag                                                                                                                                                                  | `Tag`                                       |
+| `Api\Admin\MediaController`         | Upload gambar (WebP + thumbnail) dan file non-gambar (allowlist, maks. 10 MB), list per `type` dengan filter/usage, update metadata, trash/restore/force-delete, kategori | `Media`, `MediaCategory`, `Post`, `Setting` |
+| `Api\Admin\MediaCategoryController` | CRUD kategori media kustom                                                                                                                                                | `MediaCategory`                             |
+| `Api\Admin\SettingController`       | Baca/tulis settings: whitelist key, validasi URL/boolean/panjang                                                                                                          | `Setting`                                   |
 
 Prinsip umum controller:
 
@@ -535,16 +535,16 @@ Prinsip umum controller:
 
 ### 8.1 Ringkasan model
 
-| Model | Tabel | Fitur penting |
-|---|---|---|
-| `User` | `users` | `HasApiTokens`, `CanResetPassword`, `Notifiable`, cast `is_admin` boolean, relasi `posts` |
-| `Post` | `posts` | `SoftDeletes`, scope `published`, accessor `cover_url`/`og_url`, auto slug + reading time |
-| `Category` | `categories` | `name` string biasa, relasi `posts` |
-| `Tag` | `tags` | `name` string biasa, relasi many-to-many `posts` |
-| `Comment` | `comments` | Relasi `post`, `parent`, `replies`; scope `approved`/`pending`/`rootComments`; accessor `name` menampilkan `Setting::authorName()` untuk komentar `is_author`; field sensitif disembunyikan |
-| `Media` | `media` | `SoftDeletes`, `type` (`image`/`file`), scope `images()`/`files()`, accessor `url`/`thumb_url`/`download_name`, kategori kustom, normalisasi path statis (`diskPath`, `isExternalUrl`), `thumbnailPathFor()` |
-| `MediaCategory` | `media_categories` | Kategori media kustom; relasi `media`; nama unik |
-| `Setting` | `settings` | Key-value dengan `getValue`/`setValue`, `authorName()`, `DEFAULTS` (23 key), dan `allValues()` |
+| Model           | Tabel              | Fitur penting                                                                                                                                                                                                |
+| --------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `User`          | `users`            | `HasApiTokens`, `CanResetPassword`, `Notifiable`, cast `is_admin` boolean, relasi `posts`                                                                                                                    |
+| `Post`          | `posts`            | `SoftDeletes`, scope `published`, accessor `cover_url`/`og_url`, auto slug + reading time                                                                                                                    |
+| `Category`      | `categories`       | `name` string biasa, relasi `posts`                                                                                                                                                                          |
+| `Tag`           | `tags`             | `name` string biasa, relasi many-to-many `posts`                                                                                                                                                             |
+| `Comment`       | `comments`         | Relasi `post`, `parent`, `replies`; scope `approved`/`pending`/`rootComments`; accessor `name` menampilkan `Setting::authorName()` untuk komentar `is_author`; field sensitif disembunyikan                  |
+| `Media`         | `media`            | `SoftDeletes`, `type` (`image`/`file`), scope `images()`/`files()`, accessor `url`/`thumb_url`/`download_name`, kategori kustom, normalisasi path statis (`diskPath`, `isExternalUrl`), `thumbnailPathFor()` |
+| `MediaCategory` | `media_categories` | Kategori media kustom; relasi `media`; nama unik                                                                                                                                                             |
+| `Setting`       | `settings`         | Key-value dengan `getValue`/`setValue`, `authorName()`, `DEFAULTS` (23 key), dan `allValues()`                                                                                                               |
 
 ### 8.2 Diagram relasi
 
@@ -580,35 +580,35 @@ Detail penting:
 
 ### 8.3 Scope dan method `Post`
 
-| Nama | Jenis | Perilaku |
-|---|---|---|
-| `published()` | Scope | `status = published` **dan** `published_at <= now()` **dan** tidak null |
-| `coverImageUrl()` | Method | URL absolut cover; mendukung path relatif, legacy `storage/...`, URL `/storage/...`, dan URL eksternal |
-| `ogImageUrl()` | Method | Sama seperti cover untuk OG image |
-| `cover_url`, `og_url` | Appended accessor | Otomatis ikut di JSON |
-| `isPublished()` | Method | Cek visibilitas saat ini |
-| `booted()->saving` | Hook | Auto-generate slug dari judul; hitung `reading_time = ceil(kata/200)`, minimal 1 |
+| Nama                  | Jenis             | Perilaku                                                                                               |
+| --------------------- | ----------------- | ------------------------------------------------------------------------------------------------------ |
+| `published()`         | Scope             | `status = published` **dan** `published_at <= now()` **dan** tidak null                                |
+| `coverImageUrl()`     | Method            | URL absolut cover; mendukung path relatif, legacy `storage/...`, URL `/storage/...`, dan URL eksternal |
+| `ogImageUrl()`        | Method            | Sama seperti cover untuk OG image                                                                      |
+| `cover_url`, `og_url` | Appended accessor | Otomatis ikut di JSON                                                                                  |
+| `isPublished()`       | Method            | Cek visibilitas saat ini                                                                               |
+| `booted()->saving`    | Hook              | Auto-generate slug dari judul; hitung `reading_time = ceil(kata/200)`, minimal 1                       |
 
 ### 8.4 Normalisasi media (`Media::diskPath`)
 
-| Nilai tersimpan | Hasil `diskPath` | URL akhir |
-|---|---|---|
-| `uploads/a.webp` | `uploads/a.webp` | `{APP_URL}/storage/uploads/a.webp` |
-| `/uploads/a.webp` | `uploads/a.webp` | idem |
-| `storage/uploads/a.webp` | `uploads/a.webp` | idem |
-| `http://blog.test/storage/uploads/a.webp` | `uploads/a.webp` | idem |
-| `https://cdn.example.com/a.jpg` | `null` (eksternal) | URL asli dipertahankan |
-| `null` / string kosong | `null` | `null` |
+| Nilai tersimpan                             | Hasil `diskPath`   | URL akhir                          |
+| ------------------------------------------- | ------------------ | ---------------------------------- |
+| `uploads/a.webp`                            | `uploads/a.webp`   | `{APP_URL}/storage/uploads/a.webp` |
+| `/uploads/a.webp`                           | `uploads/a.webp`   | idem                               |
+| `storage/uploads/a.webp`                    | `uploads/a.webp`   | idem                               |
+| `http://godang.test/storage/uploads/a.webp` | `uploads/a.webp`   | idem                               |
+| `https://cdn.example.com/a.jpg`             | `null` (eksternal) | URL asli dipertahankan             |
+| `null` / string kosong                      | `null`             | `null`                             |
 
 ### 8.5 Settings sebagai sumber konten publik
 
-| Method | Perilaku |
-|---|---|
-| `Setting::DEFAULTS` | 23 nilai default untuk seluruh key yang dikenal aplikasi |
-| `Setting::allValues()` | `array_merge(DEFAULTS, nilai DB)`; key yang belum tersimpan tetap tampil dengan default |
-| `Setting::authorName()` | Nama penulis dari `author_name` (di-trim, fallback `Godang`); dipakai accessor `Comment::name` untuk komentar author |
-| `Media::urlFor($path)` | Mengubah path media/URL eksternal menjadi URL absolut (dipakai avatar, logo & accessor `url`) |
-| `Media::thumbnailPathFor($path)` | Menurunkan nama file thumbnail (`...-thumb.webp`) dari path asli |
+| Method                           | Perilaku                                                                                                             |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `Setting::DEFAULTS`              | 23 nilai default untuk seluruh key yang dikenal aplikasi                                                             |
+| `Setting::allValues()`           | `array_merge(DEFAULTS, nilai DB)`; key yang belum tersimpan tetap tampil dengan default                              |
+| `Setting::authorName()`          | Nama penulis dari `author_name` (di-trim, fallback `Godang`); dipakai accessor `Comment::name` untuk komentar author |
+| `Media::urlFor($path)`           | Mengubah path media/URL eksternal menjadi URL absolut (dipakai avatar, logo & accessor `url`)                        |
+| `Media::thumbnailPathFor($path)` | Menurunkan nama file thumbnail (`...-thumb.webp`) dari path asli                                                     |
 
 `ShareSiteSettings` memakai method tersebut untuk membentuk `$site`: judul situs, deskripsi, tagline, meta default, logo terang/gelap, link sosial, avatar (path + URL + alt), nama & inisial penulis, serta key profil/About.
 
@@ -620,59 +620,59 @@ Database aktif: **MySQL**, nama `blog` (lihat `.env`; `.env.example` juga memaka
 
 ### 9.1 `users`
 
-| Kolom | Tipe | Catatan |
-|---|---|---|
-| `id` | bigint PK | |
-| `name` | string | |
-| `email` | string unique | |
-| `email_verified_at` | timestamp nullable | |
-| `password` | string | cast `hashed` |
-| `avatar` | string nullable | ditambahkan migrasi profil |
-| `bio` | text nullable | ditambahkan migrasi profil |
-| `is_admin` | boolean default false | penentu akses panel |
-| `remember_token` | string nullable | |
-| `created_at`, `updated_at` | timestamp | |
+| Kolom                      | Tipe                  | Catatan                    |
+| -------------------------- | --------------------- | -------------------------- |
+| `id`                       | bigint PK             |                            |
+| `name`                     | string                |                            |
+| `email`                    | string unique         |                            |
+| `email_verified_at`        | timestamp nullable    |                            |
+| `password`                 | string                | cast `hashed`              |
+| `avatar`                   | string nullable       | ditambahkan migrasi profil |
+| `bio`                      | text nullable         | ditambahkan migrasi profil |
+| `is_admin`                 | boolean default false | penentu akses panel        |
+| `remember_token`           | string nullable       |                            |
+| `created_at`, `updated_at` | timestamp             |                            |
 
 ### 9.2 `categories`
 
-| Kolom | Tipe | Catatan |
-|---|---|---|
-| `id` | bigint PK | |
-| `name` | string(255) | nama kategori (teks biasa) |
-| `slug` | string unique | |
-| `description` | text nullable | deskripsi kategori |
-| `created_at`, `updated_at` | timestamp | |
+| Kolom                      | Tipe          | Catatan                    |
+| -------------------------- | ------------- | -------------------------- |
+| `id`                       | bigint PK     |                            |
+| `name`                     | string(255)   | nama kategori (teks biasa) |
+| `slug`                     | string unique |                            |
+| `description`              | text nullable | deskripsi kategori         |
+| `created_at`, `updated_at` | timestamp     |                            |
 
 ### 9.3 `tags`
 
-| Kolom | Tipe | Catatan |
-|---|---|---|
-| `id` | bigint PK | |
-| `name` | string(255) | nama tag (teks biasa) |
-| `slug` | string unique | |
-| `created_at`, `updated_at` | timestamp | |
+| Kolom                      | Tipe          | Catatan               |
+| -------------------------- | ------------- | --------------------- |
+| `id`                       | bigint PK     |                       |
+| `name`                     | string(255)   | nama tag (teks biasa) |
+| `slug`                     | string unique |                       |
+| `created_at`, `updated_at` | timestamp     |                       |
 
 ### 9.4 `posts`
 
-| Kolom | Tipe | Catatan |
-|---|---|---|
-| `id` | bigint PK | |
-| `user_id` | FK users | cascade delete |
-| `category_id` | FK categories nullable | null on delete |
-| `title` | string | |
-| `slug` | string | unik global |
-| `excerpt` | text nullable | |
-| `content` | longtext nullable | HTML dari editor |
-| `cover_image` | string nullable | path/URL |
-| `og_image` | string nullable | path/URL |
-| `status` | string default `draft` | `draft` / `published` / `scheduled` |
-| `published_at` | timestamp nullable | |
-| `meta_title` | string nullable | |
-| `meta_description` | text nullable | |
-| `reading_time` | unsigned smallint default 0 | menit |
-| `views_count` | unsigned int default 0 | |
-| `deleted_at` | timestamp nullable | soft delete |
-| `created_at`, `updated_at` | timestamp | |
+| Kolom                      | Tipe                        | Catatan                             |
+| -------------------------- | --------------------------- | ----------------------------------- |
+| `id`                       | bigint PK                   |                                     |
+| `user_id`                  | FK users                    | cascade delete                      |
+| `category_id`              | FK categories nullable      | null on delete                      |
+| `title`                    | string                      |                                     |
+| `slug`                     | string                      | unik global                         |
+| `excerpt`                  | text nullable               |                                     |
+| `content`                  | longtext nullable           | HTML dari editor                    |
+| `cover_image`              | string nullable             | path/URL                            |
+| `og_image`                 | string nullable             | path/URL                            |
+| `status`                   | string default `draft`      | `draft` / `published` / `scheduled` |
+| `published_at`             | timestamp nullable          |                                     |
+| `meta_title`               | string nullable             |                                     |
+| `meta_description`         | text nullable               |                                     |
+| `reading_time`             | unsigned smallint default 0 | menit                               |
+| `views_count`              | unsigned int default 0      |                                     |
+| `deleted_at`               | timestamp nullable          | soft delete                         |
+| `created_at`, `updated_at` | timestamp                   |                                     |
 
 Index/constraint:
 
@@ -681,80 +681,80 @@ Index/constraint:
 
 ### 9.5 `comments`
 
-| Kolom | Tipe | Catatan |
-|---|---|---|
-| `id` | bigint PK | |
-| `post_id` | FK posts | cascade delete |
-| `parent_id` | FK comments nullable | cascade delete (self) |
-| `reply_to_name` | string nullable | nama yang dibalas |
-| `name` | string | nama tampilan; untuk `is_author = true`, accessor mengembalikan `author_name` dari Settings |
-| `email` | string | disembunyikan di JSON publik |
-| `body` | text | |
-| `status` | string default `pending` | `pending` / `approved` / `spam` |
-| `is_author` | boolean default false | komentar admin/penulis |
-| `notify_replies` | boolean default false | opt-in notifikasi |
-| `ip_hash` | string nullable | SHA-256 IP |
-| `user_agent` | string nullable | |
-| `created_at`, `updated_at` | timestamp | |
+| Kolom                      | Tipe                     | Catatan                                                                                     |
+| -------------------------- | ------------------------ | ------------------------------------------------------------------------------------------- |
+| `id`                       | bigint PK                |                                                                                             |
+| `post_id`                  | FK posts                 | cascade delete                                                                              |
+| `parent_id`                | FK comments nullable     | cascade delete (self)                                                                       |
+| `reply_to_name`            | string nullable          | nama yang dibalas                                                                           |
+| `name`                     | string                   | nama tampilan; untuk `is_author = true`, accessor mengembalikan `author_name` dari Settings |
+| `email`                    | string                   | disembunyikan di JSON publik                                                                |
+| `body`                     | text                     |                                                                                             |
+| `status`                   | string default `pending` | `pending` / `approved` / `spam`                                                             |
+| `is_author`                | boolean default false    | komentar admin/penulis                                                                      |
+| `notify_replies`           | boolean default false    | opt-in notifikasi                                                                           |
+| `ip_hash`                  | string nullable          | SHA-256 IP                                                                                  |
+| `user_agent`               | string nullable          |                                                                                             |
+| `created_at`, `updated_at` | timestamp                |                                                                                             |
 
 Index: `(post_id, status)`.
 
 ### 9.6 `media`
 
-| Kolom | Tipe | Catatan |
-|---|---|---|
-| `id` | bigint PK | |
-| `path` | string | path relatif disk `public` |
-| `type` | string(10) default `image`, index | `image` atau `file`; index gabungan `(type, deleted_at)` |
-| `original_name` | string nullable | nama file asli dari browser; dipakai `download_name` |
-| `thumb_path` | string nullable | thumbnail WebP ≤480 px untuk gambar; `null` untuk file non-gambar |
-| `folder` | string default `uploads`, index | `uploads` / `cover` / `avatar` / `files`; nilai lama bisa muncul sebagai `other` |
-| `media_category_id` | FK media_categories nullable | null on delete |
-| `alt_text` | string nullable | default nama file asli saat upload |
-| `mime` | string(50) nullable | `image/webp` untuk gambar; MIME asli untuk file non-gambar |
-| `size` | unsigned int | byte |
-| `width`, `height` | unsigned smallint nullable | dimensi gambar setelah diskalakan; `null` untuk file non-gambar |
-| `deleted_at` | timestamp nullable | soft delete (trash) |
-| `created_at`, `updated_at` | timestamp | |
+| Kolom                      | Tipe                              | Catatan                                                                          |
+| -------------------------- | --------------------------------- | -------------------------------------------------------------------------------- |
+| `id`                       | bigint PK                         |                                                                                  |
+| `path`                     | string                            | path relatif disk `public`                                                       |
+| `type`                     | string(10) default `image`, index | `image` atau `file`; index gabungan `(type, deleted_at)`                         |
+| `original_name`            | string nullable                   | nama file asli dari browser; dipakai `download_name`                             |
+| `thumb_path`               | string nullable                   | thumbnail WebP ≤480 px untuk gambar; `null` untuk file non-gambar                |
+| `folder`                   | string default `uploads`, index   | `uploads` / `cover` / `avatar` / `files`; nilai lama bisa muncul sebagai `other` |
+| `media_category_id`        | FK media_categories nullable      | null on delete                                                                   |
+| `alt_text`                 | string nullable                   | default nama file asli saat upload                                               |
+| `mime`                     | string(50) nullable               | `image/webp` untuk gambar; MIME asli untuk file non-gambar                       |
+| `size`                     | unsigned int                      | byte                                                                             |
+| `width`, `height`          | unsigned smallint nullable        | dimensi gambar setelah diskalakan; `null` untuk file non-gambar                  |
+| `deleted_at`               | timestamp nullable                | soft delete (trash)                                                              |
+| `created_at`, `updated_at` | timestamp                         |                                                                                  |
 
 Index: `(type, deleted_at)`, `folder`, `media_category_id`.
 
 ### 9.7 `media_categories`
 
-| Kolom | Tipe | Catatan |
-|---|---|---|
-| `id` | bigint PK | |
-| `name` | string unique | kategori media kustom (bukan multi-bahasa) |
-| `created_at`, `updated_at` | timestamp | |
+| Kolom                      | Tipe          | Catatan                                    |
+| -------------------------- | ------------- | ------------------------------------------ |
+| `id`                       | bigint PK     |                                            |
+| `name`                     | string unique | kategori media kustom (bukan multi-bahasa) |
+| `created_at`, `updated_at` | timestamp     |                                            |
 
 ### 9.8 `settings`
 
-| Kolom | Tipe | Catatan |
-|---|---|---|
-| `id` | bigint PK | |
-| `key` | string unique | |
-| `value` | text nullable | |
-| `created_at`, `updated_at` | timestamp | |
+| Kolom                      | Tipe          | Catatan |
+| -------------------------- | ------------- | ------- |
+| `id`                       | bigint PK     |         |
+| `key`                      | string unique |         |
+| `value`                    | text nullable |         |
+| `created_at`, `updated_at` | timestamp     |         |
 
 Key yang dikenal beserta default-nya didefinisikan di `Setting::DEFAULTS` (23 key). Tidak perlu migrasi baru untuk menambah key; cukup menambahkannya ke `DEFAULTS` dan whitelist admin.
 
 ### 9.9 `post_tag`
 
-| Kolom | Tipe | Catatan |
-|---|---|---|
-| `post_id` | FK posts | cascade delete |
-| `tag_id` | FK tags | cascade delete |
+| Kolom       | Tipe                | Catatan            |
+| ----------- | ------------------- | ------------------ |
+| `post_id`   | FK posts            | cascade delete     |
+| `tag_id`    | FK tags             | cascade delete     |
 | PK komposit | `(post_id, tag_id)` | mencegah duplikasi |
 
 ### 9.10 Tabel framework
 
-| Tabel | Fungsi |
-|---|---|
-| `sessions` | Sesi web (driver `database`) |
-| `cache`, `cache_locks` | Cache (store `database`) |
+| Tabel                                | Fungsi                                                                 |
+| ------------------------------------ | ---------------------------------------------------------------------- |
+| `sessions`                           | Sesi web (driver `database`)                                           |
+| `cache`, `cache_locks`               | Cache (store `database`)                                               |
 | `jobs`, `job_batches`, `failed_jobs` | Antrean (queue `database` lokal; `.env.example` deploy memakai `sync`) |
-| `password_reset_tokens` | Reset password (digunakan untuk forgot/reset password) |
-| `personal_access_tokens` | Token Sanctum (tersedia, tapi SPA memakai cookie sesi) |
+| `password_reset_tokens`              | Reset password (digunakan untuk forgot/reset password)                 |
+| `personal_access_tokens`             | Token Sanctum (tersedia, tapi SPA memakai cookie sesi)                 |
 
 ---
 
@@ -779,7 +779,6 @@ Key yang dikenal beserta default-nya didefinisikan di `Setting::DEFAULTS` (23 ke
 - Nama kategori dan tag disimpan sebagai string biasa.
 - Slug kategori/tag unik global dan tidak diterjemahkan.
 - Halaman kategori menampilkan `description` bila tersedia; jika kosong, memakai teks generik berbahasa Indonesia.
-
 
 ---
 
@@ -830,8 +829,8 @@ status === 'published'
 3. Jika `slug` kosong: `Str::slug(title)` + pengecekan unik (termasuk baris soft-deleted).
 4. Jika status `published` dan `published_at` kosong: diisi `now()`.
 5. Tag diproses:
-   - Angka / objek `{id}` → pakai ID yang ada.
-   - String / objek `{name|value|label}` → cari berdasarkan slug; jika belum ada, buat tag baru.
+    - Angka / objek `{id}` → pakai ID yang ada.
+    - String / objek `{name|value|label}` → cari berdasarkan slug; jika belum ada, buat tag baru.
 6. Simpan post, lalu `tags()->sync()`.
 
 ### 11.3 Update artikel
@@ -844,14 +843,14 @@ status === 'published'
 
 ### 11.4 Soft delete, restore, dan hapus permanen
 
-| Aksi | Endpoint | Perilaku |
-|---|---|---|
-| Soft delete | `DELETE /api/admin/posts/{post}` | `deleted_at` diisi; hilang dari publik dan daftar utama |
-| Hapus permanen | `DELETE ...?force=1` | `forceDelete()` |
-| Bulk soft delete | `POST /api/admin/posts/bulk-delete` | `whereIn(...)->delete()` |
-| Bulk permanent | `POST .../bulk-delete` dengan `force=true` | `forceDelete()` per baris |
-| Restore | `POST /api/admin/posts/{post}/restore` | `restore()` |
-| Lihat trash | `GET /api/admin/posts?trashed=1` | `onlyTrashed()` |
+| Aksi             | Endpoint                                   | Perilaku                                                |
+| ---------------- | ------------------------------------------ | ------------------------------------------------------- |
+| Soft delete      | `DELETE /api/admin/posts/{post}`           | `deleted_at` diisi; hilang dari publik dan daftar utama |
+| Hapus permanen   | `DELETE ...?force=1`                       | `forceDelete()`                                         |
+| Bulk soft delete | `POST /api/admin/posts/bulk-delete`        | `whereIn(...)->delete()`                                |
+| Bulk permanent   | `POST .../bulk-delete` dengan `force=true` | `forceDelete()` per baris                               |
+| Restore          | `POST /api/admin/posts/{post}/restore`     | `restore()`                                             |
+| Lihat trash      | `GET /api/admin/posts?trashed=1`           | `onlyTrashed()`                                         |
 
 Catatan: slug tetap “terpakai” oleh baris soft-deleted karena unique index database dan `uniqueSlug()` memakai `withTrashed()`.
 
@@ -919,14 +918,14 @@ Detail:
 Dua mekanisme:
 
 1. **Junction/symlink** `public/storage` → `storage/app/public`.
-   - Dibuat dengan `php artisan storage:link`.
-   - Web server menyajikan langsung.
+    - Dibuat dengan `php artisan storage:link`.
+    - Web server menyajikan langsung.
 2. **Fallback Laravel** `GET /storage/{path}` → `StorageFileController`.
-   - Dipakai bila symlink tidak tersedia.
-   - Hanya mengizinkan `uploads/...`, `cover/...`, `avatar/...`, atau `files/...` dengan nama file `[A-Za-z0-9._-]+`.
-   - `404` untuk path lain (termasuk subfolder tambahan dan `..`).
-   - Header: `Cache-Control: public, max-age=31536000, immutable` dan `X-Content-Type-Options: nosniff`.
-   - Khusus `files/...`, ditambahkan `Content-Disposition: inline; filename="{nama file di disk}"`.
+    - Dipakai bila symlink tidak tersedia.
+    - Hanya mengizinkan `uploads/...`, `cover/...`, `avatar/...`, atau `files/...` dengan nama file `[A-Za-z0-9._-]+`.
+    - `404` untuk path lain (termasuk subfolder tambahan dan `..`).
+    - Header: `Cache-Control: public, max-age=31536000, immutable` dan `X-Content-Type-Options: nosniff`.
+    - Khusus `files/...`, ditambahkan `Content-Disposition: inline; filename="{nama file di disk}"`.
 
 URL publik dibentuk oleh `Storage::disk('public')->url($path)` → `{APP_URL}/storage/{path}`.
 
@@ -986,11 +985,11 @@ php artisan media:thumbnails --force
 
 Storage media **tidak memerlukan perubahan `.env`**. Disk yang dipakai selalu `public` dan didefinisikan di `config/filesystems.php`:
 
-| Konfigurasi | Nilai |
-|---|---|
-| `root` | `storage/app/public` |
-| `url` | `{APP_URL}/storage` |
-| `visibility` | `public` |
+| Konfigurasi  | Nilai                |
+| ------------ | -------------------- |
+| `root`       | `storage/app/public` |
+| `url`        | `{APP_URL}/storage`  |
+| `visibility` | `public`             |
 
 `FILESYSTEM_DISK` hanya menentukan disk default Laravel untuk kebutuhan lain; kode media selalu memanggil `Storage::disk('public')`. Karena itu nilai `FILESYSTEM_DISK=local` di `.env` tidak memengaruhi media.
 
@@ -999,11 +998,12 @@ Langkah setup:
 1. **Siapkan folder** di `storage/app/public/`: `uploads/`, `cover/`, `avatar/`, dan `files/`. Folder dibuat otomatis saat upload pertama, tetapi membuatnya manual memudahkan pengecekan izin.
 2. **Buat junction/symlink** dari `public/storage` ke `storage/app/public`:
 
-   ```bash
-   php artisan storage:link
-   ```
+    ```bash
+    php artisan storage:link
+    ```
 
-   Di Windows, junction bisa rusak setelah clone ulang. Jika perintah menolak karena link sudah ada, hapus dulu `public/storage`, lalu jalankan ulang.
+    Di Windows, junction bisa rusak setelah clone ulang. Jika perintah menolak karena link sudah ada, hapus dulu `public/storage`, lalu jalankan ulang.
+
 3. **Pastikan izin tulis** untuk web server pada `storage/` (khususnya `storage/app/public`) dan `storage/framework`.
 4. **Pastikan `APP_URL` benar.** URL file dibentuk dari `APP_URL` + `/storage`, jadi `APP_URL` yang salah membuat gambar gagal dimuat meski file ada.
 5. **Verifikasi**: unggah satu gambar di `/admin/media`, lalu buka URL yang disalin (format `{APP_URL}/storage/{folder}/{uuid}.webp`).
@@ -1012,12 +1012,12 @@ Jika `storage:link` tidak tersedia (mis. shared hosting tanpa symlink), file tet
 
 Perbaikan cepat:
 
-| Masalah | Tindakan |
-|---|---|
-| Gambar 404 setelah clone/pindah mesin | `php artisan storage:link` |
-| Path media lama/absolut | `php artisan media:backfill --force --prune-missing` |
-| Thumbnail tidak muncul | `php artisan media:thumbnails` |
-| File tidak bisa diunggah | cek izin `storage/app/public` serta `upload_max_filesize`/`post_max_size` |
+| Masalah                               | Tindakan                                                                  |
+| ------------------------------------- | ------------------------------------------------------------------------- |
+| Gambar 404 setelah clone/pindah mesin | `php artisan storage:link`                                                |
+| Path media lama/absolut               | `php artisan media:backfill --force --prune-missing`                      |
+| Thumbnail tidak muncul                | `php artisan media:thumbnails`                                            |
+| File tidak bisa diunggah              | cek izin `storage/app/public` serta `upload_max_filesize`/`post_max_size` |
 
 Yang tidak boleh di-commit: `public/storage` (junction) dan isi `storage/app/public/uploads|cover|avatar|files` (media pengguna).
 
@@ -1036,13 +1036,13 @@ Alur `POST /api/posts/{post}/comments`:
 3. Tentukan identitas: jika request berasal dari admin (`is_admin = true`), `name`/`email` tidak divalidasi dan diambil dari server; selain itu `name` (max 100) dan `email` wajib. Field `body` (max 2000), `parent_id` (opsional, harus ada), dan `notify_replies` (boolean) selalu divalidasi.
 4. Maksimal **2 link** (`http://`/`https://`) dalam body; lebih dari itu ditolak.
 5. Jika balasan:
-   - Parent harus milik post yang sama.
-   - `reply_to_name` diisi nama parent.
-   - Jika parent adalah balasan, komentar baru di-**re-parent** ke root (`parent_id ?? id`) agar thread tetap dua tingkat.
+    - Parent harus milik post yang sama.
+    - `reply_to_name` diisi nama parent.
+    - Jika parent adalah balasan, komentar baru di-**re-parent** ke root (`parent_id ?? id`) agar thread tetap dua tingkat.
 6. Status:
-   - Komentar admin/author → selalu `approved` dengan `is_author = true`.
-   - `comment_moderation = true` → `pending`
-   - selain itu → `approved`
+    - Komentar admin/author → selalu `approved` dengan `is_author = true`.
+    - `comment_moderation = true` → `pending`
+    - selain itu → `approved`
 7. Simpan `ip_hash = sha256(ip)` dan `user_agent`. Nama yang disimpan untuk komentar admin adalah `Setting::authorName()` (bukan nama akun).
 8. Kirim notifikasi (lihat 13.3). Notifikasi ke admin hanya dipicu komentar pembaca, bukan komentar author.
 9. Response `201` dengan pesan berbahasa Indonesia.
@@ -1058,10 +1058,10 @@ Rate limit: **6 request/menit** per IP (middleware `throttle:6,1`).
 
 ### 13.3 Notifikasi
 
-| Notifikasi | Penerima | Kapan | Kanal |
-|---|---|---|---|
-| `NewCommentNotification` | Semua user `is_admin = true` | Setiap komentar pembaca baru (bukan komentar author), jika `comment_notification` aktif | Mail (queued) |
-| `ReplyToCommentNotification` | Email parent comment | Jika parent `notify_replies = true` | Mail (queued) |
+| Notifikasi                   | Penerima                     | Kapan                                                                                   | Kanal         |
+| ---------------------------- | ---------------------------- | --------------------------------------------------------------------------------------- | ------------- |
+| `NewCommentNotification`     | Semua user `is_admin = true` | Setiap komentar pembaca baru (bukan komentar author), jika `comment_notification` aktif | Mail (queued) |
+| `ReplyToCommentNotification` | Email parent comment         | Jika parent `notify_replies = true`                                                     | Mail (queued) |
 
 Keduanya `ShouldQueue`. Dengan `QUEUE_CONNECTION=database`, email baru benar-benar terkirim setelah queue worker berjalan. `MAIL_MAILER=log` membuat email ditulis ke log, bukan dikirim.
 
@@ -1069,15 +1069,15 @@ Kegagalan pengiriman notifikasi balasan ditangkap (`try/catch`) agar tidak mengg
 
 ### 13.4 Moderasi admin
 
-| Aksi | Endpoint | Efek |
-|---|---|---|
-| List | `GET /api/admin/comments` | Default hanya root; filter `status`, `post_id`, `category_id`; email di-`makeVisible` |
-| Approve | `PATCH /api/admin/comments/{comment}` | `status = approved` |
-| Edit isi | `PUT /api/admin/comments/{comment}` | Update `body` |
-| Spam | `PATCH /api/admin/comments/{comment}/spam` | Spam untuk komentar + semua balasannya |
-| Balas | `POST /api/admin/comments/{comment}/reply` | Komentar baru `is_author = true`, `approved`, nama author |
-| Hapus | `DELETE /api/admin/comments/{comment}` | Hapus balasan lalu komentar |
-| Bulk hapus | `POST /api/admin/comments/bulk-delete` | Hapus balasan lalu komentar terpilih |
+| Aksi       | Endpoint                                   | Efek                                                                                  |
+| ---------- | ------------------------------------------ | ------------------------------------------------------------------------------------- |
+| List       | `GET /api/admin/comments`                  | Default hanya root; filter `status`, `post_id`, `category_id`; email di-`makeVisible` |
+| Approve    | `PATCH /api/admin/comments/{comment}`      | `status = approved`                                                                   |
+| Edit isi   | `PUT /api/admin/comments/{comment}`        | Update `body`                                                                         |
+| Spam       | `PATCH /api/admin/comments/{comment}/spam` | Spam untuk komentar + semua balasannya                                                |
+| Balas      | `POST /api/admin/comments/{comment}/reply` | Komentar baru `is_author = true`, `approved`, nama author                             |
+| Hapus      | `DELETE /api/admin/comments/{comment}`     | Hapus balasan lalu komentar                                                           |
+| Bulk hapus | `POST /api/admin/comments/bulk-delete`     | Hapus balasan lalu komentar terpilih                                                  |
 
 Komentar buatan admin (`store`/`reply`) memakai `Setting::authorName()` untuk `name`, email user admin, `is_author = true`, dan langsung `approved`. Di UI, komentar author menampilkan **Edit** (bukan Spam); balasan tingkat 2 juga punya **Hapus** di `admin/comments`, sedangkan `PostComments` (pratinjau artikel) menyembunyikan Spam untuk komentar author.
 
@@ -1093,9 +1093,12 @@ Komentar buatan admin (`store`/`reply`) memakai `Setting::authorName()` untuk `n
 
 ```js
 axios.create({
-  baseURL: '/api',
-  headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-  withXSRFToken: true,
+    baseURL: "/api",
+    headers: {
+        Accept: "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+    },
+    withXSRFToken: true,
 });
 ```
 
@@ -1113,12 +1116,12 @@ axios.create({
 
 ### 14.2 Lapisan otorisasi
 
-| Lapisan | Lokasi | Fungsi |
-|---|---|---|
-| Kredensial admin | `AuthController@login` | Hanya user `is_admin = true` yang bisa login |
-| Middleware `auth` | route `/admin/{path?}` | Wajib login untuk semua halaman admin selain login |
-| Middleware `admin` | route admin web + seluruh API admin | `EnsureUserIsAdmin` → `403` bila bukan admin |
-| `auth:sanctum` | API admin & auth | Validasi sesi |
+| Lapisan            | Lokasi                              | Fungsi                                             |
+| ------------------ | ----------------------------------- | -------------------------------------------------- |
+| Kredensial admin   | `AuthController@login`              | Hanya user `is_admin = true` yang bisa login       |
+| Middleware `auth`  | route `/admin/{path?}`              | Wajib login untuk semua halaman admin selain login |
+| Middleware `admin` | route admin web + seluruh API admin | `EnsureUserIsAdmin` → `403` bila bukan admin       |
+| `auth:sanctum`     | API admin & auth                    | Validasi sesi                                      |
 
 ### 14.3 Proteksi lain
 
@@ -1137,13 +1140,14 @@ axios.create({
 
 Saat ini aplikasi **tidak memiliki UI** di panel admin untuk mengelola user/admin. Untuk mengganti email dan password akun admin, gunakan salah satu cara berikut:
 
-| Opsi | Kapan dipakai | Langkah |
-|---|---|---|
-| **1. Edit seeder** | Jika ingin reset data dengan `migrate:fresh --seed` | Ubah pembuatan user admin di `database/seeders/DatabaseSeeder.php`. Pastikan password di-hash (bisa pakai `Hash::make()` atau memanfaatkan cast `hashed` pada model `User`). |
-| **2. Gunakan Tinker** | Cepat, tanpa reset database | Jalankan `php artisan tinker`, lalu perbarui user: `User::where('email', 'admin@godang.com')->update(['email' => 'email@baru.com', 'password' => Hash::make('password_baru')]);` |
-| **3. Langsung di database** | Jika tidak ingin pakai Artisan | Update tabel `users` langsung. Pastikan kolom `password` diisi dalam bentuk hash bcrypt/argon yang valid. |
+| Opsi                        | Kapan dipakai                                       | Langkah                                                                                                                                                                          |
+| --------------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1. Edit seeder**          | Jika ingin reset data dengan `migrate:fresh --seed` | Ubah pembuatan user admin di `database/seeders/DatabaseSeeder.php`. Pastikan password di-hash (bisa pakai `Hash::make()` atau memanfaatkan cast `hashed` pada model `User`).     |
+| **2. Gunakan Tinker**       | Cepat, tanpa reset database                         | Jalankan `php artisan tinker`, lalu perbarui user: `User::where('email', 'admin@godang.com')->update(['email' => 'email@baru.com', 'password' => Hash::make('password_baru')]);` |
+| **3. Langsung di database** | Jika tidak ingin pakai Artisan                      | Update tabel `users` langsung. Pastikan kolom `password` diisi dalam bentuk hash bcrypt/argon yang valid.                                                                        |
 
 **Catatan:**
+
 - Akun admin default dibuat oleh `DatabaseSeeder.php` dengan email `admin@godang.com` dan password default dari `UserFactory` (`password`).
 - Model `User` sudah memiliki cast `hashed` untuk kolom `password`, sehingga aman jika diisi dengan string biasa saat menggunakan factory, namun untuk update manual pastikan di-hash.
 - Hanya user dengan `is_admin = true` yang bisa login ke panel admin (lihat [14.1](#141-mekanisme-login) dan [14.2](#142-lapisan-otorisasi)).
@@ -1159,16 +1163,16 @@ Langkah menonaktifkan:
 
 1. Kosongkan kedua key di `.env`:
 
-   ```dotenv
-   TURNSTILE_SITE_KEY=
-   TURNSTILE_SECRET_KEY=
-   ```
+    ```dotenv
+    TURNSTILE_SITE_KEY=
+    TURNSTILE_SECRET_KEY=
+    ```
 
 2. Bersihkan cache config bila pernah di-cache:
 
-   ```bash
-   php artisan config:clear
-   ```
+    ```bash
+    php artisan config:clear
+    ```
 
 3. Muat ulang `/admin/login` (hard refresh). Widget hilang dan login cukup memakai email + password.
 
@@ -1201,11 +1205,11 @@ Setting::allValues();                                  // DEFAULTS + nilai DB
 
 ### 15.2 Key yang dikenal
 
-| Kelompok | Key | Dipakai di |
-|---|---|---|
-| Situs | `site_title`, `site_logo`, `site_logo_dark`, `site_logo_alt`, `site_description`, `tagline`, `default_meta_title`, `default_meta_description` | `<title>`, meta/OG, navbar, footer, branding login/admin |
-| Sosial | `github_url`, `twitter_url`, `linkedin_url` | navbar, footer, About; kosong = tidak dirender |
-| Komentar | `comment_moderation`, `comment_notification` | status komentar baru & email admin |
+| Kelompok     | Key                                                                                                                                                                                         | Dipakai di                                                                                           |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Situs        | `site_title`, `site_logo`, `site_logo_dark`, `site_logo_alt`, `site_description`, `tagline`, `default_meta_title`, `default_meta_description`                                               | `<title>`, meta/OG, navbar, footer, branding login/admin                                             |
+| Sosial       | `github_url`, `twitter_url`, `linkedin_url`                                                                                                                                                 | navbar, footer, About; kosong = tidak dirender                                                       |
+| Komentar     | `comment_moderation`, `comment_notification`                                                                                                                                                | status komentar baru & email admin                                                                   |
 | Profil/About | `author_name`, `author_avatar`, `author_avatar_alt`, `author_role`, `about_bio`, `about_topics_heading`, `about_topics`, `about_contact_heading`, `about_contact`, `about_meta_description` | halaman About, JSON-LD Person, nama komentar author, badge **Mode Admin**, dan nama di sidebar admin |
 
 Total: **23 key** (lihat `Setting::DEFAULTS`).
@@ -1224,11 +1228,11 @@ Format konten teks biasa:
 
 ```json
 {
-  "settings": {
-    "site_title": "Godang",
-    "comment_moderation": "false",
-    "github_url": "https://github.com/godang"
-  }
+    "settings": {
+        "site_title": "Godang",
+        "comment_moderation": "false",
+        "github_url": "https://github.com/godang"
+    }
 }
 ```
 
@@ -1275,37 +1279,37 @@ View memakai `$site[...]` dengan fallback `config('app.name')`, sehingga halaman
 
 Sumber konten: seluruh teks situs dibaca dari `$site` yang dibagikan middleware (lihat [15.5](#155-cara-settings-dibagikan-ke-view-publik)).
 
-| Bagian | Key settings |
-|---|---|
-| Navbar & footer | Navbar: `site_logo`/`site_logo_dark` (+ `site_logo_alt`) dengan fallback `site_title`. Footer: `site_title`, `site_description`, `tagline`, `github_url`, `twitter_url`, `linkedin_url` |
-| Judul & meta halaman | `site_title`, `default_meta_description`, meta spesifik halaman |
-| Hero beranda | Teks hero & section About di-hardcode di `public/landing.blade.php`; avatar/nama penulis dari `$site` |
-| Header blog | Judul, deskripsi, dan meta di-hardcode di `public/blog/index.blade.php` dan feed RSS |
-| Halaman About | `author_name`, `author_avatar(_alt)`, `author_role`, `about_*` |
+| Bagian               | Key settings                                                                                                                                                                            |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Navbar & footer      | Navbar: `site_logo`/`site_logo_dark` (+ `site_logo_alt`) dengan fallback `site_title`. Footer: `site_title`, `site_description`, `tagline`, `github_url`, `twitter_url`, `linkedin_url` |
+| Judul & meta halaman | `site_title`, `default_meta_description`, meta spesifik halaman                                                                                                                         |
+| Hero beranda         | Teks hero & section About di-hardcode di `public/landing.blade.php`; avatar/nama penulis dari `$site`                                                                                   |
+| Header blog          | Judul, deskripsi, dan meta di-hardcode di `public/blog/index.blade.php` dan feed RSS                                                                                                    |
+| Halaman About        | `author_name`, `author_avatar(_alt)`, `author_role`, `about_*`                                                                                                                          |
 
 ### 16.2 Halaman
 
-| View | Route | Data utama |
-|---|---|---|
-| `public/landing.blade.php` | `/` | Teks hero + section About hardcoded, avatar penulis dari `$site`; 6 artikel terbaru, kategori + jumlah post |
-| `public/blog/index.blade.php` | `/blog` | Header hardcoded; paginator 12, filter `q`/`category`/`tag`, daftar kategori |
-| `public/blog/show.blade.php` | `/blog/{slug}` | Post, komentar, total komentar, 2 related, JSON-LD |
-| `public/about.blade.php` | `/about` | Profil dari `$site`: avatar (fallback inisial), nama, role, bio, topik, kontak, sosial, JSON-LD Person |
-| `public/category.blade.php` | `/category/{slug}` | Kategori + paginator 12 |
-| `public/tag.blade.php` | `/tag/{slug}` | Tag + paginator 12 |
-| `seo/sitemap.blade.php` | `/sitemap.xml` | Daftar URL |
-| `seo/feed.blade.php` | `/feed.xml` | 20 artikel terbaru; judul dari `site_title`, deskripsi hardcoded |
-| `errors/404.blade.php` | error 404 | Halaman error kustom |
+| View                          | Route              | Data utama                                                                                                  |
+| ----------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `public/landing.blade.php`    | `/`                | Teks hero + section About hardcoded, avatar penulis dari `$site`; 6 artikel terbaru, kategori + jumlah post |
+| `public/blog/index.blade.php` | `/blog`            | Header hardcoded; paginator 12, filter `q`/`category`/`tag`, daftar kategori                                |
+| `public/blog/show.blade.php`  | `/blog/{slug}`     | Post, komentar, total komentar, 2 related, JSON-LD                                                          |
+| `public/about.blade.php`      | `/about`           | Profil dari `$site`: avatar (fallback inisial), nama, role, bio, topik, kontak, sosial, JSON-LD Person      |
+| `public/category.blade.php`   | `/category/{slug}` | Kategori + paginator 12                                                                                     |
+| `public/tag.blade.php`        | `/tag/{slug}`      | Tag + paginator 12                                                                                          |
+| `seo/sitemap.blade.php`       | `/sitemap.xml`     | Daftar URL                                                                                                  |
+| `seo/feed.blade.php`          | `/feed.xml`        | 20 artikel terbaru; judul dari `site_title`, deskripsi hardcoded                                            |
+| `errors/404.blade.php`        | error 404          | Halaman error kustom                                                                                        |
 
 ### 16.3 Partial
 
-| Partial | Isi |
-|---|---|
-| `partials/navbar.blade.php` | Logo (`site_logo` terang / `site_logo_dark` gelap, fallback ke `site_title`), menu Blog/About, badge **Mode Admin** (khusus admin, menuju `/admin`), theme toggle, menu mobile |
-| `partials/footer.blade.php` | Info situs dari `$site`, link sosial (kosong = disembunyikan), copyright |
-| `partials/post-card.blade.php` | Kartu artikel dengan cover fallback yang benar |
-| `partials/pagination.blade.php` | Paginasi kustom |
-| `partials/comment-thread.blade.php` | Render balasan komentar (rekursif satu tingkat); saat mode admin menampilkan tombol **Spam**/**Hapus** dan menyembunyikan field nama/email |
+| Partial                             | Isi                                                                                                                                                                            |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `partials/navbar.blade.php`         | Logo (`site_logo` terang / `site_logo_dark` gelap, fallback ke `site_title`), menu Blog/About, badge **Mode Admin** (khusus admin, menuju `/admin`), theme toggle, menu mobile |
+| `partials/footer.blade.php`         | Info situs dari `$site`, link sosial (kosong = disembunyikan), copyright                                                                                                       |
+| `partials/post-card.blade.php`      | Kartu artikel dengan cover fallback yang benar                                                                                                                                 |
+| `partials/pagination.blade.php`     | Paginasi kustom                                                                                                                                                                |
+| `partials/comment-thread.blade.php` | Render balasan komentar (rekursif satu tingkat); saat mode admin menampilkan tombol **Spam**/**Hapus** dan menyembunyikan field nama/email                                     |
 
 ### 16.4 JavaScript publik
 
@@ -1357,28 +1361,28 @@ App.jsx  -> QueryClientProvider + BrowserRouter + Routes
 - Saat mengetik spasi setelah snippet, `onKeyDown` mengganti teks pemicu dengan markup:
   `/p`, `/div`, `/h2`, `/h3`, `/h4`, `/ul`, `/ol`, `/br`, `/hr`, `/pre` (blok `language-php`), dan `/code`.
 - Kursor dipindahkan ke dalam tag penutup setelah snippet disisipkan.
-- Sisa kode dan dependensi TipTap sudah dihapus; halaman admin di-*code split* lewat `React.lazy` sehingga `PostForm` dimuat sebagai chunk terpisah.
+- Sisa kode dan dependensi TipTap sudah dihapus; halaman admin di-_code split_ lewat `React.lazy` sehingga `PostForm` dimuat sebagai chunk terpisah.
 
 ### 17.2 Struktur file
 
-| File | Peran |
-|---|---|
-| `main.jsx` | Entry point React; memuat `highlight.js` CSS untuk pratinjau admin |
-| `App.jsx` | Router, `QueryClient`, `AuthGate`, `LoginRoute` |
-| `api.js` | Instance axios, interceptor 401, helper error, daftar endpoint |
-| `media.js` | Helper `resolveMediaUrl()` dan `toStoredPath()` yang dipakai bersama halaman admin |
-| `stores/auth.js` | Zustand: `user`, `status`, `fetchMe`, `login`, `logout`, `setGuest` |
-| `components/Shell.jsx` | Sidebar, header (termasuk link **Home** ke situs publik), outlet, menu mobile, logout |
-| `components/Toast.jsx` | Notifikasi sukses/error |
-| `components/ConfirmModal.jsx` | Dialog konfirmasi |
-| `components/StatusBadge.jsx` | Badge status artikel/komentar |
-| `components/MediaPicker.jsx` | Modal pilih/unggah media **gambar** (`type=image`) dengan filter kategori dan pagination (dipakai Settings dan PostForm) |
-| `components/MediaEditModal.jsx` | Ubah alt text dan kategori satu media |
-| `components/MediaCategoryManager.jsx` | CRUD kategori media dari halaman Media |
-| `components/PostPreview.jsx` | Render artikel gaya blog dari HTML mentah: header, `prose-article`, sidebar **Daftar Isi** sticky, heading anchor, highlight kode + tombol salin; menerima `children` (komentar) agar TOC tetap sticky melewati komentar (dipakai `PostView`) |
-| `components/PostComments.jsx` | Panel moderasi komentar pada halaman pratinjau artikel; komentar author menampilkan **Edit** (tanpa Spam) |
-| `components/TurnstileWidget.jsx` | Widget Cloudflare Turnstile untuk form login (no-op bila site key kosong) |
-| `pages/*.jsx` | 13 halaman admin |
+| File                                  | Peran                                                                                                                                                                                                                                         |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `main.jsx`                            | Entry point React; memuat `highlight.js` CSS untuk pratinjau admin                                                                                                                                                                            |
+| `App.jsx`                             | Router, `QueryClient`, `AuthGate`, `LoginRoute`                                                                                                                                                                                               |
+| `api.js`                              | Instance axios, interceptor 401, helper error, daftar endpoint                                                                                                                                                                                |
+| `media.js`                            | Helper `resolveMediaUrl()` dan `toStoredPath()` yang dipakai bersama halaman admin                                                                                                                                                            |
+| `stores/auth.js`                      | Zustand: `user`, `status`, `fetchMe`, `login`, `logout`, `setGuest`                                                                                                                                                                           |
+| `components/Shell.jsx`                | Sidebar, header (termasuk link **Home** ke situs publik), outlet, menu mobile, logout                                                                                                                                                         |
+| `components/Toast.jsx`                | Notifikasi sukses/error                                                                                                                                                                                                                       |
+| `components/ConfirmModal.jsx`         | Dialog konfirmasi                                                                                                                                                                                                                             |
+| `components/StatusBadge.jsx`          | Badge status artikel/komentar                                                                                                                                                                                                                 |
+| `components/MediaPicker.jsx`          | Modal pilih/unggah media **gambar** (`type=image`) dengan filter kategori dan pagination (dipakai Settings dan PostForm)                                                                                                                      |
+| `components/MediaEditModal.jsx`       | Ubah alt text dan kategori satu media                                                                                                                                                                                                         |
+| `components/MediaCategoryManager.jsx` | CRUD kategori media dari halaman Media                                                                                                                                                                                                        |
+| `components/PostPreview.jsx`          | Render artikel gaya blog dari HTML mentah: header, `prose-article`, sidebar **Daftar Isi** sticky, heading anchor, highlight kode + tombol salin; menerima `children` (komentar) agar TOC tetap sticky melewati komentar (dipakai `PostView`) |
+| `components/PostComments.jsx`         | Panel moderasi komentar pada halaman pratinjau artikel; komentar author menampilkan **Edit** (tanpa Spam)                                                                                                                                     |
+| `components/TurnstileWidget.jsx`      | Widget Cloudflare Turnstile untuk form login (no-op bila site key kosong)                                                                                                                                                                     |
+| `pages/*.jsx`                         | 13 halaman admin                                                                                                                                                                                                                              |
 
 ### 17.3 Alur auth di React
 
@@ -1401,69 +1405,69 @@ App dimuat
 - Semua query dan mutation memakai TanStack Query.
 - Query key yang umum:
 
-| Key | Data |
-|---|---|
-| `['dashboard']` | Statistik |
-| `['posts', searchParams.toString()]` | Daftar artikel |
-| `['posts', 'trash', searchParams.toString()]` | Daftar artikel di trash |
-| `['post', id]` | Detail artikel untuk form edit |
-| `['posts', 'view', id]` | Data artikel untuk halaman pratinjau |
-| `['comments', status, categoryId]` | Komentar |
-| `['categories']` | Kategori |
-| `['tags']` | Tag |
-| `['media', searchParams.toString()]` | Media (pencarian, filter, urutan, halaman) |
-| `['media', 'trash', searchParams.toString()]` | Media di trash |
-| `['media-picker', query, folder, category, page]` | Modal pemilih media |
-| `['media-categories']` | Kategori media kustom |
-| `['settings']` | Settings |
+| Key                                               | Data                                       |
+| ------------------------------------------------- | ------------------------------------------ |
+| `['dashboard']`                                   | Statistik                                  |
+| `['posts', searchParams.toString()]`              | Daftar artikel                             |
+| `['posts', 'trash', searchParams.toString()]`     | Daftar artikel di trash                    |
+| `['post', id]`                                    | Detail artikel untuk form edit             |
+| `['posts', 'view', id]`                           | Data artikel untuk halaman pratinjau       |
+| `['comments', status, categoryId]`                | Komentar                                   |
+| `['categories']`                                  | Kategori                                   |
+| `['tags']`                                        | Tag                                        |
+| `['media', searchParams.toString()]`              | Media (pencarian, filter, urutan, halaman) |
+| `['media', 'trash', searchParams.toString()]`     | Media di trash                             |
+| `['media-picker', query, folder, category, page]` | Modal pemilih media                        |
+| `['media-categories']`                            | Kategori media kustom                      |
+| `['settings']`                                    | Settings                                   |
 
 - Setelah mutation, halaman terkait memanggil `invalidateQueries` untuk key yang terpengaruh.
 - `errorMessage(error)` di `api.js` mengambil pesan validasi pertama dari response.
 
 ### 17.5 Halaman admin
 
-| Halaman | Fitur utama |
-|---|---|
-| `Dashboard` | Total/published/draft/scheduled post, total views, komentar pending/total, 5 post & komentar terbaru |
-| `Posts` | Tabel, filter `q`/`status`, paginasi via query string, pilih banyak, bulk delete, link ke edit/view/trash |
-| `Trash` | Daftar soft-deleted, restore, hapus permanen, bulk |
-| `PostForm` | Form create/edit lengkap (lihat 17.6) |
-| `PostView` | Pratinjau artikel bergaya blog publik: Daftar Isi sticky (bertahan sampai komentar), highlight kode + tombol salin, dan panel moderasi komentar |
-| `Comments` | Filter status/kategori, approve, spam, balas, edit isi, hapus, bulk, tampilkan email; komentar author menampilkan **Edit** (bukan Spam), balasan punya **Hapus** |
-| `Categories` | CRUD dengan nama, slug, dan deskripsi (max 500 karakter) |
-| `Tags` | CRUD tag |
-| `Media` | Tab **Gambar** dan **File** (data tidak pernah tercampur): grid media, filter folder (`uploads`/`cover`/`avatar`/`files`/lainnya), kategori kustom (`none` = tanpa kategori), `unused`, pencarian nama/alt/path, urutan, pagination; upload gambar atau file non-gambar, ubah alt/kategori, salin URL, trash, bulk trash; kelola kategori |
-| `MediaTrash` | Tab **Gambar** dan **File**: media soft-deleted, restore, hapus permanen, bulk restore/force-delete; item yang masih dipakai diblokir dengan daftar referensi |
-| `Settings` | 3 tab (Umum, Profil & About, Komentar); tab Umum berisi teks situs, sosial, dan logo terang/gelap via MediaPicker; tab Profil & About berisi avatar via MediaPicker dan field profil/About yang ditumpuk satu kolom; penghitung karakter; indikator perubahan belum disimpan + peringatan `beforeunload` (tanpa tombol pratinjau) |
-| `Login` | Email + password, widget Cloudflare Turnstile, lupa/reset password, branding dari pengaturan situs |
-| `ResetPassword` | Form password baru + konfirmasi; membaca `token` dan `email` dari query string lalu memanggil `POST /api/auth/reset-password` |
+| Halaman         | Fitur utama                                                                                                                                                                                                                                                                                                                               |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Dashboard`     | Total/published/draft/scheduled post, total views, komentar pending/total, 5 post & komentar terbaru                                                                                                                                                                                                                                      |
+| `Posts`         | Tabel, filter `q`/`status`, paginasi via query string, pilih banyak, bulk delete, link ke edit/view/trash                                                                                                                                                                                                                                 |
+| `Trash`         | Daftar soft-deleted, restore, hapus permanen, bulk                                                                                                                                                                                                                                                                                        |
+| `PostForm`      | Form create/edit lengkap (lihat 17.6)                                                                                                                                                                                                                                                                                                     |
+| `PostView`      | Pratinjau artikel bergaya blog publik: Daftar Isi sticky (bertahan sampai komentar), highlight kode + tombol salin, dan panel moderasi komentar                                                                                                                                                                                           |
+| `Comments`      | Filter status/kategori, approve, spam, balas, edit isi, hapus, bulk, tampilkan email; komentar author menampilkan **Edit** (bukan Spam), balasan punya **Hapus**                                                                                                                                                                          |
+| `Categories`    | CRUD dengan nama, slug, dan deskripsi (max 500 karakter)                                                                                                                                                                                                                                                                                  |
+| `Tags`          | CRUD tag                                                                                                                                                                                                                                                                                                                                  |
+| `Media`         | Tab **Gambar** dan **File** (data tidak pernah tercampur): grid media, filter folder (`uploads`/`cover`/`avatar`/`files`/lainnya), kategori kustom (`none` = tanpa kategori), `unused`, pencarian nama/alt/path, urutan, pagination; upload gambar atau file non-gambar, ubah alt/kategori, salin URL, trash, bulk trash; kelola kategori |
+| `MediaTrash`    | Tab **Gambar** dan **File**: media soft-deleted, restore, hapus permanen, bulk restore/force-delete; item yang masih dipakai diblokir dengan daftar referensi                                                                                                                                                                             |
+| `Settings`      | 3 tab (Umum, Profil & About, Komentar); tab Umum berisi teks situs, sosial, dan logo terang/gelap via MediaPicker; tab Profil & About berisi avatar via MediaPicker dan field profil/About yang ditumpuk satu kolom; penghitung karakter; indikator perubahan belum disimpan + peringatan `beforeunload` (tanpa tombol pratinjau)         |
+| `Login`         | Email + password, widget Cloudflare Turnstile, lupa/reset password, branding dari pengaturan situs                                                                                                                                                                                                                                        |
+| `ResetPassword` | Form password baru + konfirmasi; membaca `token` dan `email` dari query string lalu memanggil `POST /api/auth/reset-password`                                                                                                                                                                                                             |
 
 ### 17.6 `PostForm.jsx` (halaman terbesar, ±650 baris)
 
 Bagian penting:
 
 - **Validasi**: `react-hook-form` + `zod`.
-  - `title` wajib, max 255.
-  - `status`: `draft`/`published`/`scheduled`.
-  - `excerpt` max 500, `meta_title` max 255, `meta_description` max 500.
+    - `title` wajib, max 255.
+    - `status`: `draft`/`published`/`scheduled`.
+    - `excerpt` max 500, `meta_title` max 255, `meta_description` max 500.
 - **Slug**: auto dari judul selama belum diedit manual (`slugAuto`) lewat `slugify`.
-  - Jika slug diubah pada artikel yang sudah `published`/`scheduled`, muncul peringatan bahwa URL lama bisa mati.
+    - Jika slug diubah pada artikel yang sudah `published`/`scheduled`, muncul peringatan bahwa URL lama bisa mati.
 - **Konten**: `<textarea>` HTML mentah dengan snippet `/p`, `/div`, `/h2`, `/h3`, `/h4`, `/ul`, `/ol`, `/br`, `/hr`, `/pre`, `/code`.
-  - Tidak ada mode visual. Untuk melihat hasil render, buka `/admin/posts/{id}/view` setelah artikel disimpan.
+    - Tidak ada mode visual. Untuk melihat hasil render, buka `/admin/posts/{id}/view` setelah artikel disimpan.
 - **Media**:
-  - Cover dan OG image bisa diunggah langsung (folder `cover`) atau dipilih dari `MediaPicker` (khusus gambar, memaksa `type=image`).
-  - Gambar di dalam konten ditulis manual sebagai HTML (`<img src="...">`); URL bisa disalin dari halaman Media.
-  - `resolveMediaUrl()`/`toStoredPath()` menormalkan URL `/storage/...` menjadi path relatif saat disimpan.
+    - Cover dan OG image bisa diunggah langsung (folder `cover`) atau dipilih dari `MediaPicker` (khusus gambar, memaksa `type=image`).
+    - Gambar di dalam konten ditulis manual sebagai HTML (`<img src="...">`); URL bisa disalin dari halaman Media.
+    - `resolveMediaUrl()`/`toStoredPath()` menormalkan URL `/storage/...` menjadi path relatif saat disimpan.
 - **Tag**:
-  - Pilih tag yang ada atau buat tag baru lewat input chip.
-  - Dikirim sebagai array (ID atau nama) ke API.
+    - Pilih tag yang ada atau buat tag baru lewat input chip.
+    - Dikirim sebagai array (ID atau nama) ke API.
 - **Metadata**:
-  - Kategori, excerpt, meta title/description, OG image.
-  - `published_at` untuk penjadwalan.
+    - Kategori, excerpt, meta title/description, OG image.
+    - `published_at` untuk penjadwalan.
 - **Navigasi dan guard**:
-  - Tombol simpan dan kembali (pratinjau tersedia dari halaman daftar artikel lewat tautan **Lihat**).
-  - `hasUnsavedChanges = dirty || isDirty`; `beforeunload` aktif selama ada perubahan.
-  - Setelah create, user diarahkan ke halaman edit artikel baru; setelah update, state dirty direset.
+    - Tombol simpan dan kembali (pratinjau tersedia dari halaman daftar artikel lewat tautan **Lihat**).
+    - `hasUnsavedChanges = dirty || isDirty`; `beforeunload` aktif selama ada perubahan.
+    - Setelah create, user diarahkan ke halaman edit artikel baru; setelah update, state dirty direset.
 
 ---
 
@@ -1474,8 +1478,8 @@ Bagian penting:
 - `layouts/public.blade.php`: title, description, canonical, OG type/title/description/url/image, `og:site_name`. Judul dan deskripsi default berasal dari `$site` (`site_title`, `default_meta_description`).
 - Halaman About menambahkan JSON-LD `Person` (nama, role, bio, avatar, dan link sosial dari settings).
 - Halaman detail menambahkan:
-  - `hreflang="id"` dan `hreflang="x-default"` yang menunjuk URL artikel.
-  - JSON-LD (`application/ld+json`) untuk artikel.
+    - `hreflang="id"` dan `hreflang="x-default"` yang menunjuk URL artikel.
+    - JSON-LD (`application/ld+json`) untuk artikel.
 - Halaman arsip dan About tidak merender `hreflang` alternatif.
 
 ### 18.2 Sitemap
@@ -1571,27 +1575,27 @@ php artisan media:thumbnails {--force}
 
 ### 20.1 Seeder
 
-| Seeder | Isi |
-|---|---|
+| Seeder           | Isi                                                                                                                   |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------- |
 | `DatabaseSeeder` | Membuat admin `admin@godang.com` (`is_admin = true`, password default factory `password`), lalu memanggil seeder lain |
-| `CategorySeeder` | 6 kategori: Laravel, PHP, JavaScript, DevOps, Database, Linux |
-| `TagSeeder` | 15 tag (troubleshooting, eloquent, mysql, react, deployment, dll.) |
-| `PostSeeder` | 1 artikel unggulan + 8 artikel contoh berbahasa Indonesia (total 7 published, 2 draft) |
-| `CommentSeeder` | 2–4 komentar root per post published (6 post pertama), sebagian dibalas admin, plus 1 komentar pending per post |
-| `SettingSeeder` | Semua key dari `Setting::DEFAULTS` (23 key: situs/logo, sosial, komentar, profil/About) |
-| `MediaSeeder` | Kosong |
+| `CategorySeeder` | 6 kategori: Laravel, PHP, JavaScript, DevOps, Database, Linux                                                         |
+| `TagSeeder`      | 15 tag (troubleshooting, eloquent, mysql, react, deployment, dll.)                                                    |
+| `PostSeeder`     | 1 artikel unggulan + 8 artikel contoh berbahasa Indonesia (total 7 published, 2 draft)                                |
+| `CommentSeeder`  | 2–4 komentar root per post published (6 post pertama), sebagian dibalas admin, plus 1 komentar pending per post       |
+| `SettingSeeder`  | Semua key dari `Setting::DEFAULTS` (23 key: situs/logo, sosial, komentar, profil/About)                               |
+| `MediaSeeder`    | Kosong                                                                                                                |
 
 ### 20.2 Factory
 
-| Factory | Catatan |
-|---|---|
-| `UserFactory` | Password default `password` |
-| `PostFactory` | Mendukung state status dan `indonesian()` |
-| `CategoryFactory` | Nama teks biasa dari kata acak |
-| `TagFactory` | Nama teks biasa |
-| `CommentFactory` | State `pending`, `authorReply`, dll. |
-| `MediaFactory` | Data media gambar dummy; state `file()` untuk file non-gambar (PDF) |
-| `MediaCategoryFactory` | Kategori media untuk filter perpustakaan |
+| Factory                | Catatan                                                             |
+| ---------------------- | ------------------------------------------------------------------- |
+| `UserFactory`          | Password default `password`                                         |
+| `PostFactory`          | Mendukung state status dan `indonesian()`                           |
+| `CategoryFactory`      | Nama teks biasa dari kata acak                                      |
+| `TagFactory`           | Nama teks biasa                                                     |
+| `CommentFactory`       | State `pending`, `authorReply`, dll.                                |
+| `MediaFactory`         | Data media gambar dummy; state `file()` untuk file non-gambar (PDF) |
+| `MediaCategoryFactory` | Kategori media untuk filter perpustakaan                            |
 
 Contoh membuat data demo:
 
@@ -1618,29 +1622,29 @@ Sejak commit `43a9cc0`, folder `tests/` **dilacak git** (tidak lagi masuk `.giti
 
 ### 21.1 Test fitur
 
-| File | Fokus |
-|---|---|
-| `AdminAuthorizationTest` | Akses admin vs non-admin |
-| `AdminCategoryTest` | CRUD kategori, nama, slug, deskripsi |
-| `AdminPostManagementTest` | CRUD, slug, status, reading time, tag baru/reuse, soft delete, restore, force delete, bulk delete |
-| `AdminCommentManagementTest` | List, edit, hapus, balas, bulk |
-| `AdminCommentModerationTest` | Approve, spam, moderasi |
-| `AdminDashboardTest` | Statistik dashboard dan nama author pada komentar terbaru |
-| `AdminMediaTest` | List/filter media per `type`, kategori media, upload gambar & file non-gambar, allowlist/MIME, trash/restore/force-delete, blokir 409, usage |
-| `AdminSettingsTest` | Default, whitelist, validasi per key, logo, dan key About |
-| `AdminSpaRoutesTest` | Shell SPA dan redirect guest |
-| `AuthLoginTest` | Login, Turnstile (wajib/valid/invalid/dilewati), rate limit, logout, me, forgot/reset password |
-| `CommentNotificationTest` | Email notifikasi komentar dan balasan; kegagalan email tidak menggagalkan request |
-| `MediaUploadTest` | Validasi, konversi WebP, thumbnail, metadata |
-| `PostCoverImageTest` | URL cover/OG dan normalisasi path |
-| `PublicCommentTest` | Honeypot, link limit, threading, reparent balasan, rate limit, moderasi |
-| `PublicPagesTest` | Landing, about, category, tag |
-| `PublicPostsTest` | Daftar/detail artikel, filter, dan pencarian judul/excerpt/isi |
-| `PublicSiteContentTest` | Konten About dari settings, teks hero/blog hardcoded, avatar, sosial kosong, escaping, fallback default, feed |
-| `PublishScheduledPostsTest` | Command publish terjadwal |
-| `SeoRoutesTest` | Sitemap, robots, feed 20 item, canonical, redirect legacy, 404 noindex |
-| `StorageFileTest` | Fallback `/storage/{path}` untuk `avatar` dan `files`, path traversal |
-| `ExampleTest` | Sanity check, redirect legacy `/id`/`/en`, dan 404 untuk prefix tak dikenal |
+| File                         | Fokus                                                                                                                                        |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AdminAuthorizationTest`     | Akses admin vs non-admin                                                                                                                     |
+| `AdminCategoryTest`          | CRUD kategori, nama, slug, deskripsi                                                                                                         |
+| `AdminPostManagementTest`    | CRUD, slug, status, reading time, tag baru/reuse, soft delete, restore, force delete, bulk delete                                            |
+| `AdminCommentManagementTest` | List, edit, hapus, balas, bulk                                                                                                               |
+| `AdminCommentModerationTest` | Approve, spam, moderasi                                                                                                                      |
+| `AdminDashboardTest`         | Statistik dashboard dan nama author pada komentar terbaru                                                                                    |
+| `AdminMediaTest`             | List/filter media per `type`, kategori media, upload gambar & file non-gambar, allowlist/MIME, trash/restore/force-delete, blokir 409, usage |
+| `AdminSettingsTest`          | Default, whitelist, validasi per key, logo, dan key About                                                                                    |
+| `AdminSpaRoutesTest`         | Shell SPA dan redirect guest                                                                                                                 |
+| `AuthLoginTest`              | Login, Turnstile (wajib/valid/invalid/dilewati), rate limit, logout, me, forgot/reset password                                               |
+| `CommentNotificationTest`    | Email notifikasi komentar dan balasan; kegagalan email tidak menggagalkan request                                                            |
+| `MediaUploadTest`            | Validasi, konversi WebP, thumbnail, metadata                                                                                                 |
+| `PostCoverImageTest`         | URL cover/OG dan normalisasi path                                                                                                            |
+| `PublicCommentTest`          | Honeypot, link limit, threading, reparent balasan, rate limit, moderasi                                                                      |
+| `PublicPagesTest`            | Landing, about, category, tag                                                                                                                |
+| `PublicPostsTest`            | Daftar/detail artikel, filter, dan pencarian judul/excerpt/isi                                                                               |
+| `PublicSiteContentTest`      | Konten About dari settings, teks hero/blog hardcoded, avatar, sosial kosong, escaping, fallback default, feed                                |
+| `PublishScheduledPostsTest`  | Command publish terjadwal                                                                                                                    |
+| `SeoRoutesTest`              | Sitemap, robots, feed 20 item, canonical, redirect legacy, 404 noindex                                                                       |
+| `StorageFileTest`            | Fallback `/storage/{path}` untuk `avatar` dan `files`, path traversal                                                                        |
+| `ExampleTest`                | Sanity check, redirect legacy `/id`/`/en`, dan 404 untuk prefix tak dikenal                                                                  |
 
 ### 21.2 Menjalankan test
 
@@ -1779,11 +1783,11 @@ npm run build
 - Aset publik dan admin dibangun oleh Vite.
 - **`public/build/` dilacak git** karena workflow deploy tidak menjalankan build. Setiap perubahan `resources/js` atau `resources/css` wajib diakhiri dengan:
 
-  ```bash
-  npm run build
-  git add public/build
-  git commit -m "build: perbarui aset frontend"
-  ```
+    ```bash
+    npm run build
+    git add public/build
+    git commit -m "build: perbarui aset frontend"
+    ```
 
 - Jangan commit `public/hot` (penanda mode dev) atau `public/storage` (junction).
 - Jika di server muncul error **“Unable to locate file in Vite manifest”** atau **“Vite manifest not found at: /htdocs/public/build/manifest.json”**, artinya `public/build` belum ikut ter-upload. Jalankan `npm run build`, commit `public/build`, lalu push.
@@ -1793,17 +1797,17 @@ npm run build
 
 Workflow aktif: `.github/workflows/infinityfree.yml`.
 
-| Aspek | Kondisi saat ini |
-|---|---|
-| Trigger | Push ke `main` atau `workflow_dispatch` |
-| Langkah workflow | `actions/checkout` → FTP ke `/htdocs/` |
-| Build di CI | **Tidak ada** (`composer install`, `npm run build`, dan test tidak dijalankan) |
-| `public/build` | Di-commit ke repo, ikut ter-upload |
-| `vendor/` | Baris `/vendor` di `.gitignore` dikomentari, jadi folder ini tidak diabaikan dan **dapat ikut ter-commit**; saat ini belum di-track, sehingga `git add .` akan memasukkannya. Workflow FTP tidak menjalankan `composer install`. |
-| `.env` server | Tidak tertimpa (tidak ada di repo); pakai `QUEUE_CONNECTION=sync` untuk InfinityFree |
-| Media (`storage/app/public`) | Tidak di-commit; file di server dipertahankan, termasuk `files/` untuk non-gambar |
-| Migrasi | Dijalankan manual; workflow tidak menjalankannya |
-| `exclude` | `**/.git*`, `**/.git*/**`, `**/node_modules/**`, `STRUCTURE.md` — dokumen internal tidak di-upload dan tidak dihapus dari server |
+| Aspek                        | Kondisi saat ini                                                                                                                                                                                                                 |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Trigger                      | Push ke `main` atau `workflow_dispatch`                                                                                                                                                                                          |
+| Langkah workflow             | `actions/checkout` → FTP ke `/htdocs/`                                                                                                                                                                                           |
+| Build di CI                  | **Tidak ada** (`composer install`, `npm run build`, dan test tidak dijalankan)                                                                                                                                                   |
+| `public/build`               | Di-commit ke repo, ikut ter-upload                                                                                                                                                                                               |
+| `vendor/`                    | Baris `/vendor` di `.gitignore` dikomentari, jadi folder ini tidak diabaikan dan **dapat ikut ter-commit**; saat ini belum di-track, sehingga `git add .` akan memasukkannya. Workflow FTP tidak menjalankan `composer install`. |
+| `.env` server                | Tidak tertimpa (tidak ada di repo); pakai `QUEUE_CONNECTION=sync` untuk InfinityFree                                                                                                                                             |
+| Media (`storage/app/public`) | Tidak di-commit; file di server dipertahankan, termasuk `files/` untuk non-gambar                                                                                                                                                |
+| Migrasi                      | Dijalankan manual; workflow tidak menjalankannya                                                                                                                                                                                 |
+| `exclude`                    | `**/.git*`, `**/.git*/**`, `**/node_modules/**`, `STRUCTURE.md` — dokumen internal tidak di-upload dan tidak dihapus dari server                                                                                                 |
 
 Karena itu:
 
@@ -1912,18 +1916,18 @@ git push origin main
 
 ### 26.2 Matriks perubahan
 
-| Jenis perubahan | Perintah wajib | File yang harus ikut commit | Catatan deploy |
-|---|---|---|---|
-| PHP (controller, model, middleware, route, command) | `vendor/bin/pint --dirty --format agent` + `php artisan test --compact` | File PHP terkait + test | Langsung ter-upload via FTP |
-| Migrasi database | `php artisan migrate` + test | `database/migrations/*.php` | Jalankan migrasi **manual** di server |
-| Seeder / factory | `php artisan migrate:fresh --seed` (lokal) + test | `database/seeders`, `database/factories` | Tidak otomatis dijalankan |
-| Frontend JS/CSS | `npm run build` + test | `resources/js`, `resources/css`, **`public/build/`** | Tanpa `public/build`, muncul error Vite manifest |
-| Blade saja (tanpa aset baru) | `php artisan test --compact` | File Blade | Tidak perlu build |
-| Dependency PHP | `composer update` + `composer audit` + test | `composer.json`, `composer.lock`, **`vendor/`** (tidak di-ignore) | Commit `vendor/` atau upload ulang ke server |
-| Dependency JS | `npm install` + `npm audit` + `npm run build` | `package.json`, `package-lock.json`, **`public/build/`** | Sama seperti perubahan frontend |
-| Key settings baru | test | `Setting.php`, `SettingController.php`, `ShareSiteSettings.php`, `SettingSeeder.php` | Tidak perlu migrasi |
-| Route / API baru | test + update dokumen ini | `routes/*.php`, controller, test | Cek `php artisan route:list` |
-| Test baru | `php artisan test --compact` | `tests/**` | Folder `tests` sudah dilacak git |
+| Jenis perubahan                                     | Perintah wajib                                                          | File yang harus ikut commit                                                          | Catatan deploy                                   |
+| --------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------ |
+| PHP (controller, model, middleware, route, command) | `vendor/bin/pint --dirty --format agent` + `php artisan test --compact` | File PHP terkait + test                                                              | Langsung ter-upload via FTP                      |
+| Migrasi database                                    | `php artisan migrate` + test                                            | `database/migrations/*.php`                                                          | Jalankan migrasi **manual** di server            |
+| Seeder / factory                                    | `php artisan migrate:fresh --seed` (lokal) + test                       | `database/seeders`, `database/factories`                                             | Tidak otomatis dijalankan                        |
+| Frontend JS/CSS                                     | `npm run build` + test                                                  | `resources/js`, `resources/css`, **`public/build/`**                                 | Tanpa `public/build`, muncul error Vite manifest |
+| Blade saja (tanpa aset baru)                        | `php artisan test --compact`                                            | File Blade                                                                           | Tidak perlu build                                |
+| Dependency PHP                                      | `composer update` + `composer audit` + test                             | `composer.json`, `composer.lock`, **`vendor/`** (tidak di-ignore)                    | Commit `vendor/` atau upload ulang ke server     |
+| Dependency JS                                       | `npm install` + `npm audit` + `npm run build`                           | `package.json`, `package-lock.json`, **`public/build/`**                             | Sama seperti perubahan frontend                  |
+| Key settings baru                                   | test                                                                    | `Setting.php`, `SettingController.php`, `ShareSiteSettings.php`, `SettingSeeder.php` | Tidak perlu migrasi                              |
+| Route / API baru                                    | test + update dokumen ini                                               | `routes/*.php`, controller, test                                                     | Cek `php artisan route:list`                     |
+| Test baru                                           | `php artisan test --compact`                                            | `tests/**`                                                                           | Folder `tests` sudah dilacak git                 |
 
 ### 26.3 Perubahan frontend (paling sering)
 
@@ -2037,4 +2041,4 @@ Jika rollback menyentuh frontend, jalankan `npm run build` dan commit ulang `pub
 
 ---
 
-*Dokumen ini dibuat berdasarkan kondisi kode saat ini. Terakhir diperbarui: 13 November 2026. Jika struktur berubah, perbarui bagian yang relevan agar tetap menjadi peta yang akurat.*
+_Dokumen ini dibuat berdasarkan kondisi kode saat ini. Terakhir diperbarui: 13 November 2026. Jika struktur berubah, perbarui bagian yang relevan agar tetap menjadi peta yang akurat._
