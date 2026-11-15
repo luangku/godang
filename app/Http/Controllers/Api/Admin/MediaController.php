@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -591,7 +590,17 @@ class MediaController extends Controller
     }
 
     /**
+     * Cached usage map, keyed by the normalized media path.
+     *
+     * @var array<string, array{count: int, labels: array<int, string>}>|null
+     */
+    private ?array $usageCache = null;
+
+    /**
      * Find posts/settings that reference the given media paths.
+     *
+     * Only exact path matches are counted, so "uploads/a.webp" is not reported
+     * as used when an article merely references "uploads/a.webp.bak".
      *
      * @param  array<int, string|null>  $paths
      * @return array<string, array{count: int, labels: array<int, string>}>
@@ -610,46 +619,51 @@ class MediaController extends Controller
             return $usage;
         }
 
-        $normalizedPaths = [];
+        $referenced = $this->referencedUsage();
 
         foreach ($paths as $path) {
-            $normalizedPaths[$path] = Media::diskPath($path) ?? $path;
+            $normalized = Media::diskPath($path) ?? $path;
+
+            $usage[$path] = $referenced[$normalized] ?? ['count' => 0, 'labels' => []];
         }
 
-        $posts = Post::withTrashed()
-            ->where(function (Builder $query) use ($paths, $normalizedPaths) {
-                foreach (array_unique([...$paths, ...array_values($normalizedPaths)]) as $path) {
-                    $query->orWhere('cover_image', 'like', "%{$path}%")
-                        ->orWhere('og_image', 'like', "%{$path}%")
-                        ->orWhere('content', 'like', "%{$path}%");
-                }
-            })
-            ->get(['id', 'title', 'cover_image', 'og_image', 'content']);
+        return $usage;
+    }
 
-        foreach ($posts as $post) {
-            foreach (['cover_image' => 'Cover artikel', 'og_image' => 'OG artikel'] as $column => $label) {
-                $normalized = Media::diskPath($post->{$column});
+    /**
+     * Build the exact usage map for every media path referenced by content.
+     *
+     * @return array<string, array{count: int, labels: array<int, string>}>
+     */
+    private function referencedUsage(): array
+    {
+        if ($this->usageCache !== null) {
+            return $this->usageCache;
+        }
 
-                if ($normalized === null) {
-                    continue;
-                }
+        $usage = [];
 
-                foreach ($normalizedPaths as $path => $pathNormalized) {
-                    if ($pathNormalized === $normalized) {
-                        $this->addUsage($usage[$path], "{$label}: {$post->title}");
+        Post::withTrashed()
+            ->select(['id', 'title', 'cover_image', 'og_image', 'content'])
+            ->chunkById(200, function ($posts) use (&$usage): void {
+                foreach ($posts as $post) {
+                    $cover = Media::diskPath($post->cover_image);
+
+                    if ($cover !== null) {
+                        $this->addUsage($usage, $cover, "Cover artikel: {$post->title}");
+                    }
+
+                    $og = Media::diskPath($post->og_image);
+
+                    if ($og !== null) {
+                        $this->addUsage($usage, $og, "OG artikel: {$post->title}");
+                    }
+
+                    foreach ($this->contentMediaPaths($post->content) as $path) {
+                        $this->addUsage($usage, $path, "Konten artikel: {$post->title}");
                     }
                 }
-            }
-
-            foreach ($paths as $path) {
-                if ($post->content && (
-                    str_contains($post->content, $path)
-                    || str_contains($post->content, $normalizedPaths[$path])
-                )) {
-                    $this->addUsage($usage[$path], "Konten artikel: {$post->title}");
-                }
-            }
-        }
+            });
 
         $settingReferences = [
             'author_avatar' => 'Avatar penulis',
@@ -658,33 +672,55 @@ class MediaController extends Controller
         ];
 
         foreach ($settingReferences as $key => $label) {
-            $settingPath = Media::diskPath(Setting::getValue($key));
+            $path = Media::diskPath(Setting::getValue($key));
 
-            if ($settingPath === null) {
-                continue;
-            }
-
-            foreach ($normalizedPaths as $path => $pathNormalized) {
-                if ($pathNormalized === $settingPath) {
-                    $this->addUsage($usage[$path], $label);
-                }
+            if ($path !== null) {
+                $this->addUsage($usage, $path, $label);
             }
         }
 
-        return $usage;
+        return $this->usageCache = $usage;
     }
 
     /**
-     * Record one usage while keeping the label list short.
+     * Extract every media path referenced from an article body.
      *
-     * @param  array{count: int, labels: array<int, string>}  $usage
+     * Absolute /storage/ URLs and legacy "storage/" prefixes are normalized
+     * before matching so the result is always a public disk path.
+     *
+     * @return array<int, string>
      */
-    private function addUsage(array &$usage, string $label): void
+    private function contentMediaPaths(?string $content): array
     {
-        $usage['count']++;
+        if ($content === null || trim($content) === '') {
+            return [];
+        }
 
-        if (count($usage['labels']) < 5 && ! in_array($label, $usage['labels'], true)) {
-            $usage['labels'][] = $label;
+        $normalized = preg_replace('#(?:https?://[^"\'\s<>()]+?)?/storage/#i', '/', $content) ?? $content;
+
+        preg_match_all('#(?<![\w.-])(?:uploads|cover|avatar|files)/[\w.-]+#i', $normalized, $matches);
+
+        $paths = array_map(
+            fn (string $path): string => rtrim($path, '.,;:'),
+            $matches[0]
+        );
+
+        return array_values(array_unique(array_filter($paths)));
+    }
+
+    /**
+     * Record one usage of a media path while keeping the label list short.
+     *
+     * @param  array<string, array{count: int, labels: array<int, string>}>  $usage
+     */
+    private function addUsage(array &$usage, string $path, string $label): void
+    {
+        $usage[$path] ??= ['count' => 0, 'labels' => []];
+
+        $usage[$path]['count']++;
+
+        if (count($usage[$path]['labels']) < 5 && ! in_array($label, $usage[$path]['labels'], true)) {
+            $usage[$path]['labels'][] = $label;
         }
     }
 
@@ -693,24 +729,29 @@ class MediaController extends Controller
      */
     private function applyUnusedFilter(Builder $query): void
     {
-        $concat = DB::connection()->getDriverName() === 'sqlite'
-            ? "'%' || media.path || '%'"
-            : "CONCAT('%', media.path, '%')";
+        $query->whereNotIn('path', $this->usedPathVariants());
+    }
 
-        $query->whereNotExists(function ($sub) use ($concat): void {
-            $sub->selectRaw('1')
-                ->from('posts')
-                ->where(function ($posts) use ($concat): void {
-                    $posts->whereRaw("posts.cover_image LIKE {$concat}")
-                        ->orWhereRaw("posts.og_image LIKE {$concat}")
-                        ->orWhereRaw("posts.content LIKE {$concat}");
-                });
-        })->whereNotExists(function ($sub) use ($concat): void {
-            $sub->selectRaw('1')
-                ->from('settings')
-                ->whereIn('settings.key', ['author_avatar', 'site_logo', 'site_logo_dark'])
-                ->whereRaw("settings.value LIKE {$concat}");
-        });
+    /**
+     * Every stored representation of a referenced media path.
+     *
+     * Media paths are normalized, but legacy rows may still carry a "storage/"
+     * prefix or an absolute /storage/ URL.
+     *
+     * @return array<int, string>
+     */
+    private function usedPathVariants(): array
+    {
+        $variants = [];
+
+        foreach (array_keys($this->referencedUsage()) as $path) {
+            $variants[] = $path;
+            $variants[] = 'storage/'.$path;
+            $variants[] = '/storage/'.$path;
+            $variants[] = rtrim((string) config('app.url'), '/').'/storage/'.$path;
+        }
+
+        return array_values(array_unique($variants));
     }
 
     /**

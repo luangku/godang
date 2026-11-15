@@ -547,6 +547,45 @@ class AdminMediaTest extends TestCase
         $this->assertSame(1, $counts['Ilustrasi']);
     }
 
+    public function test_usage_detection_ignores_paths_that_only_share_a_prefix(): void
+    {
+        $admin = $this->admin();
+        Media::factory()->create([
+            'path' => 'uploads/prefix.webp',
+            'folder' => 'uploads',
+        ]);
+
+        Post::factory()->create([
+            'content' => '<p><img src="/storage/uploads/prefix.webp.bak"></p>',
+        ]);
+
+        $this->actingAs($admin)
+            ->getJson('/api/admin/media?q=prefix')
+            ->assertOk()
+            ->assertJsonPath('data.0.usage_count', 0)
+            ->assertJsonPath('unused_count', 1);
+    }
+
+    public function test_usage_detection_matches_absolute_storage_urls(): void
+    {
+        $admin = $this->admin();
+        $media = Media::factory()->create([
+            'path' => 'uploads/absolute-exact.webp',
+            'folder' => 'uploads',
+        ]);
+
+        Post::factory()->create([
+            'content' => '<p><img src="'.rtrim((string) config('app.url'), '/').'/storage/'
+                .$media->path.'?cache=1"></p>',
+        ]);
+
+        $this->actingAs($admin)
+            ->getJson('/api/admin/media?q=absolute-exact')
+            ->assertOk()
+            ->assertJsonPath('data.0.usage_count', 1)
+            ->assertJsonPath('unused_count', 0);
+    }
+
     public function test_update_changes_alt_text_and_category(): void
     {
         $admin = $this->admin();

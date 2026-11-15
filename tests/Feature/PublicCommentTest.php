@@ -214,6 +214,38 @@ class PublicCommentTest extends TestCase
             ->assertDontSee('name="email"', false);
     }
 
+    public function test_blog_page_shows_edit_button_only_for_author_comments(): void
+    {
+        $post = Post::factory()->published()->create();
+        $admin = User::factory()->admin()->create();
+
+        Comment::factory()->approved()->create([
+            'post_id' => $post->id,
+            'is_author' => true,
+        ]);
+        Comment::factory()->approved()->create([
+            'post_id' => $post->id,
+            'is_author' => false,
+        ]);
+
+        $response = $this->actingAs($admin)->get("/blog/{$post->slug}")->assertOk();
+
+        $this->assertSame(1, substr_count($response->getContent(), 'class="comment-admin-edit inline-flex'));
+    }
+
+    public function test_blog_page_hides_edit_button_for_guests(): void
+    {
+        $post = Post::factory()->published()->create();
+        Comment::factory()->approved()->create([
+            'post_id' => $post->id,
+            'is_author' => true,
+        ]);
+
+        $response = $this->get("/blog/{$post->slug}")->assertOk();
+
+        $this->assertSame(0, substr_count($response->getContent(), 'class="comment-admin-edit inline-flex'));
+    }
+
     public function test_blog_page_hides_admin_comment_controls_for_guests(): void
     {
         $post = Post::factory()->published()->create();
@@ -270,6 +302,24 @@ class PublicCommentTest extends TestCase
         ])->assertCreated();
 
         $this->assertSame($root->id, $response->json('comment.parent_id'));
+    }
+
+    public function test_store_strips_html_from_the_comment_body(): void
+    {
+        Setting::setValue('comment_moderation', 'false');
+        $post = Post::factory()->published()->create();
+
+        $response = $this->postJson("/api/posts/{$post->id}/comments", [
+            'name' => 'Pembaca',
+            'email' => 'pembaca@example.com',
+            'body' => '<p>Halo <strong>dunia</strong></p><script>alert("xss")</script>',
+        ])->assertCreated();
+
+        $this->assertSame('Halo dunia', $response->json('comment.body'));
+        $this->assertDatabaseHas('comments', [
+            'id' => $response->json('comment.id'),
+            'body' => 'Halo dunia',
+        ]);
     }
 
     public function test_store_is_rate_limited_after_six_requests(): void

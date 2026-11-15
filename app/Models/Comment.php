@@ -49,6 +49,24 @@ class Comment extends Model
     }
 
     /**
+     * Store the comment body as plain text so no markup reaches the page.
+     */
+    protected function body(): Attribute
+    {
+        return Attribute::set(function (?string $value): ?string {
+            if ($value === null) {
+                return null;
+            }
+
+            $text = preg_replace('#<(script|style)\b[^>]*>.*?</\1>#is', '', $value) ?? $value;
+            $text = str_replace(["\r\n", "\r"], "\n", strip_tags($text));
+            $text = preg_replace("/\n{3,}/", "\n\n", $text) ?? $text;
+
+            return trim($text);
+        });
+    }
+
+    /**
      * The post this comment belongs to.
      */
     public function post(): BelongsTo

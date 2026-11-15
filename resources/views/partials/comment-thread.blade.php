@@ -26,7 +26,7 @@
                         {{ \Carbon\Carbon::parse($reply->created_at)->diffForHumans() }}
                     </time>
                 </div>
-                <p class="text-sm text-(--color-text) leading-relaxed">{{ $reply->body }}</p>
+                <p class="comment-body text-sm text-(--color-text) leading-relaxed">{{ $reply->body }}</p>
 
                 <div class="mt-2 flex flex-wrap items-center gap-3">
                     <button type="button"
@@ -39,6 +39,13 @@
                         Balas
                     </button>
                     @if ($isAdmin ?? false)
+                        @if ($reply->is_author ?? false)
+                            <button type="button"
+                                class="comment-admin-edit inline-flex items-center gap-1 text-xs font-medium text-(--color-accent) hover:underline cursor-pointer"
+                                data-comment-id="{{ $reply->id }}">
+                                Edit
+                            </button>
+                        @endif
                         <button type="button"
                             class="comment-admin-spam inline-flex items-center gap-1 text-xs font-medium text-(--color-warning) hover:underline cursor-pointer"
                             data-comment-id="{{ $reply->id }}">

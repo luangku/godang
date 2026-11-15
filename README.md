@@ -1,90 +1,193 @@
-# CMS Blog Godang
+# CMS Blog
 
-Aplikasi Blog Sederhana yang dibuat menggunakan framework Laravel dan di deploy ke ifinityfree
+Aplikasi blog sederhana yang dibangun dengan framework Laravel. Aplikasi ini terdiri dari dua bagian:
+
+- **Halaman publik** — daftar artikel, halaman kategori/tag, pencarian, detail artikel, dan komentar pengunjung.
+- **Panel admin** (`/admin`) — SPA React untuk mengelola artikel, komentar, kategori, tag, media, pengguna admin, dan pengaturan situs.
+
+Aplikasi ini di-deploy ke InfinityFree melalui GitHub Actions.
 
 ## Fitur Aplikasi
 
-- Menampilkan semua daftar postingan
-- Menampilkan daftar berdasarkan kategori
-- Tiap pengunjung bisa meninggalkan komentar di postingan
+### Halaman publik
+
+- Menampilkan semua daftar postingan yang sudah terbit
+- Menampilkan daftar postingan berdasarkan kategori dan tag
+- Pencarian artikel
+- Detail artikel dengan daftar isi (TOC), progress bar bacaan, dan syntax highlighting
+- Tiap pengunjung bisa meninggalkan komentar, termasuk balasan (reply) bertingkat
+- Komentar dimoderasi sebelum tampil (opsional melalui pengaturan)
+- Notifikasi email ke admin saat ada komentar baru, dan ke komentator saat balasannya dibalas
+- SEO: meta title/description, Open Graph, JSON-LD, sitemap, dan RSS
+
+### Panel admin
+
+- Dashboard statistik (artikel, komentar, jumlah tayangan)
+- CRUD artikel dengan editor HTML, preview, penjadwalan terbit, dan soft delete (Trash)
+- Moderasi komentar (setujui, tandai spam, edit, hapus, balas sebagai penulis)
+- Edit komentar milik penulis langsung dari halaman artikel (tombol **Edit** di samping Spam/Hapus)
+- CRUD kategori dan tag
+- Pustaka media: upload gambar (otomatis dikonversi ke WebP dan diperkecil), thumbnail, kategori media, pencarian, serta deteksi media yang masih dipakai artikel/pengaturan
+- Manajemen pengguna admin (tambah, edit, hapus)
+- Pengaturan situs: nama situs, logo, avatar penulis, sosial media, moderasi komentar, dan lainnya
 
 ## Tech dan Versi
 
-Aplikasi ini dibangun dengan menggunakan :
+Aplikasi ini dibangun dengan menggunakan:
 
-- Laragon 6
-- Laravel 13
-- PHP 8.4.1
-- VS Code 1.146
-- Node Js 26.13
-- Git 2.56
-- Composer 2.11.2
-- Opencode 2.2.7
+| Komponen | Versi |
+| --- | --- |
+| Laragon | 6 |
+| PHP | 8.5.12 |
+| Laravel | 13.37.0 |
+| Composer | 2.11.1 |
+| Node.js | 26.13.0 |
+| npm | 12.2.2 |
+| Git | 2.56 |
+| VS Code | 1.146 |
+| OpenCode | 2.2.7 |
 
-Lebih lengkapnya silahkan lihat STRUCTURE.md
+> Versi di atas adalah versi yang dipakai saat dokumentasi ini diperbarui. Versi minimum yang dibutuhkan mengikuti `composer.json` dan `package.json`.
 
 ## Instalasi
 
-- Cloning repository git ke sebuah folder di local
+- Buka folder `C:\laragon\www` di aplikasi VS Code (jika Laragon di-install di drive C)
+- Buka terminal di VS Code dan jalankan
 
 ```sh
-git clone https://github.com/luangku/simple-blog.git
+git clone https://github.com/luangku/godang.git
 ```
 
-- Install modul yang dibutuhkan
+- Di VS Code klik **File → Open Folder**, lalu pilih folder hasil clone
+- Install modul frontend yang dibutuhkan
 
 ```sh
 npm install
 ```
 
-- Install depedensi via composer
+- Install dependensi PHP via Composer
 
 ```sh
 composer install
 ```
 
-- Generate autoload dengan composer (jika belum ada)
+- Generate autoload Composer (jika folder `vendor` belum lengkap)
 
 ```sh
 composer dump-autoload
 ```
 
+- Copy file `.env.example` lalu rename menjadi `.env`
+
+```sh
+copy .env.example .env
+```
+
+- Isi opsi `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, dan `DB_PASSWORD` di `.env` sesuai kredensial database yang sudah dibuat
+- Jalankan Laragon, lalu klik **Start All**
 - Lakukan migrasi database dan jalankan seeder
 
 ```sh
 php artisan migrate:fresh --seed
 ```
 
-- Copy file .env.example dan rename menjadi .env
-
-```sh
-.env
-```
-
-- Pada file `.env` isikan opsi `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, dan `DB_PASSWORD` sesuai dengan kredensial database yang sudah di buat
-
-- Buat simbolik link agar fitur upload bisa berfungsi
+- Buat symbolic link agar fitur upload media bisa berfungsi
 
 ```sh
 php artisan storage:link
 ```
 
-- Generate key
+- Generate application key
 
 ```sh
 php artisan key:generate
 ```
 
-- Lalu jalankan
+- Build asset frontend
 
 ```sh
 npm run build
 ```
 
-- Jalankan aplikasi Laragon, lalu klik start all
-
-- Buka aplikasi blog di browser
+- Buka aplikasi Laragon, klik kanan, pilih **www**, lalu pilih folder proyek. Atau langsung buka:
 
 ```sh
-http://simple-blog.test
+http://godang.test
 ```
+
+## Login Admin
+
+- URL login: `http://godang.test/admin/login`
+- Email: `admin@godang.com`
+- Password: `password`
+
+> Segera ganti email dan password default setelah instalasi.
+
+## Mengelola Pengguna Admin
+
+Pengguna admin sekarang dikelola langsung dari panel admin, tidak perlu lagi memakai `php artisan tinker`.
+
+1. Login sebagai admin.
+2. Buka menu **Pengguna** di sidebar (`/admin/users`).
+3. Isi form **Tambah Admin** (nama, email, password, konfirmasi password) lalu klik **Simpan**.
+4. Untuk mengubah data, klik **Edit** pada baris admin. Kosongkan kolom password bila tidak ingin menggantinya.
+5. Untuk menghapus, klik **Hapus** lalu konfirmasi.
+
+Pengaman yang berlaku:
+
+- Hanya akun dengan `is_admin = true` yang muncul dan bisa dikelola di halaman ini.
+- Admin tidak dapat menghapus akunnya sendiri.
+- Admin yang masih memiliki artikel (termasuk artikel di Trash) tidak dapat dihapus. Pindahkan atau hapus artikelnya terlebih dahulu.
+- Minimal harus ada satu admin yang tersisa.
+
+Jika Anda terkunci di luar panel admin, gunakan perintah darurat berikut:
+
+```sh
+php artisan tinker --execute 'User::where("email", "admin@godang.com")->update(["password" => Hash::make("password_baru")]);'
+```
+
+## Queue Email
+
+Notifikasi email (komentar baru dan balasan komentar) dikirim melalui queue. Konfigurasi default di `.env.example` adalah:
+
+```sh
+QUEUE_CONNECTION=database
+```
+
+Artinya email tidak dikirim saat request berjalan, tetapi masuk ke tabel `jobs` lebih dulu. Agar email benar-benar terkirim, jalankan worker di server:
+
+```sh
+php artisan queue:work --tries=3
+```
+
+Untuk produksi, jalankan worker tersebut lewat supervisor, cron, atau process manager lain yang tersedia di hosting. Jika hosting tidak mendukung worker sama sekali, ubah `QUEUE_CONNECTION=sync` agar email dikirim langsung (konsekuensinya request bisa lebih lambat bila server SMTP bermasalah).
+
+Konfigurasi email sendiri diatur melalui variabel `MAIL_*` di `.env`.
+
+## Testing
+
+```sh
+php artisan test
+```
+
+Test menggunakan SQLite in-memory (`phpunit.xml`), jadi tidak mengganggu database development. Untuk menjalankan sebagian test saja:
+
+```sh
+php artisan test --filter=NamaTest
+```
+
+## Deployment
+
+Deploy otomatis berjalan melalui `.github/workflows/infinityfree.yml` setiap kali ada push ke branch `main`. Workflow ini meng-upload file ke hosting via FTP.
+
+Beberapa hal yang sengaja dilakukan agar cocok dengan keterbatasan hosting:
+
+- **`vendor/` ikut di-commit.** Hosting InfinityFree tidak menyediakan Composer dan tidak menjalankan `composer install` saat deploy. Karena itu dependensi PHP disimpan di repository agar aplikasi langsung bisa jalan setelah di-upload. Konsekuensinya ukuran repository lebih besar; perbarui folder ini setiap kali dependensi berubah (`composer update`).
+- **`public/build/` ikut di-commit.** Hosting tidak menjalankan `npm install`/`npm run build`, sehingga asset hasil build harus sudah ada di repository. Jalankan `npm run build` sebelum commit jika ada perubahan JavaScript/CSS.
+- **`STRUCTURE.md` tidak ikut di-upload.** File ini hanya dokumentasi teknis untuk developer, bukan bagian dari aplikasi, jadi sengaja dikecualikan dari proses deploy.
+- **Scheduler tidak berjalan otomatis.** Hosting tidak menyediakan cron yang bisa memanggil `php artisan schedule:run`, sehingga artikel berstatus `scheduled` perlu diterbitkan manual (atau lewat cron eksternal) di hosting yang mendukung.
+
+## Struktur Dokumentasi
+
+- `README.md` — panduan instalasi, penggunaan, dan deployment (file ini).
+- `STRUCTURE.md` — dokumentasi teknis lengkap: arsitektur, routing, model, controller, komponen frontend, skema database, dan daftar test.

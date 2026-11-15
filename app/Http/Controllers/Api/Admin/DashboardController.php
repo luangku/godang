@@ -16,7 +16,7 @@ class DashboardController extends Controller
     {
         return response()->json([
             'total_posts' => Post::count(),
-            'published_posts' => Post::where('status', 'published')->count(),
+            'published_posts' => Post::published()->count(),
             'draft_posts' => Post::where('status', 'draft')->count(),
             'scheduled_posts' => Post::where('status', 'scheduled')->count(),
             'total_views' => Post::sum('views_count'),

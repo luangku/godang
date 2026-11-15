@@ -298,4 +298,40 @@ class AuthLoginTest extends TestCase
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['email']);
     }
+
+    public function test_forgot_password_is_throttled_per_email(): void
+    {
+        Notification::fake();
+
+        User::factory()->admin()->create(['email' => 'admin@example.com']);
+        $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.55']);
+
+        foreach (range(1, 3) as $attempt) {
+            $this->withHeaders($this->statefulHeaders())
+                ->postJson('/api/auth/forgot-password', ['email' => 'admin@example.com'])
+                ->assertOk();
+        }
+
+        $this->withHeaders($this->statefulHeaders())
+            ->postJson('/api/auth/forgot-password', ['email' => 'admin@example.com'])
+            ->assertTooManyRequests();
+    }
+
+    public function test_forgot_password_throttle_is_scoped_per_email(): void
+    {
+        Notification::fake();
+
+        User::factory()->admin()->create(['email' => 'admin@example.com']);
+        $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.56']);
+
+        foreach (range(1, 3) as $attempt) {
+            $this->withHeaders($this->statefulHeaders())
+                ->postJson('/api/auth/forgot-password', ['email' => 'admin@example.com'])
+                ->assertOk();
+        }
+
+        $this->withHeaders($this->statefulHeaders())
+            ->postJson('/api/auth/forgot-password', ['email' => 'other@example.com'])
+            ->assertOk();
+    }
 }

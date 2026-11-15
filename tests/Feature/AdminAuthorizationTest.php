@@ -22,6 +22,7 @@ class AdminAuthorizationTest extends TestCase
             'categories index' => ['/api/admin/categories'],
             'tags index' => ['/api/admin/tags'],
             'comments index' => ['/api/admin/comments'],
+            'users index' => ['/api/admin/users'],
             'settings index' => ['/api/admin/settings'],
         ];
     }

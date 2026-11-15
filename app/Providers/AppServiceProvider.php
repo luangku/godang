@@ -28,5 +28,14 @@ class AppServiceProvider extends ServiceProvider
                 Str::lower((string) $request->input('email')).'|'.$request->ip()
             ));
         });
+
+        RateLimiter::for('forgot-password', function (Request $request): array {
+            $email = Str::transliterate(Str::lower((string) $request->input('email')));
+
+            return [
+                Limit::perMinute(3)->by('forgot-password:'.$email.'|'.$request->ip()),
+                Limit::perMinute(10)->by('forgot-password-ip:'.$request->ip()),
+            ];
+        });
     }
 }

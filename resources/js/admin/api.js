@@ -58,5 +58,6 @@ export const endpoints = {
     mediaBulkForceDelete: '/admin/media/bulk-force-delete',
     mediaRestore: (id) => `/admin/media/${id}/restore`,
     mediaForceDelete: (id) => `/admin/media/${id}/force`,
+    users: '/admin/users',
     settings: '/admin/settings',
 };

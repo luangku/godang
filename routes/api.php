@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\Admin\MediaController;
 use App\Http\Controllers\Api\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Api\Admin\SettingController;
 use App\Http\Controllers\Api\Admin\TagController as AdminTagController;
+use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CommentController;
@@ -41,7 +42,9 @@ Route::get('/site/settings', [SiteController::class, 'settings'])->name('api.sit
 Route::post('/auth/login', [AuthController::class, 'login'])
     ->middleware('throttle:login')
     ->name('api.auth.login');
-Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword'])->name('api.auth.forgot-password');
+Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword'])
+    ->middleware('throttle:forgot-password')
+    ->name('api.auth.forgot-password');
 Route::post('/auth/reset-password', [AuthController::class, 'resetPassword'])->name('api.auth.reset-password');
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -96,6 +99,9 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->name('api.admin.'
     Route::post('/media-categories', [MediaCategoryController::class, 'store'])->name('media-categories.store');
     Route::patch('/media-categories/{mediaCategory}', [MediaCategoryController::class, 'update'])->name('media-categories.update');
     Route::delete('/media-categories/{mediaCategory}', [MediaCategoryController::class, 'destroy'])->name('media-categories.destroy');
+
+    // Admin users
+    Route::apiResource('users', AdminUserController::class)->except(['show']);
 
     // Settings
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');

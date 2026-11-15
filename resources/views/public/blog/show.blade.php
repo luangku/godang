@@ -342,7 +342,7 @@
                                                 {{ \Carbon\Carbon::parse($comment->created_at)->diffForHumans() }}
                                             </time>
                                         </div>
-                                        <p class="text-sm text-(--color-text) leading-relaxed">{{ $comment->body }}</p>
+                                        <p class="comment-body text-sm text-(--color-text) leading-relaxed">{{ $comment->body }}</p>
 
                                         <div class="mt-3 flex flex-wrap items-center gap-3">
                                             <button type="button"
@@ -356,6 +356,13 @@
                                                 Balas
                                             </button>
                                             @if ($isAdmin)
+                                                @if ($comment->is_author ?? false)
+                                                    <button type="button"
+                                                        class="comment-admin-edit inline-flex items-center gap-1 text-xs font-medium text-(--color-accent) hover:underline cursor-pointer"
+                                                        data-comment-id="{{ $comment->id }}">
+                                                        Edit
+                                                    </button>
+                                                @endif
                                                 <button type="button"
                                                     class="comment-admin-spam inline-flex items-center gap-1 text-xs font-medium text-(--color-warning) hover:underline cursor-pointer"
                                                     data-comment-id="{{ $comment->id }}">
@@ -538,11 +545,21 @@
             const commentsToggle = document.getElementById('comments-toggle');
             const commentsList = document.getElementById('comments-list');
             const commentsChevron = document.getElementById('comments-toggle-chevron');
+
+            const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;',
+            })[character]);
+
             @if ($isAdmin)
                 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
-                const adminActions = (commentId) => `
+                const adminActions = (commentId, isAuthor = false) => `
                     <div class="mt-2 flex flex-wrap items-center gap-3 comment-admin-actions">
+                        ${isAuthor ? `<button type="button" class="comment-admin-edit text-xs font-medium text-(--color-accent) hover:underline cursor-pointer" data-comment-id="${commentId}">Edit</button>` : ''}
                         <button type="button" class="comment-admin-spam text-xs font-medium text-(--color-warning) hover:underline cursor-pointer" data-comment-id="${commentId}">Spam</button>
                         <button type="button" class="comment-admin-delete text-xs font-medium text-(--color-error) hover:underline cursor-pointer" data-comment-id="${commentId}">Hapus</button>
                     </div>`;
@@ -559,7 +576,85 @@
                     }
                 };
 
+                const startCommentEdit = (button) => {
+                    const card = button.closest('[id^="comment-"]');
+                    const bodyEl = card?.querySelector('.comment-body');
+                    if (!card || !bodyEl || card.querySelector('.comment-edit-form')) return;
+
+                    const original = bodyEl.textContent;
+                    const textarea = document.createElement('textarea');
+                    textarea.className = 'comment-edit-input w-full px-3 py-2 rounded-lg bg-(--color-bg) border border-(--color-border) text-sm text-(--color-text) focus:border-(--color-accent) focus:ring-1 focus:ring-(--color-accent) outline-none resize-y';
+                    textarea.rows = 3;
+                    textarea.value = original;
+
+                    const actions = document.createElement('div');
+                    actions.className = 'comment-edit-form mt-2 flex items-center gap-2';
+
+                    const saveButton = document.createElement('button');
+                    saveButton.type = 'button';
+                    saveButton.className = 'px-3 py-1.5 rounded-lg bg-(--color-accent) text-(--color-on-accent) text-xs font-medium hover:opacity-90 disabled:opacity-60';
+                    saveButton.textContent = 'Simpan';
+
+                    const cancelButton = document.createElement('button');
+                    cancelButton.type = 'button';
+                    cancelButton.className = 'px-2.5 py-1.5 rounded-lg border border-(--color-border) text-xs text-(--color-text-muted) hover:text-(--color-text)';
+                    cancelButton.textContent = 'Batal';
+
+                    actions.append(saveButton, cancelButton);
+                    bodyEl.replaceWith(textarea);
+                    textarea.after(actions);
+                    textarea.focus();
+
+                    const closeEdit = () => {
+                        actions.remove();
+                        textarea.replaceWith(bodyEl);
+                    };
+
+                    cancelButton.addEventListener('click', closeEdit);
+
+                    saveButton.addEventListener('click', async () => {
+                        const body = textarea.value.trim();
+                        if (!body) {
+                            window.alert('Komentar tidak boleh kosong.');
+                            return;
+                        }
+
+                        saveButton.disabled = true;
+
+                        try {
+                            const response = await fetch(`/api/admin/comments/${card.id.replace('comment-', '')}`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'X-CSRF-TOKEN': csrfToken,
+                                },
+                                body: JSON.stringify({ body }),
+                            });
+
+                            const data = await response.json().catch(() => ({}));
+
+                            if (!response.ok) {
+                                throw new Error(data.message || 'Request failed');
+                            }
+
+                            bodyEl.textContent = data.comment?.body ?? body;
+                            closeEdit();
+                        } catch (error) {
+                            window.alert('Gagal menyimpan komentar. Silakan coba lagi.');
+                            saveButton.disabled = false;
+                        }
+                    });
+                };
+
                 commentsList?.addEventListener('click', async (event) => {
+                    const editButton = event.target.closest('.comment-admin-edit');
+                    if (editButton) {
+                        startCommentEdit(editButton);
+                        return;
+                    }
+
                     const spamButton = event.target.closest('.comment-admin-spam');
                     const deleteButton = event.target.closest('.comment-admin-delete');
                     if (!spamButton && !deleteButton) return;
@@ -681,16 +776,16 @@
                     card.innerHTML = `
                     <div class="flex items-start gap-3">
                         <div class="w-10 h-10 rounded-full bg-gradient-to-br from-(--color-accent-bg) to-(--color-accent)/20 flex items-center justify-center flex-shrink-0">
-                            <span class="text-sm font-bold text-(--color-accent)">${(comment.name || '?').substring(0,1).toUpperCase()}</span>
+                            <span class="text-sm font-bold text-(--color-accent)">${escapeHtml((comment.name || '?').substring(0,1).toUpperCase())}</span>
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-1 flex-wrap">
-                                <span class="font-semibold text-sm">${comment.name || ''}</span>
+                                <span class="font-semibold text-sm">${escapeHtml(comment.name)}</span>
                                 ${comment.is_author ? `<span class="text-xs px-2 py-0.5 rounded-md bg-(--color-accent) text-(--color-on-accent) font-medium">Penulis</span>` : ''}
                                 <time class="text-xs text-(--color-text-muted)">Baru saja</time>
                             </div>
-                            <p class="text-sm text-(--color-text) leading-relaxed">${comment.body || ''}</p>
-                            ${adminActions(comment.id)}
+                            <p class="comment-body text-sm text-(--color-text) leading-relaxed">${escapeHtml(comment.body)}</p>
+                            ${adminActions(comment.id, comment.is_author)}
                         </div>
                     </div>`;
                     commentsList.prepend(card);
@@ -720,17 +815,17 @@
                     replyEl.innerHTML = `
                     <div class="flex items-start gap-2">
                         <div class="w-8 h-8 rounded-full bg-gradient-to-br from-(--color-accent-bg) to-(--color-accent)/20 flex items-center justify-center flex-shrink-0">
-                            <span class="text-xs font-bold text-(--color-accent)">${(reply.name || '?').substring(0,1).toUpperCase()}</span>
+                            <span class="text-xs font-bold text-(--color-accent)">${escapeHtml((reply.name || '?').substring(0,1).toUpperCase())}</span>
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-1 flex-wrap">
-                                <span class="font-semibold text-sm">${reply.name || ''}</span>
+                                <span class="font-semibold text-sm">${escapeHtml(reply.name)}</span>
                                 ${reply.is_author ? `<span class="text-xs px-2 py-0.5 rounded-md bg-(--color-accent) text-(--color-on-accent) font-medium">Penulis</span>` : ''}
-                                ${reply.reply_to_name ? `<span class="text-xs text-(--color-text-muted)">membalas ke @${reply.reply_to_name}</span>` : ''}
+                                ${reply.reply_to_name ? `<span class="text-xs text-(--color-text-muted)">membalas ke @${escapeHtml(reply.reply_to_name)}</span>` : ''}
                                 <time class="text-xs text-(--color-text-muted)">Baru saja</time>
                             </div>
-                            <p class="text-sm text-(--color-text) leading-relaxed">${reply.body || ''}</p>
-                            ${adminActions(reply.id)}
+                            <p class="comment-body text-sm text-(--color-text) leading-relaxed">${escapeHtml(reply.body)}</p>
+                            ${adminActions(reply.id, reply.is_author)}
                         </div>
                     </div>`;
                     repliesWrap.prepend(replyEl);
