@@ -113,7 +113,7 @@ godang/
 ├── config/                        # 11 file konfigurasi Laravel
 ├── database/
 │   ├── factories/                 # 7 factory
-│   ├── migrations/                # 11 migration
+│   ├── migrations/                # 12 migration
 │   └── seeders/                   # 7 seeder (1 tidak dipanggil)
 ├── public/
 │   ├── build/                     # hasil `npm run build` (di-track git)
@@ -319,6 +319,7 @@ Shell admin
   -> GET /admin/login atau /admin/{path?}
   -> middleware ShareSiteSettings yang sama
   -> admin.blade.php memakai $site untuk logo/nama situs sebelum React mount
+  -> setelah login, sidebar menampilkan user.name dari tabel users
 ```
 
 Perubahan settings langsung berlaku pada request publik berikutnya; tidak ada cache tambahan. Logo situs dan avatar penulis hanya menyimpan path media, jadi tidak ada penyalinan file saat settings disimpan.
@@ -505,10 +506,11 @@ Index: `folder`, dan `['type', 'deleted_at']`.
 - **Reading time** dihitung ulang setiap kali `content` tidak kosong: `max(1, ceil(jumlah kata / 200))`.
 - **`Post::published()`** berarti `status = published`, `published_at` tidak null, dan `published_at <= now()`. Artikel `scheduled` yang waktunya sudah lewat belum otomatis tampil sampai command scheduler mengubah statusnya.
 - **Soft delete artikel** tidak menghapus komentar. Komentar baru ikut hilang jika artikel di-force-delete (FK cascade).
-- **`Comment` name accessor** menampilkan `author_name` dari setting untuk komentar yang `is_author = true`.
+- **`Comment` name accessor** memakai nama yang tersimpan di komentar. Fallback ke `author_name` dari setting hanya jika komentar `is_author = true` tidak punya nama (data lama). Nama komentar admin diisi dari `users.name` akun yang menulis saat komentar dibuat.
 - **`Comment` body mutator** membuang blok `<script>`/`<style>`, seluruh tag HTML, menormalkan baris baru, dan `trim()`. Body selalu tersimpan sebagai teks polos, termasuk komentar yang dibuat dari panel admin.
 - **`Media::diskPath()`** menerima path relatif, path berawalan `storage/`, atau URL absolut yang mengandung `/storage/`, lalu mengembalikan path relatif disk `public`. URL eksternal non-storage dikembalikan apa adanya oleh `urlFor()`.
 - **`Media::thumbnailPathFor()`** mengubah `folder/name.ext` menjadi `folder/name-thumb.webp`.
+- **Migrasi `backfill_admin_comment_names`** menyalin `users.name` saat ini ke komentar `is_author = true` yang `email`-nya cocok dengan akun admin (perbandingan case-insensitive). Komentar demo dengan email palsu tidak berubah. Migrasi ini tidak bisa di-rollback karena nama lama tidak disimpan terpisah.
 
 ### 6.4 Siklus hidup artikel
 
@@ -639,7 +641,7 @@ Endpoint: `POST /api/posts/{post}/comments` (throttle 6/menit).
    - Balasan ke komentar root menjadi anak root.
    - Balasan ke balasan tetap ditempel di bawah root yang sama, dengan `reply_to_name` diisi nama yang dibalas.
 7. Status:
-   - Admin → langsung `approved`, `is_author = true`.
+   - Admin → langsung `approved`, `is_author = true`, `name` diisi `users.name` akun admin yang menulis, `email` diisi email akun tersebut.
    - Non-admin + `comment_moderation=true` → `pending`.
    - Non-admin + moderasi mati → `approved`.
 8. Metadata: `ip_hash` = SHA-256 IP, `user_agent` disimpan.
@@ -656,13 +658,13 @@ Endpoint: `POST /api/posts/{post}/comments` (throttle 6/menit).
 - Pengunjung bisa mengurutkan **Terbaru / Terlama** di sisi klien.
 - Form komentar dikirim via `fetch`, lalu komentar baru langsung ditambahkan ke DOM.
 - Komentar baru di DOM dibangun dengan helper `escapeHtml()` untuk nama, body, dan `reply_to_name`, sehingga meskipun body disimpan sebagai teks polos, karakter seperti `<`, `>`, `&`, dan kutip tetap tidak bisa menyuntikkan markup.
-- Admin yang sedang login melihat badge "Mode Admin", tidak perlu mengisi nama/email, dan mendapat tombol **Spam** serta **Hapus** langsung di halaman artikel. Khusus komentar milik penulis (`is_author = true`), tersedia tombol **Edit** yang mengubah body secara inline lewat `PUT /api/admin/comments/{comment}`.
+- Admin yang sedang login melihat badge "Mode Admin — nama admin" (dari `users.name`), tidak perlu mengisi nama/email, dan mendapat tombol **Spam** serta **Hapus** langsung di halaman artikel. Komentar admin ditandai badge **Admin** di samping namanya. Khusus komentar admin (`is_author = true`), tersedia tombol **Edit** yang mengubah body secara inline lewat `PUT /api/admin/comments/{comment}`.
 
 ### 8.3 Moderasi admin
 
 | Aksi | Endpoint | Perilaku |
 |---|---|---|
-| Daftar | `GET /api/admin/comments` | Filter `status`, `post_id`, `category_id`; default hanya root comment; email di-`makeVisible` untuk admin. |
+| Daftar | `GET /api/admin/comments` | Filter `status`, `post_id`, `category_id`; `sort=desc` (default) atau `sort=asc` untuk urutan waktu komentar induk dan balasan; default hanya root comment; email di-`makeVisible` untuk admin. |
 | Buat | `POST /api/admin/comments` | Komentar root sebagai author, langsung approved. |
 | Edit | `PUT /api/admin/comments/{comment}` | Mengubah body. |
 | Approve | `PATCH /api/admin/comments/{comment}` | Status menjadi approved. |
@@ -786,7 +788,7 @@ Default penting:
 | `Setting::getValue($key, $default)` | Ambil satu nilai, fallback ke default. |
 | `Setting::setValue($key, $value)` | `updateOrCreate` berdasarkan key. |
 | `Setting::allValues()` | Semua default yang ditimpa nilai database. |
-| `Setting::authorName($fallback)` | Nama penulis yang dipakai untuk komentar author. |
+| `Setting::authorName($fallback)` | Nama penulis publik untuk halaman About/landing dan fallback komentar author yang tidak punya nama tersimpan. |
 
 ### 10.3 Alur ke tampilan
 
@@ -932,7 +934,7 @@ Semua halaman admin di-lazy-load. Path lain diarahkan ke `/admin`.
 | `PostForm.jsx` | React Hook Form + Zod; editor HTML mentah; snippet tag saat mengetik; slug otomatis dan peringatan jika slug artikel terbit berubah; status draft/published/scheduled; `published_at`; kategori; tag; meta title/description; cover dan OG image via `MediaPicker`; upload langsung ke media library; preview. |
 | `PostView.jsx` | Pratinjau artikel dari admin. |
 | `Trash.jsx` | Artikel soft-deleted, restore, hapus permanen. |
-| `Comments.jsx` | Filter status/post/kategori; buka thread; approve; edit; reply; spam; hapus; bulk delete. |
+| `Comments.jsx` | Filter status/kategori dan urutan waktu (**Terbaru dulu** default atau **Terlama dulu**); buka thread; approve; edit; reply; spam; hapus; bulk delete. |
 | `Categories.jsx` | CRUD kategori dengan slug. |
 | `Tags.jsx` | CRUD tag dengan slug. |
 | `Media.jsx` | Grid media, pencarian, filter folder/kategori/tipe, sort, upload gambar/file, edit alt & kategori, lihat usage, pindah ke trash. |
@@ -944,7 +946,7 @@ Semua halaman admin di-lazy-load. Path lain diarahkan ke `/admin`.
 
 Komponen pendukung:
 
-- `Shell.jsx` — sidebar desktop, menu mobile, toggle tema, logout.
+- `Shell.jsx` — sidebar desktop, menu mobile, toggle tema, logout, dan nama admin yang sedang login (`user.name`) di samping tombol **Keluar**.
 - `MediaPicker.jsx` — modal pemilih media.
 - `MediaEditModal.jsx`, `MediaCategoryManager.jsx` — edit metadata dan kategori media.
 - `PostComments.jsx` — thread komentar di halaman edit/preview.
@@ -1105,7 +1107,7 @@ Saat dokumen ini diperbarui:
 
 ```
 php artisan test --compact
-237 tests, 867 assertions, semua lulus
+238 tests, 873 assertions, semua lulus
 ```
 
 Durasi sekitar 32 detik di mesin lokal.
@@ -1500,7 +1502,7 @@ Fakta yang dicek langsung saat dokumen ini dibuat:
 | Controller | 19 file (termasuk `Controller.php`) |
 | Seeder | 7 file (6 dipanggil, `MediaSeeder` tidak) |
 | Factory | 7 |
-| Test | 237 test, 867 assertion, semua lulus |
+| Test | 238 test, 873 assertion, semua lulus |
 | File test | 24 (22 feature, 1 unit, `TestCase.php`) |
 | Command kustom | 3 |
 | Notifikasi | 2 |

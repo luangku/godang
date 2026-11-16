@@ -13,12 +13,12 @@ class AdminDashboardTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_recent_comments_use_author_name_for_author_comments(): void
+    public function test_recent_comments_use_stored_names(): void
     {
-        $admin = User::factory()->admin()->create(['name' => 'Admin']);
+        $admin = User::factory()->admin()->create(['name' => 'Admin Utama']);
         Setting::setValue('author_name', 'Nama Penulis');
 
-        Comment::factory()->authorReply()->create(['name' => 'Admin']);
+        Comment::factory()->authorReply()->create(['name' => 'Admin Utama']);
         Comment::factory()->approved()->create(['name' => 'Pembaca']);
 
         $recent = collect(
@@ -28,7 +28,7 @@ class AdminDashboardTest extends TestCase
                 ->json('recent_comments')
         );
 
-        $this->assertSame('Nama Penulis', $recent->firstWhere('is_author', true)['name']);
+        $this->assertSame('Admin Utama', $recent->firstWhere('is_author', true)['name']);
         $this->assertSame('Pembaca', $recent->firstWhere('is_author', false)['name']);
     }
 

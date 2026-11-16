@@ -45,7 +45,7 @@ class AdminCommentModerationTest extends TestCase
 
     public function test_reply_creates_approved_author_comment(): void
     {
-        $admin = User::factory()->admin()->create(['name' => 'Admin']);
+        $admin = User::factory()->admin()->create(['name' => 'Admin Utama']);
         $comment = Comment::factory()->approved()->create();
         Setting::setValue('author_name', 'Godang');
 
@@ -56,7 +56,7 @@ class AdminCommentModerationTest extends TestCase
             ->assertCreated()
             ->assertJsonPath('reply.status', 'approved')
             ->assertJsonPath('reply.is_author', true)
-            ->assertJsonPath('reply.name', 'Godang')
+            ->assertJsonPath('reply.name', 'Admin Utama')
             ->assertJsonPath('reply.parent_id', $comment->id);
     }
 

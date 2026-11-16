@@ -26,7 +26,7 @@ export default function Shell() {
     const logout = useAuth((state) => state.logout);
     const navigate = useNavigate();
     const [siteData] = useState(initialSiteData);
-    const authorName = siteData.author_name || user?.name || user?.email;
+    const adminName = user?.name || user?.email || siteData.author_name;
     const logoLight = siteData.site_logo || siteData.site_logo_dark;
     const logoDark = siteData.site_logo_dark || siteData.site_logo;
 
@@ -116,8 +116,8 @@ export default function Shell() {
                 </nav>
 
                 <div className="px-5 py-4 border-t border-(--color-border) flex items-center justify-between gap-2">
-                    <p className="text-xs text-(--color-text-muted) truncate" title={authorName}>
-                        {authorName}
+                    <p className="text-xs text-(--color-text-muted) truncate" title={adminName}>
+                        {adminName}
                     </p>
                     <button
                         type="button"

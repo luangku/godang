@@ -44,9 +44,46 @@ class AdminCommentManagementTest extends TestCase
         $this->assertCount(1, $response->json('data.0.replies'));
     }
 
+    public function test_index_sorts_comments_and_replies_by_time(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $older = Comment::factory()->approved()->create(['created_at' => now()->subDays(2)]);
+        $newer = Comment::factory()->approved()->create(['created_at' => now()->subDay()]);
+        $olderReply = Comment::factory()->approved()->create([
+            'post_id' => $older->post_id,
+            'parent_id' => $older->id,
+            'created_at' => now()->subDays(4),
+        ]);
+        $newerReply = Comment::factory()->approved()->create([
+            'post_id' => $older->post_id,
+            'parent_id' => $older->id,
+            'created_at' => now()->subHours(2),
+        ]);
+
+        $descending = $this->actingAs($admin)
+            ->getJson('/api/admin/comments')
+            ->assertOk();
+
+        $this->assertSame([$newer->id, $older->id], array_column($descending->json('data'), 'id'));
+        $this->assertSame(
+            [$newerReply->id, $olderReply->id],
+            array_column($descending->json('data.1.replies'), 'id')
+        );
+
+        $ascending = $this->actingAs($admin)
+            ->getJson('/api/admin/comments?sort=asc')
+            ->assertOk();
+
+        $this->assertSame([$older->id, $newer->id], array_column($ascending->json('data'), 'id'));
+        $this->assertSame(
+            [$olderReply->id, $newerReply->id],
+            array_column($ascending->json('data.0.replies'), 'id')
+        );
+    }
+
     public function test_store_creates_top_level_author_comment(): void
     {
-        $admin = User::factory()->admin()->create(['name' => 'Admin', 'email' => 'admin@example.com']);
+        $admin = User::factory()->admin()->create(['name' => 'Admin Utama', 'email' => 'admin@example.com']);
         $post = Post::factory()->published()->create();
         Setting::setValue('author_name', 'Godang');
 
@@ -58,14 +95,14 @@ class AdminCommentManagementTest extends TestCase
             ->assertCreated()
             ->assertJsonPath('comment.status', 'approved')
             ->assertJsonPath('comment.is_author', true)
-            ->assertJsonPath('comment.name', 'Godang')
+            ->assertJsonPath('comment.name', 'Admin Utama')
             ->assertJsonPath('comment.email', 'admin@example.com')
             ->assertJsonPath('comment.post_id', $post->id)
             ->assertJsonPath('comment.parent_id', null);
 
         $this->assertDatabaseHas('comments', [
             'post_id' => $post->id,
-            'name' => 'Godang',
+            'name' => 'Admin Utama',
             'is_author' => true,
             'status' => 'approved',
         ]);

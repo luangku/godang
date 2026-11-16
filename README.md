@@ -26,6 +26,7 @@ Aplikasi ini di-deploy ke InfinityFree melalui GitHub Actions.
 - CRUD artikel dengan editor HTML, preview, penjadwalan terbit, dan soft delete (Trash)
 - Moderasi komentar (setujui, tandai spam, edit, hapus, balas sebagai penulis)
 - Edit komentar milik penulis langsung dari halaman artikel (tombol **Edit** di samping Spam/Hapus)
+- Nama admin di komentar (dengan badge **Admin**), badge "Mode Admin", dan sidebar diambil dari akun admin (`users.name`), bukan dari setting nama penulis
 - CRUD kategori dan tag
 - Pustaka media: upload gambar (otomatis dikonversi ke WebP dan diperkecil), thumbnail, kategori media, pencarian, serta deteksi media yang masih dipakai artikel/pengaturan
 - Manajemen pengguna admin (tambah, edit, hapus)

@@ -126,7 +126,7 @@ class PublicCommentTest extends TestCase
     public function test_admin_can_comment_without_name_and_email(): void
     {
         $post = Post::factory()->published()->create();
-        $admin = User::factory()->admin()->create(['name' => 'Admin']);
+        $admin = User::factory()->admin()->create(['name' => 'Admin Utama']);
         Setting::setValue('author_name', 'Godang');
         Setting::setValue('comment_moderation', 'true');
 
@@ -136,23 +136,23 @@ class PublicCommentTest extends TestCase
 
         $response->assertCreated()
             ->assertJsonPath('message', 'Komentar berhasil dikirim.')
-            ->assertJsonPath('comment.name', 'Godang')
+            ->assertJsonPath('comment.name', 'Admin Utama')
             ->assertJsonPath('comment.status', 'approved')
             ->assertJsonPath('comment.is_author', true);
 
         $this->assertDatabaseHas('comments', [
             'post_id' => $post->id,
-            'name' => 'Godang',
+            'name' => 'Admin Utama',
             'email' => $admin->email,
             'status' => 'approved',
             'is_author' => true,
         ]);
     }
 
-    public function test_admin_comment_uses_author_name_instead_of_submitted_fields(): void
+    public function test_admin_comment_uses_admin_name_instead_of_submitted_fields(): void
     {
         $post = Post::factory()->published()->create();
-        $admin = User::factory()->admin()->create(['name' => 'Admin']);
+        $admin = User::factory()->admin()->create(['name' => 'Admin Utama']);
         Setting::setValue('author_name', 'Nama Penulis');
 
         $this->actingAs($admin)->postJson("/api/posts/{$post->id}/comments", [
@@ -164,29 +164,29 @@ class PublicCommentTest extends TestCase
         $this->assertDatabaseMissing('comments', ['email' => 'palsu@example.com']);
         $this->assertDatabaseHas('comments', [
             'post_id' => $post->id,
-            'name' => 'Nama Penulis',
+            'name' => 'Admin Utama',
             'email' => $admin->email,
         ]);
     }
 
-    public function test_author_comments_display_configured_author_name(): void
+    public function test_author_comments_display_stored_admin_name(): void
     {
         $post = Post::factory()->published()->create();
-        $admin = User::factory()->admin()->create(['name' => 'Admin']);
+        $admin = User::factory()->admin()->create(['name' => 'Admin Utama']);
         Setting::setValue('author_name', 'Nama Penulis');
         Comment::factory()->approved()->create([
             'post_id' => $post->id,
-            'name' => 'Admin',
+            'name' => 'Admin Utama',
             'is_author' => true,
         ]);
 
         $this->get("/blog/{$post->slug}")
             ->assertOk()
-            ->assertSee('Nama Penulis');
+            ->assertSee('Admin Utama');
 
         $this->actingAs($admin)->getJson('/api/admin/comments')
             ->assertOk()
-            ->assertJsonPath('data.0.name', 'Nama Penulis');
+            ->assertJsonPath('data.0.name', 'Admin Utama');
     }
 
     public function test_non_admin_user_still_requires_name_and_email(): void

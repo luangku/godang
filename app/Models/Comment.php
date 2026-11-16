@@ -37,13 +37,13 @@ class Comment extends Model
     }
 
     /**
-     * Display the configured author name for comments written by the author.
+     * Fall back to the configured author name when an author comment has no stored name.
      */
     protected function name(): Attribute
     {
         return Attribute::get(
-            fn (?string $value) => $this->is_author
-                ? Setting::authorName($value)
+            fn (?string $value) => $this->is_author && blank($value)
+                ? Setting::authorName()
                 : $value
         );
     }
