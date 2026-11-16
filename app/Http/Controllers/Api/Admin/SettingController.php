@@ -62,7 +62,10 @@ class SettingController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json(Setting::allValues());
+        $values = Setting::allValues();
+        $values['author_name'] = Setting::authorName();
+
+        return response()->json($values);
     }
 
     /**
@@ -94,6 +97,10 @@ class SettingController extends Controller
         $validated = $request->validate($rules);
 
         foreach ($validated['settings'] as $key => $value) {
+            if ($key === 'author_name') {
+                continue;
+            }
+
             Setting::setValue($key, is_string($value) ? trim($value) : $value);
         }
 

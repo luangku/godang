@@ -50,6 +50,18 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_admin' => true,
+            'is_primary' => false,
+        ]);
+    }
+
+    /**
+     * Indicate that the user is the primary administrator.
+     */
+    public function primaryAdmin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_admin' => true,
+            'is_primary' => true,
         ]);
     }
 }

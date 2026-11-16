@@ -17,15 +17,20 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Admin user
-        User::updateOrCreate(
-            ['email' => 'admin@godang.com'],
-            [
-                'name' => 'Admin',
-                'bio' => 'Developer & Penulis Teknis',
-                'password' => Hash::make('password'),
-                'is_admin' => true,
-            ]
-        );
+        $hasPrimaryAdmin = User::query()
+            ->where('is_admin', true)
+            ->where('is_primary', true)
+            ->exists();
+
+        $admin = User::firstOrNew(['email' => 'admin@godang.com']);
+        $admin->fill([
+            'name' => 'Admin',
+            'bio' => 'Developer & Penulis Teknis',
+            'password' => Hash::make('password'),
+            'is_admin' => true,
+        ]);
+        $admin->is_primary = $hasPrimaryAdmin ? (bool) $admin->is_primary : true;
+        $admin->save();
 
         $this->call([
             CategorySeeder::class,

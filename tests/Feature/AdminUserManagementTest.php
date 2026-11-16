@@ -14,22 +14,26 @@ class AdminUserManagementTest extends TestCase
 
     public function test_index_lists_admin_accounts_with_post_counts(): void
     {
-        $admin = User::factory()->admin()->create(['name' => 'Admin Utama']);
+        $admin = User::factory()->primaryAdmin()->create(['name' => 'Admin Utama']);
+        User::factory()->admin()->create(['name' => 'Admin Biasa']);
         User::factory()->create(['name' => 'Pembaca']);
         Post::factory()->create(['user_id' => $admin->id]);
 
         $this->actingAs($admin)
             ->getJson('/api/admin/users')
             ->assertOk()
-            ->assertJsonCount(1)
+            ->assertJsonCount(2)
             ->assertJsonPath('0.name', 'Admin Utama')
+            ->assertJsonPath('0.is_primary', true)
             ->assertJsonPath('0.posts_count', 1)
+            ->assertJsonPath('1.name', 'Admin Biasa')
+            ->assertJsonPath('1.is_primary', false)
             ->assertJsonMissingPath('0.password');
     }
 
     public function test_store_creates_a_new_admin_account(): void
     {
-        $admin = User::factory()->admin()->create();
+        $admin = User::factory()->primaryAdmin()->create();
 
         $this->actingAs($admin)
             ->postJson('/api/admin/users', [
@@ -46,12 +50,13 @@ class AdminUserManagementTest extends TestCase
         $created = User::where('email', 'admin-baru@example.com')->firstOrFail();
 
         $this->assertTrue($created->is_admin);
+        $this->assertFalse($created->is_primary);
         $this->assertTrue(Hash::check('rahasia-123', $created->password));
     }
 
     public function test_store_rejects_a_duplicate_email(): void
     {
-        $admin = User::factory()->admin()->create();
+        $admin = User::factory()->primaryAdmin()->create();
         User::factory()->admin()->create(['email' => 'dipakai@example.com']);
 
         $this->actingAs($admin)
@@ -67,7 +72,7 @@ class AdminUserManagementTest extends TestCase
 
     public function test_store_requires_a_confirmed_password(): void
     {
-        $admin = User::factory()->admin()->create();
+        $admin = User::factory()->primaryAdmin()->create();
 
         $this->actingAs($admin)
             ->postJson('/api/admin/users', [
@@ -82,7 +87,7 @@ class AdminUserManagementTest extends TestCase
 
     public function test_update_changes_name_and_email_without_touching_the_password(): void
     {
-        $admin = User::factory()->admin()->create();
+        $admin = User::factory()->primaryAdmin()->create();
         $target = User::factory()->admin()->create(['password' => 'password-lama']);
         $originalPassword = $target->password;
 
@@ -103,7 +108,7 @@ class AdminUserManagementTest extends TestCase
 
     public function test_update_replaces_the_password_when_provided(): void
     {
-        $admin = User::factory()->admin()->create();
+        $admin = User::factory()->primaryAdmin()->create();
         $target = User::factory()->admin()->create();
 
         $this->actingAs($admin)
@@ -118,7 +123,7 @@ class AdminUserManagementTest extends TestCase
 
     public function test_update_rejects_an_email_used_by_another_account(): void
     {
-        $admin = User::factory()->admin()->create();
+        $admin = User::factory()->primaryAdmin()->create();
         User::factory()->admin()->create(['email' => 'dipakai@example.com']);
         $target = User::factory()->admin()->create(['email' => 'target@example.com']);
 
@@ -130,7 +135,7 @@ class AdminUserManagementTest extends TestCase
 
     public function test_update_returns_404_for_non_admin_users(): void
     {
-        $admin = User::factory()->admin()->create();
+        $admin = User::factory()->primaryAdmin()->create();
         $reader = User::factory()->create();
 
         $this->actingAs($admin)
@@ -140,7 +145,7 @@ class AdminUserManagementTest extends TestCase
 
     public function test_destroy_removes_an_admin_without_posts(): void
     {
-        $admin = User::factory()->admin()->create();
+        $admin = User::factory()->primaryAdmin()->create();
         $target = User::factory()->admin()->create();
 
         $this->actingAs($admin)
@@ -153,7 +158,7 @@ class AdminUserManagementTest extends TestCase
 
     public function test_destroy_rejects_deleting_your_own_account(): void
     {
-        $admin = User::factory()->admin()->create();
+        $admin = User::factory()->primaryAdmin()->create();
 
         $this->actingAs($admin)
             ->deleteJson("/api/admin/users/{$admin->id}")
@@ -165,7 +170,7 @@ class AdminUserManagementTest extends TestCase
 
     public function test_destroy_rejects_an_admin_that_still_owns_posts(): void
     {
-        $admin = User::factory()->admin()->create();
+        $admin = User::factory()->primaryAdmin()->create();
         $target = User::factory()->admin()->create();
         Post::factory()->create(['user_id' => $target->id]);
 
@@ -179,7 +184,7 @@ class AdminUserManagementTest extends TestCase
 
     public function test_destroy_rejects_an_admin_with_only_trashed_posts(): void
     {
-        $admin = User::factory()->admin()->create();
+        $admin = User::factory()->primaryAdmin()->create();
         $target = User::factory()->admin()->create();
         $post = Post::factory()->create(['user_id' => $target->id]);
         $post->delete();
@@ -190,5 +195,50 @@ class AdminUserManagementTest extends TestCase
             ->assertJsonValidationErrors(['user']);
 
         $this->assertDatabaseHas('users', ['id' => $target->id]);
+    }
+
+    public function test_regular_admin_cannot_manage_admin_accounts(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $target = User::factory()->admin()->create();
+
+        $this->actingAs($admin)
+            ->getJson('/api/admin/users')
+            ->assertForbidden();
+
+        $this->actingAs($admin)
+            ->postJson('/api/admin/users', [
+                'name' => 'Admin Baru',
+                'email' => 'admin-baru@example.com',
+                'password' => 'rahasia-123',
+                'password_confirmation' => 'rahasia-123',
+            ])
+            ->assertForbidden();
+
+        $this->actingAs($admin)
+            ->putJson("/api/admin/users/{$target->id}", ['name' => 'Diubah'])
+            ->assertForbidden();
+
+        $this->actingAs($admin)
+            ->deleteJson("/api/admin/users/{$target->id}")
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('users', ['id' => $target->id, 'name' => $target->name]);
+    }
+
+    public function test_another_primary_admin_cannot_be_modified_or_deleted(): void
+    {
+        $primary = User::factory()->primaryAdmin()->create();
+        $otherPrimary = User::factory()->primaryAdmin()->create();
+
+        $this->actingAs($otherPrimary)
+            ->putJson("/api/admin/users/{$primary->id}", ['name' => 'Diubah'])
+            ->assertForbidden();
+
+        $this->actingAs($otherPrimary)
+            ->deleteJson("/api/admin/users/{$primary->id}")
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('users', ['id' => $primary->id, 'name' => $primary->name]);
     }
 }

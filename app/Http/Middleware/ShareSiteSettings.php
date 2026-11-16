@@ -17,7 +17,7 @@ class ShareSiteSettings
     public function handle(Request $request, Closure $next): Response
     {
         $settings = Setting::allValues();
-        $authorName = trim((string) ($settings['author_name'] ?? '')) ?: 'Godang';
+        $authorName = Setting::authorName();
 
         $site = [
             'site_title' => trim((string) ($settings['site_title'] ?? '')) ?: 'Godang',

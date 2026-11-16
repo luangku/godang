@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\MediaCategoryController;
 use App\Http\Controllers\Api\Admin\MediaController;
 use App\Http\Controllers\Api\Admin\PostController as AdminPostController;
+use App\Http\Controllers\Api\Admin\ProfileController;
 use App\Http\Controllers\Api\Admin\SettingController;
 use App\Http\Controllers\Api\Admin\TagController as AdminTagController;
 use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
@@ -100,10 +101,19 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->name('api.admin.'
     Route::patch('/media-categories/{mediaCategory}', [MediaCategoryController::class, 'update'])->name('media-categories.update');
     Route::delete('/media-categories/{mediaCategory}', [MediaCategoryController::class, 'destroy'])->name('media-categories.destroy');
 
-    // Admin users
-    Route::apiResource('users', AdminUserController::class)->except(['show']);
+    // Admin users (primary admin only)
+    Route::apiResource('users', AdminUserController::class)
+        ->except(['show'])
+        ->middleware('primary-admin');
 
-    // Settings
-    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
-    Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+    // Own profile (every admin)
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    // Settings (primary admin only)
+    Route::get('/settings', [SettingController::class, 'index'])
+        ->middleware('primary-admin')
+        ->name('settings.index');
+    Route::put('/settings', [SettingController::class, 'update'])
+        ->middleware('primary-admin')
+        ->name('settings.update');
 });

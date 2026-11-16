@@ -17,7 +17,13 @@ const GENERAL_FIELDS = [
 ];
 
 const ABOUT_FIELDS = [
-    { key: 'author_name', label: 'Nama Penulis', max: 150 },
+    {
+        key: 'author_name',
+        label: 'Nama Penulis',
+        max: 150,
+        readOnly: true,
+        hint: 'Nama penulis selalu mengikuti nama Admin Utama dan tidak dapat diubah dari halaman ini.',
+    },
     { key: 'author_avatar_alt', label: 'Alt Text Avatar', max: 255 },
     { key: 'author_role', label: 'Role', max: 150 },
     { key: 'about_bio', label: 'Bio', type: 'textarea', rows: 6, max: 5000, hint: 'Pisahkan paragraf dengan baris kosong.' },
@@ -61,6 +67,7 @@ function Field({ field, value, onChange }) {
                     onChange={(event) => onChange(event.target.value)}
                     rows={field.rows ?? 4}
                     maxLength={field.max}
+                    readOnly={field.readOnly}
                     className="w-full px-3 py-2 rounded-lg bg-(--color-bg) border border-(--color-border) text-sm resize-y"
                 />
             ) : (
@@ -69,7 +76,13 @@ function Field({ field, value, onChange }) {
                     value={value ?? ''}
                     onChange={(event) => onChange(event.target.value)}
                     maxLength={field.max}
-                    className="w-full px-3 py-2 rounded-lg bg-(--color-bg) border border-(--color-border) text-sm"
+                    readOnly={field.readOnly}
+                    aria-readonly={field.readOnly || undefined}
+                    className={`w-full px-3 py-2 rounded-lg border border-(--color-border) text-sm ${
+                        field.readOnly
+                            ? 'bg-(--color-accent-bg) text-(--color-text-muted) cursor-not-allowed'
+                            : 'bg-(--color-bg)'
+                    }`}
                 />
             )}
             {field.hint && <p className="mt-1 text-[11px] text-(--color-text-muted)">{field.hint}</p>}
@@ -139,7 +152,10 @@ export default function Settings() {
         if (!form) return;
 
         const settings = {};
-        for (const field of ALL_FIELDS) settings[field.key] = form[field.key] ?? '';
+        for (const field of ALL_FIELDS) {
+            if (field.readOnly) continue;
+            settings[field.key] = form[field.key] ?? '';
+        }
         settings.author_avatar = form.author_avatar ?? '';
         settings.site_logo = form.site_logo ?? '';
         settings.site_logo_dark = form.site_logo_dark ?? '';

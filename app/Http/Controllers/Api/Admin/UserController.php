@@ -19,8 +19,9 @@ class UserController extends Controller
         $users = User::query()
             ->where('is_admin', true)
             ->withCount('posts')
+            ->orderByDesc('is_primary')
             ->orderBy('name')
-            ->get(['id', 'name', 'email', 'created_at']);
+            ->get(['id', 'name', 'email', 'is_primary', 'created_at']);
 
         return response()->json($users);
     }
@@ -41,6 +42,7 @@ class UserController extends Controller
             'email' => $validated['email'],
             'password' => $validated['password'],
             'is_admin' => true,
+            'is_primary' => false,
         ]);
 
         return response()->json([
@@ -55,6 +57,10 @@ class UserController extends Controller
     public function update(Request $request, User $user): JsonResponse
     {
         abort_unless($user->is_admin, 404);
+
+        if ($user->is_primary && ! $request->user()->is($user)) {
+            abort(403, 'Admin utama lain tidak dapat diubah.');
+        }
 
         $validated = $request->validate([
             'name' => ['sometimes', 'required', 'string', 'max:100'],
@@ -86,6 +92,10 @@ class UserController extends Controller
     public function destroy(Request $request, User $user): JsonResponse
     {
         abort_unless($user->is_admin, 404);
+
+        if ($user->is_primary && ! $request->user()->is($user)) {
+            abort(403, 'Admin utama lain tidak dapat dihapus.');
+        }
 
         if ($request->user()->is($user)) {
             throw ValidationException::withMessages([

@@ -104,7 +104,7 @@ godang/
 │   │   ├── Controllers/           # controller publik + API
 │   │   │   ├── Api/               # API publik dan auth
 │   │   │   └── Api/Admin/         # API admin
-│   │   └── Middleware/            # EnsureUserIsAdmin, ShareSiteSettings
+│   │   └── Middleware/            # EnsureUserIsAdmin, EnsureUserIsPrimaryAdmin, ShareSiteSettings
 │   ├── Models/                    # 8 model Eloquent
 │   ├── Notifications/             # 2 notifikasi email
 │   ├── Providers/AppServiceProvider.php
@@ -132,7 +132,7 @@ godang/
 │   └── console.php                # command `inspire` + scheduler
 ├── storage/app/public/            # media: uploads, cover, avatar, files
 ├── tests/
-│   ├── Feature/                   # 22 feature test
+│   ├── Feature/                   # 24 feature test
 │   ├── Unit/                      # 1 unit test
 │   └── TestCase.php
 ├── .github/workflows/infinityfree.yml
@@ -147,8 +147,8 @@ godang/
 ### Yang di-track dan yang tidak
 
 - `vendor/` **di-track** (sekitar 9.930 file). Baris `#/vendor` di `.gitignore` memang dikomentari agar hasil `composer install` ikut terkirim lewat FTP, karena InfinityFree tidak menyediakan Composer.
-- `public/build/` **di-track** (51 file) dengan alasan yang sama: server InfinityFree tidak menjalankan build, jadi asset hasil `npm run build` harus sudah ada di repository.
-- `tests/` di-track (24 file).
+- `public/build/` **di-track** (54 file) dengan alasan yang sama: server InfinityFree tidak menjalankan build, jadi asset hasil `npm run build` harus sudah ada di repository.
+- `tests/` di-track (26 file).
 - `.env`, `node_modules/`, `public/hot`, `public/storage`, dan log tidak di-track.
 - `public/storage` ada di disk lokal sebagai junction/symlink ke `storage/app/public`, tetapi tidak masuk git.
 
@@ -156,7 +156,7 @@ godang/
 
 ## 4. Routing
 
-Total ada **71 route aplikasi** di `routes/web.php` dan `routes/api.php` (di luar route health `/up` dan route vendor). Semua route aplikasi memakai controller atau closure yang terdaftar eksplisit.
+Total ada **72 route aplikasi** di `routes/web.php` dan `routes/api.php` (di luar route health `/up` dan route vendor). Semua route aplikasi memakai controller atau closure yang terdaftar eksplisit.
 
 ### 4.1 Route web publik
 
@@ -217,7 +217,7 @@ Route legacy didaftarkan paling akhir agar tidak menangkap route nyata. Locale s
 
 ### 4.6 API admin
 
-Semua route di bawah memakai prefix `/api/admin`, name prefix `api.admin.`, dan middleware `auth:sanctum` + `admin`.
+Semua route di bawah memakai prefix `/api/admin`, name prefix `api.admin.`, dan middleware `auth:sanctum` + `admin`. Route **Pengguna** dan **Pengaturan** menambahkan middleware `primary-admin`.
 
 | Area | Route |
 |---|---|
@@ -228,8 +228,9 @@ Semua route di bawah memakai prefix `/api/admin`, name prefix `api.admin.`, dan 
 | Komentar | `GET\|POST /comments`, `PATCH /comments/{comment}` (approve), `PUT /comments/{comment}` (edit), `PATCH /comments/{comment}/spam`, `POST /comments/{comment}/reply`, `DELETE /comments/{comment}`, `POST /comments/bulk-delete` |
 | Media | `GET\|POST /media`, `PATCH /media/{media}`, `DELETE /media/{media}`, `POST /media/{media}/restore`, `DELETE /media/{media}/force`, `POST /media/bulk-delete`, `POST /media/bulk-restore`, `POST /media/bulk-force-delete` |
 | Kategori media | `GET\|POST /media-categories`, `PATCH\|DELETE /media-categories/{mediaCategory}` |
-| Pengguna | `apiResource /users` (index, store, update, destroy; tanpa `show`) |
-| Pengaturan | `GET /settings`, `PUT /settings` |
+| Pengguna | `apiResource /users` (index, store, update, destroy; tanpa `show`) — middleware tambahan `primary-admin` |
+| Profil sendiri | `PUT /profile` — dapat diakses semua admin |
+| Pengaturan | `GET /settings`, `PUT /settings` — middleware tambahan `primary-admin` |
 
 Catatan urutan route:
 
@@ -360,7 +361,8 @@ Semua controller berada di `app/Http/Controllers`. Tidak ada service layer atau 
 | `Api/Admin/CommentController.php` | Daftar komentar dengan filter status/post/kategori, buat komentar sebagai admin, edit body, approve, spam (beserta balasan), reply, hapus (beserta balasan), bulk delete. |
 | `Api/Admin/MediaController.php` | Media library: filter, sort, pencarian, kategori, folder, status trashed/unused, upload gambar dan file, update metadata, soft delete, restore, force delete dengan proteksi usage, serta bulk operation. |
 | `Api/Admin/MediaCategoryController.php` | CRUD kategori media; menghapus kategori membuat media terkait menjadi uncategorized (`nullOnDelete`). |
-| `Api/Admin/UserController.php` | CRUD akun admin: daftar admin beserta jumlah artikel, tambah admin (`is_admin = true`), edit nama/email dengan password opsional, dan hapus dengan pengaman (tidak boleh menghapus diri sendiri, minimal satu admin tersisa, admin yang masih punya artikel termasuk di Trash tidak boleh dihapus). Akun non-admin menghasilkan 404. |
+| `Api/Admin/UserController.php` | CRUD akun admin: daftar admin beserta jumlah artikel dan status `is_primary`, tambah admin (`is_admin = true`, `is_primary = false`), edit nama/email dengan password opsional, dan hapus dengan pengaman (tidak boleh menghapus diri sendiri, Admin Utama tidak dapat diubah/dihapus admin lain, admin yang masih punya artikel termasuk di Trash tidak boleh dihapus). Akun non-admin menghasilkan 404. |
+| `Api/Admin/ProfileController.php` | `PUT /api/admin/profile`: setiap admin dapat mengganti nama, email, dan password miliknya sendiri. Peran (`is_admin`, `is_primary`) tidak dapat diubah dari endpoint ini. |
 | `Api/Admin/SettingController.php` | Baca semua setting dan update batch dengan whitelist key, validasi URL, boolean, dan panjang maksimum. |
 
 ### 5.4 Middleware
@@ -368,6 +370,7 @@ Semua controller berada di `app/Http/Controllers`. Tidak ada service layer atau 
 | File | Tanggung jawab |
 |---|---|
 | `EnsureUserIsAdmin.php` | Alias `admin`. Menolak user yang bukan `is_admin` dengan 403 "Akses admin diperlukan." |
+| `EnsureUserIsPrimaryAdmin.php` | Alias `primary-admin`. Menolak admin yang bukan Admin Utama (`is_primary = false`) dengan 403 "Akses admin utama diperlukan." |
 | `ShareSiteSettings.php` | Menggabungkan setting database dengan default, membentuk array `$site`, dan membagikannya ke semua view. Dipakai di route publik, halaman admin, dan feed. |
 
 `bootstrap/app.php` juga mengatur:
@@ -385,7 +388,7 @@ Semua controller berada di `app/Http/Controllers`. Tidak ada service layer atau 
 
 | Model | Tabel | Fitur penting |
 |---|---|---|
-| `User` | `users` | `HasApiTokens`, `Notifiable`, `CanResetPassword`; field `avatar`, `bio`, `is_admin`; relasi `posts`. |
+| `User` | `users` | `HasApiTokens`, `Notifiable`, `CanResetPassword`; field `avatar`, `bio`, `is_admin`, `is_primary`; relasi `posts`. |
 | `Post` | `posts` | Soft delete; auto slug dan reading time; scope `published`; accessor `cover_url`, `og_url`; relasi author, category, tags, comments. |
 | `Category` | `categories` | Relasi `posts`. |
 | `Tag` | `tags` | Relasi `posts` (belongsToMany). |
@@ -410,6 +413,7 @@ Model memakai atribut PHP 8 milik Laravel 13: `#[Fillable([...])]`, `#[Hidden([.
 | `email_verified_at` | timestamp, nullable |
 | `password` | string (cast `hashed`) |
 | `is_admin` | boolean, default `false` |
+| `is_primary` | boolean, default `false`; hanya satu admin yang bernilai `true` (Admin Utama) |
 | `remember_token` | string, nullable |
 | `timestamps` | created_at, updated_at |
 
@@ -506,7 +510,7 @@ Index: `folder`, dan `['type', 'deleted_at']`.
 - **Reading time** dihitung ulang setiap kali `content` tidak kosong: `max(1, ceil(jumlah kata / 200))`.
 - **`Post::published()`** berarti `status = published`, `published_at` tidak null, dan `published_at <= now()`. Artikel `scheduled` yang waktunya sudah lewat belum otomatis tampil sampai command scheduler mengubah statusnya.
 - **Soft delete artikel** tidak menghapus komentar. Komentar baru ikut hilang jika artikel di-force-delete (FK cascade).
-- **`Comment` name accessor** memakai nama yang tersimpan di komentar. Fallback ke `author_name` dari setting hanya jika komentar `is_author = true` tidak punya nama (data lama). Nama komentar admin diisi dari `users.name` akun yang menulis saat komentar dibuat.
+- **`Comment` name accessor** memakai nama yang tersimpan di komentar. Fallback ke `Setting::authorName()` (nama Admin Utama, lalu `author_name` tersimpan) hanya jika komentar `is_author = true` tidak punya nama (data lama). Nama komentar admin diisi dari `users.name` akun yang menulis saat komentar dibuat.
 - **`Comment` body mutator** membuang blok `<script>`/`<style>`, seluruh tag HTML, menormalkan baris baru, dan `trim()`. Body selalu tersimpan sebagai teks polos, termasuk komentar yang dibuat dari panel admin.
 - **`Media::diskPath()`** menerima path relatif, path berawalan `storage/`, atau URL absolut yang mengandung `/storage/`, lalu mengembalikan path relatif disk `public`. URL eksternal non-storage dikembalikan apa adanya oleh `urlFor()`.
 - **`Media::thumbnailPathFor()`** mengubah `folder/name.ext` menjadi `folder/name-thumb.webp`.
@@ -744,7 +748,11 @@ Menonaktifkan Turnstile: kosongkan `TURNSTILE_SITE_KEY` dan `TURNSTILE_SECRET_KE
 
 ### 9.7 Mengubah email dan password admin
 
-Cara normal: login lalu buka **Pengguna** (`/admin/users`). Di sana admin bisa menambah admin baru, mengubah nama/email, dan mengganti password (kosongkan kolom password bila tidak ingin mengubahnya).
+Ada dua level admin: **Admin Utama** (`is_admin = true`, `is_primary = true`) dan **Admin** biasa (`is_admin = true`, `is_primary = false`). Hanya satu akun yang menjadi Admin Utama, yaitu admin pertama yang dibuat.
+
+Cara normal untuk mengelola admin lain: login sebagai **Admin Utama**, lalu buka **Pengguna** (`/admin/users`). Di sana Admin Utama dapat menambah admin baru (selalu Admin biasa), mengubah nama/email, dan mengganti password (kosongkan kolom password bila tidak ingin mengubahnya). Admin biasa tidak melihat menu ini dan akan mendapat 403 bila memanggil endpoint-nya.
+
+Setiap admin dapat mengganti nama, email, dan password miliknya sendiri lewat menu **Profil** (`/admin/profile`).
 
 Jika terkunci di luar panel, gunakan perintah darurat:
 
@@ -752,7 +760,11 @@ Jika terkunci di luar panel, gunakan perintah darurat:
 php artisan tinker --execute 'User::where("email", "admin@godang.com")->update(["password" => Hash::make("password_baru")]);'
 ```
 
-Pastikan akun yang diubah tetap `is_admin = true`, karena login hanya menerima akun admin.
+Pastikan akun yang diubah tetap `is_admin = true`, karena login hanya menerima akun admin. Untuk memindahkan status Admin Utama secara manual:
+
+```bash
+php artisan tinker --execute 'User::query()->update(["is_primary" => false]); User::where("email", "email-admin-baru@example.com")->update(["is_primary" => true]);'
+```
 
 ---
 
@@ -769,6 +781,8 @@ Setting disimpan sebagai key-value di tabel `settings` dan digabung dengan `Sett
 | Sosial | `github_url`, `twitter_url`, `linkedin_url` |
 | Komentar | `comment_moderation`, `comment_notification` |
 | Penulis | `author_avatar`, `author_avatar_alt`, `author_name`, `author_role` |
+
+> `author_name` adalah nilai turunan, bukan input bebas. `Setting::authorName()` selalu memakai nama Admin Utama (`users.name` dengan `is_primary = true`). Nilai tersimpan di tabel `settings` hanya menjadi fallback bila belum ada Admin Utama, misalnya pada database lama. `PUT /api/admin/settings` menerima key ini untuk kompatibilitas tetapi mengabaikannya.
 | About | `about_bio`, `about_topics_heading`, `about_topics`, `about_contact_heading`, `about_contact`, `about_meta_description` |
 
 Default penting:
@@ -788,7 +802,7 @@ Default penting:
 | `Setting::getValue($key, $default)` | Ambil satu nilai, fallback ke default. |
 | `Setting::setValue($key, $value)` | `updateOrCreate` berdasarkan key. |
 | `Setting::allValues()` | Semua default yang ditimpa nilai database. |
-| `Setting::authorName($fallback)` | Nama penulis publik untuk halaman About/landing dan fallback komentar author yang tidak punya nama tersimpan. |
+| `Setting::authorName($fallback)` | Nama penulis publik. Prioritas: nama Admin Utama (`is_primary = true`), lalu nilai `author_name` tersimpan, lalu default/fallback. Dipakai halaman About/landing dan fallback komentar author yang tidak punya nama tersimpan. |
 
 ### 10.3 Alur ke tampilan
 
@@ -801,12 +815,13 @@ Default penting:
 
 ### 10.4 Validasi update
 
-`PUT /api/admin/settings` menerima `{ "settings": { ... } }`.
+`GET /api/admin/settings` dan `PUT /api/admin/settings` hanya dapat diakses **Admin Utama** (`primary-admin`). `PUT` menerima `{ "settings": { ... } }`.
 
 - Key di luar `Setting::DEFAULTS` ditolak.
 - `comment_moderation` dan `comment_notification` hanya boleh `"true"` atau `"false"`.
 - `github_url`, `twitter_url`, `linkedin_url` harus URL valid.
 - Panjang maksimum berbeda per key (misalnya `about_bio` 5000, `site_description` 500, `default_meta_description` 300).
+- `author_name` diterima tetapi tidak disimpan; nilainya selalu diturunkan dari Admin Utama.
 - String di-`trim` sebelum disimpan.
 
 ---
@@ -911,8 +926,9 @@ Partial yang dipakai ulang:
 | `/admin/tags` | Tag |
 | `/admin/media` | Media library |
 | `/admin/media/trash` | Tempat sampah media |
-| `/admin/users` | Pengguna (manajemen admin) |
-| `/admin/settings` | Pengaturan |
+| `/admin/users` | Pengguna (manajemen admin, khusus Admin Utama) |
+| `/admin/profile` | Profil admin sendiri |
+| `/admin/settings` | Pengaturan (khusus Admin Utama) |
 
 Semua halaman admin di-lazy-load. Path lain diarahkan ke `/admin`.
 
@@ -939,14 +955,16 @@ Semua halaman admin di-lazy-load. Path lain diarahkan ke `/admin`.
 | `Tags.jsx` | CRUD tag dengan slug. |
 | `Media.jsx` | Grid media, pencarian, filter folder/kategori/tipe, sort, upload gambar/file, edit alt & kategori, lihat usage, pindah ke trash. |
 | `MediaTrash.jsx` | Restore dan force delete media dengan indikator usage. |
-| `Users.jsx` | Daftar admin beserta jumlah artikel; form tambah/edit admin (nama, email, password opsional); hapus admin dengan konfirmasi. Tombol hapus dinonaktifkan untuk akun sendiri dan untuk admin yang masih punya artikel. |
-| `Settings.jsx` | Tab **Umum**, **Profil & About**, **Komentar**; upload logo terang/gelap, avatar, alt text, URL sosial, meta default, dan toggle moderasi/notifikasi. |
+| `Users.jsx` | Daftar admin beserta peran (**Admin Utama**/**Admin**) dan jumlah artikel; form tambah/edit admin (nama, email, password opsional); hapus admin dengan konfirmasi. Hanya dapat dibuka Admin Utama. Tombol edit/hapus dinonaktifkan untuk akun sendiri, Admin Utama lain, dan admin yang masih punya artikel. |
+| `Profile.jsx` | Setiap admin mengganti nama, email, dan password miliknya sendiri; menampilkan peran akun. |
+| `Settings.jsx` | Khusus Admin Utama. Tab **Umum**, **Profil & About**, **Komentar**; upload logo terang/gelap, avatar, alt text, URL sosial, meta default, dan toggle moderasi/notifikasi. Field **Nama Penulis** read-only dan selalu berisi nama Admin Utama. |
 | `Login.jsx` | Login email/password, Turnstile opsional, tautan lupa password. |
 | `ResetPassword.jsx` | Reset password dengan token dari email. |
 
 Komponen pendukung:
 
-- `Shell.jsx` — sidebar desktop, menu mobile, toggle tema, logout, dan nama admin yang sedang login (`user.name`) di samping tombol **Keluar**.
+- `Shell.jsx` — sidebar desktop, menu mobile, toggle tema, logout, dan nama admin yang sedang login (`user.name`) beserta perannya (**Admin Utama**/**Admin**) di samping tombol **Keluar**. Menu **Pengguna** hanya dirender untuk Admin Utama.
+- `PasswordInput.jsx` — input password dengan tombol ikon mata untuk menampilkan/menyembunyikan isi; dipakai di form Pengguna dan Profil.
 - `MediaPicker.jsx` — modal pemilih media.
 - `MediaEditModal.jsx`, `MediaCategoryManager.jsx` — edit metadata dan kategori media.
 - `PostComments.jsx` — thread komentar di halaman edit/preview.
@@ -1091,12 +1109,12 @@ Factory adalah cara utama membuat data di test. Gunakan state yang sudah ada seb
 
 ### 16.2 Cakupan test
 
-Ada **22 feature test** dan **1 unit test** (ditambah `TestCase.php`):
+Ada **24 feature test** dan **1 unit test** (ditambah `TestCase.php`):
 
 | Kelompok | File |
 |---|---|
 | Halaman publik | `PublicPagesTest`, `PublicPostsTest`, `PublicSiteContentTest`, `PublicCommentTest`, `SeoRoutesTest`, `StorageFileTest` |
-| Admin | `AdminAuthorizationTest`, `AdminCategoryTest`, `AdminCommentManagementTest`, `AdminCommentModerationTest`, `AdminDashboardTest`, `AdminMediaTest`, `AdminPostManagementTest`, `AdminSettingsTest`, `AdminSpaRoutesTest`, `AdminUserManagementTest` |
+| Admin | `AdminAuthorizationTest`, `AdminCategoryTest`, `AdminCommentManagementTest`, `AdminCommentModerationTest`, `AdminDashboardTest`, `AdminMediaTest`, `AdminPostManagementTest`, `AdminProfileTest`, `AdminSettingsTest`, `AdminSpaRoutesTest`, `AdminUserManagementTest` |
 | Media | `MediaUploadTest`, `PostCoverImageTest` |
 | Auth, notifikasi, scheduler | `AuthLoginTest`, `CommentNotificationTest`, `PublishScheduledPostsTest` |
 | Contoh bawaan | `Feature/ExampleTest`, `Unit/ExampleTest` |
@@ -1107,7 +1125,7 @@ Saat dokumen ini diperbarui:
 
 ```
 php artisan test --compact
-238 tests, 873 assertions, semua lulus
+258 tests, 929 assertions, semua lulus
 ```
 
 Durasi sekitar 32 detik di mesin lokal.
@@ -1401,9 +1419,10 @@ Gunakan `php artisan route:list --except-vendor` dan `php artisan test` sebagai 
 
 **Mengubah konten situs, logo, dan avatar**
 
-1. Buka **Pengaturan**, pilih tab **Umum**, **Profil & About**, atau **Komentar**.
+1. Login sebagai **Admin Utama**, lalu buka **Pengaturan**, pilih tab **Umum**, **Profil & About**, atau **Komentar**.
 2. Upload logo/avatar lewat pemilih media, isi teks dan URL sosial.
-3. Simpan; perubahan langsung dipakai request publik berikutnya.
+3. Field **Nama Penulis** hanya menampilkan nama Admin Utama dan tidak dapat diubah dari sini; ganti nama lewat menu **Profil** milik Admin Utama.
+4. Simpan; perubahan langsung dipakai request publik berikutnya.
 
 ### 19.8 Matriks perubahan dan rollback
 
@@ -1437,7 +1456,11 @@ Bagian ini bukan daftar bug yang sudah pasti, melainkan hal yang layak diputuska
 - **`STRUCTURE.md` tetap dikecualikan dari deploy.** Dokumen ini hanya untuk developer, bukan bagian dari aplikasi.
 - **Scheduler di InfinityFree dibiarkan apa adanya.** Rencananya aplikasi akan dipindah ke hosting lain yang mendukung cron; sampai saat itu artikel `scheduled` diterbitkan manual bila perlu.
 - **Versi di `README.md` sudah disinkronkan** dengan runtime (PHP 8.5.12, Laravel 13.37.0, Composer 2.11.1, Node.js 26.13.0, npm 12.2.2).
-- **UI manajemen pengguna admin sudah tersedia** di `/admin/users` dengan endpoint `apiResource /users`.
+- **UI manajemen pengguna admin sudah tersedia** di `/admin/users` dengan endpoint `apiResource /users`, khusus Admin Utama.
+- **Level admin memakai satu Admin Utama.** Admin pertama (id terkecil) dipromosikan oleh migration `add_is_primary_to_users`; admin baru selalu `is_primary = false`. Tidak ada UI promosi/demosi.
+- **Halaman Pengaturan khusus Admin Utama.** Admin biasa tidak melihat menu **Pengaturan** dan mendapat 403 pada `GET/PUT /api/admin/settings`.
+- **Nama Penulis diturunkan dari Admin Utama.** `Setting::authorName()` memakai `users.name` milik Admin Utama; field di Settings read-only dan endpoint update mengabaikan `author_name`.
+- **Setiap admin punya halaman Profil** di `/admin/profile` untuk nama, email, dan password sendiri.
 - **Komentar disimpan sebagai teks polos** dan dirender dengan escaping di klien.
 - **`forgot-password` sudah dibatasi** dengan limiter per email+IP dan per IP.
 - **Notifikasi email memakai queue database**, dengan catatan worker harus dijalankan di server.
@@ -1480,7 +1503,7 @@ Sesuai konvensi project, API berada langsung di `/api` tanpa prefix versi. Ini k
 - Apakah komentar anonim tetap diizinkan, atau perlu login?
 - Apakah perlu halaman statis tambahan (privacy policy, contact) untuk SEO?
 - Apakah target deploy tetap InfinityFree, atau akan pindah ke Laravel Cloud/VPS?
-- Apakah perlu peran admin tambahan (misalnya editor) selain `is_admin`?
+- Apakah perlu peran admin tambahan (misalnya editor) selain `is_admin` dan `is_primary`?
 
 ---
 
@@ -1495,21 +1518,21 @@ Fakta yang dicek langsung saat dokumen ini dibuat:
 | Composer | 2.11.1 |
 | Node.js | 26.13.0 |
 | npm | 12.2.2 |
-| Route aplikasi | 71 route (`route:list --except-vendor`) |
+| Route aplikasi | 72 route (`route:list --except-vendor`) |
 | Route health | `/up` |
-| Migration | 11 file |
+| Migration | 13 file |
 | Model | 8 |
-| Controller | 19 file (termasuk `Controller.php`) |
+| Controller | 20 file (termasuk `Controller.php`) |
 | Seeder | 7 file (6 dipanggil, `MediaSeeder` tidak) |
 | Factory | 7 |
-| Test | 238 test, 873 assertion, semua lulus |
-| File test | 24 (22 feature, 1 unit, `TestCase.php`) |
+| Test | 258 test, 929 assertion, semua lulus |
+| File test | 26 (24 feature, 1 unit, `TestCase.php`) |
 | Command kustom | 3 |
 | Notifikasi | 2 |
 | Setting key | 23 |
 | `vendor/` di git | sekitar 9.930 file |
-| `public/build/` di git | 51 file |
-| `tests/` di git | 24 file |
+| `public/build/` di git | 54 file |
+| `tests/` di git | 26 file |
 | Branch | `main` |
 
 Perintah verifikasi yang dipakai:

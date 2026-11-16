@@ -37,4 +37,8 @@ export const useAuth = create((set, get) => ({
     setGuest() {
         if (get().status !== 'guest') set({ user: null, status: 'guest' });
     },
+
+    setUser(user) {
+        set({ user });
+    },
 }));

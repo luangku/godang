@@ -29,8 +29,9 @@ Aplikasi ini di-deploy ke InfinityFree melalui GitHub Actions.
 - Nama admin di komentar (dengan badge **Admin**), badge "Mode Admin", dan sidebar diambil dari akun admin (`users.name`), bukan dari setting nama penulis
 - CRUD kategori dan tag
 - Pustaka media: upload gambar (otomatis dikonversi ke WebP dan diperkecil), thumbnail, kategori media, pencarian, serta deteksi media yang masih dipakai artikel/pengaturan
-- Manajemen pengguna admin (tambah, edit, hapus)
-- Pengaturan situs: nama situs, logo, avatar penulis, sosial media, moderasi komentar, dan lainnya
+- Level admin: **Admin Utama** dan **Admin**; hanya Admin Utama yang dapat mengelola akun admin dan mengubah pengaturan situs
+- Halaman **Profil** untuk setiap admin mengganti nama, email, dan password miliknya sendiri
+- Pengaturan situs (khusus Admin Utama): nama situs, logo, avatar penulis, sosial media, moderasi komentar, dan lainnya
 
 ## Tech dan Versi
 
@@ -124,22 +125,35 @@ http://godang.test
 
 > Segera ganti email dan password default setelah instalasi.
 
+> Akun default ini adalah **Admin Utama**. Pada database lama yang sudah memiliki beberapa admin, migration `add_is_primary_to_users` otomatis mempromosikan admin dengan `id` terkecil sebagai Admin Utama.
+
 ## Mengelola Pengguna Admin
 
-Pengguna admin sekarang dikelola langsung dari panel admin, tidak perlu lagi memakai `php artisan tinker`.
+Ada dua level akun admin:
 
-1. Login sebagai admin.
+- **Admin Utama** — hanya satu akun, yaitu admin pertama yang dibuat. Akun ini dapat menambah, mengubah, dan menghapus admin lain.
+- **Admin** — akun yang ditambahkan setelahnya. Admin biasa tetap bisa mengakses panel admin selain **Pengguna** dan **Pengaturan**, tetapi tidak dapat mengelola akun admin atau mengubah pengaturan situs.
+
+Pengguna admin dikelola langsung dari panel admin, tidak perlu lagi memakai `php artisan tinker`.
+
+1. Login sebagai **Admin Utama**.
 2. Buka menu **Pengguna** di sidebar (`/admin/users`).
-3. Isi form **Tambah Admin** (nama, email, password, konfirmasi password) lalu klik **Simpan**.
+3. Isi form **Tambah Admin** (nama, email, password, konfirmasi password) lalu klik **Simpan**. Admin baru selalu dibuat sebagai **Admin** biasa.
 4. Untuk mengubah data, klik **Edit** pada baris admin. Kosongkan kolom password bila tidak ingin menggantinya.
 5. Untuk menghapus, klik **Hapus** lalu konfirmasi.
 
+Setiap admin, termasuk Admin biasa, dapat membuka menu **Profil** (`/admin/profile`) untuk mengganti nama, email, dan password miliknya sendiri.
+
 Pengaman yang berlaku:
 
+- Menu dan endpoint **Pengguna** serta **Pengaturan** hanya bisa diakses Admin Utama; admin biasa mendapat 403.
 - Hanya akun dengan `is_admin = true` yang muncul dan bisa dikelola di halaman ini.
 - Admin tidak dapat menghapus akunnya sendiri.
+- Admin Utama tidak dapat diubah atau dihapus oleh admin lain.
 - Admin yang masih memiliki artikel (termasuk artikel di Trash) tidak dapat dihapus. Pindahkan atau hapus artikelnya terlebih dahulu.
 - Minimal harus ada satu admin yang tersisa.
+
+Di halaman **Pengaturan** (khusus Admin Utama), field **Nama Penulis** bersifat read-only dan selalu menampilkan nama **Admin Utama**. Nilai ini dipakai di halaman publik (About, sidebar, komentar lama yang belum punya nama) dan tidak dapat ditimpa dari form pengaturan.
 
 Jika Anda terkunci di luar panel admin, gunakan perintah darurat berikut:
 
@@ -187,6 +201,7 @@ Beberapa hal yang sengaja dilakukan agar cocok dengan keterbatasan hosting:
 - **`public/build/` ikut di-commit.** Hosting tidak menjalankan `npm install`/`npm run build`, sehingga asset hasil build harus sudah ada di repository. Jalankan `npm run build` sebelum commit jika ada perubahan JavaScript/CSS.
 - **`STRUCTURE.md` tidak ikut di-upload.** File ini hanya dokumentasi teknis untuk developer, bukan bagian dari aplikasi, jadi sengaja dikecualikan dari proses deploy.
 - **Scheduler tidak berjalan otomatis.** Hosting tidak menyediakan cron yang bisa memanggil `php artisan schedule:run`, sehingga artikel berstatus `scheduled` perlu diterbitkan manual (atau lewat cron eksternal) di hosting yang mendukung.
+- **Migrasi database dijalankan manual.** Setelah file ter-upload, jalankan `php artisan migrate`. Migration `add_is_primary_to_users` menambahkan kolom `is_primary` dan mempromosikan admin paling awal sebagai Admin Utama.
 
 ## Struktur Dokumentasi
 

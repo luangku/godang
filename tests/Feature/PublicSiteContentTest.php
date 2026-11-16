@@ -12,6 +12,28 @@ class PublicSiteContentTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_about_page_uses_the_primary_admin_name(): void
+    {
+        User::factory()->primaryAdmin()->create(['name' => 'Admin Utama']);
+        Setting::setValue('author_name', 'Nama Lama');
+
+        $this->get('/about')
+            ->assertOk()
+            ->assertSee('Admin Utama')
+            ->assertDontSee('Nama Lama');
+    }
+
+    public function test_about_page_ignores_regular_admin_names(): void
+    {
+        User::factory()->admin()->create(['name' => 'Admin Biasa']);
+        Setting::setValue('author_name', 'Nama Tersimpan');
+
+        $this->get('/about')
+            ->assertOk()
+            ->assertSee('Nama Tersimpan')
+            ->assertDontSee('Admin Biasa');
+    }
+
     public function test_about_page_renders_configured_profile_content(): void
     {
         Setting::setValue('author_name', 'Budi Santoso');
