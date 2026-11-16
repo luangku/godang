@@ -199,7 +199,7 @@ export default function PostComments({ postId }) {
                     rows="2"
                     value={newBody}
                     onChange={(event) => setNewBody(event.target.value)}
-                    placeholder="Tulis komentar sebagai penulis..."
+                    placeholder="Tulis komentar sebagai admin..."
                     className="w-full px-3 py-2 rounded-lg bg-(--color-bg) border border-(--color-border) text-sm resize-y"
                 />
                 <button
@@ -285,7 +285,7 @@ export default function PostComments({ postId }) {
                                                 <StatusBadge status={reply.status} />
                                                 {reply.is_author && (
                                                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-(--color-accent) text-(--color-on-accent)">
-                                                        Penulis
+                                                        Admin
                                                     </span>
                                                 )}
                                                 {reply.reply_to_name && (

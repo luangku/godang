@@ -19,6 +19,7 @@ export default function Comments() {
     const { toast, show } = useToast();
     const [status, setStatus] = useState('');
     const [categoryId, setCategoryId] = useState('');
+    const [sort, setSort] = useState('desc');
     const [selected, setSelected] = useState([]);
     const [confirm, setConfirm] = useState(null);
     const [busy, setBusy] = useState(false);
@@ -26,13 +27,14 @@ export default function Comments() {
     const [editing, setEditing] = useState({ id: null, body: '' });
 
     const { data, isLoading } = useQuery({
-        queryKey: ['comments', status, categoryId],
+        queryKey: ['comments', status, categoryId, sort],
         queryFn: async () =>
             (
                 await api.get(endpoints.comments, {
                     params: {
                         ...(status ? { status } : {}),
                         ...(categoryId ? { category_id: categoryId } : {}),
+                        sort,
                     },
                 })
             ).data,
@@ -210,7 +212,7 @@ export default function Comments() {
         <div className="space-y-4">
             <h1 className="text-xl font-bold">Komentar</h1>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
                 <select
                     value={status}
                     onChange={(event) => setStatus(event.target.value)}
@@ -232,6 +234,14 @@ export default function Comments() {
                             {cat.name || cat.slug}
                         </option>
                     ))}
+                </select>
+                <select
+                    value={sort}
+                    onChange={(event) => setSort(event.target.value)}
+                    className="px-3 py-2 rounded-lg bg-(--color-surface) border border-(--color-border) text-sm"
+                >
+                    <option value="desc">Terbaru dulu</option>
+                    <option value="asc">Terlama dulu</option>
                 </select>
             </div>
 
@@ -279,7 +289,7 @@ export default function Comments() {
                                         <StatusBadge status={comment.status} />
                                         {comment.is_author && (
                                             <span className="text-xs px-2 py-0.5 rounded-md bg-(--color-accent) text-(--color-on-accent)">
-                                                Penulis
+                                                Admin
                                             </span>
                                         )}
                                     </div>
@@ -360,7 +370,7 @@ export default function Comments() {
                                             <StatusBadge status={reply.status} />
                                             {reply.is_author && (
                                                 <span className="text-xs px-2 py-0.5 rounded-md bg-(--color-accent) text-(--color-on-accent)">
-                                                    Penulis
+                                                    Admin
                                                 </span>
                                             )}
                                             {reply.reply_to_name && (

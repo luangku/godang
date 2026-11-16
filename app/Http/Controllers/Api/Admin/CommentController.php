@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
-use App\Models\Setting;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -15,13 +14,18 @@ class CommentController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        $sort = $request->query('sort') === 'asc' ? 'asc' : 'desc';
+
         $query = Comment::with([
             'post:id,title,slug',
             'parent:id,name,email,body',
-            'replies' => fn ($q) => $q->oldest()->with('parent:id,name'),
+            'replies' => fn ($q) => $q->orderBy('created_at', $sort)
+                ->orderBy('id', $sort)
+                ->with('parent:id,name'),
         ])
             ->withCount('replies')
-            ->latest();
+            ->orderBy('created_at', $sort)
+            ->orderBy('id', $sort);
 
         if ($request->filled('status')) {
             $status = $request->status;
@@ -63,7 +67,7 @@ class CommentController extends Controller
 
         $comment = Comment::create([
             'post_id' => $validated['post_id'],
-            'name' => Setting::authorName($request->user()->name),
+            'name' => $request->user()->name,
             'email' => $request->user()->email,
             'body' => $validated['body'],
             'status' => 'approved',
@@ -127,7 +131,7 @@ class CommentController extends Controller
             'post_id' => $comment->post_id,
             'parent_id' => $comment->parent_id ?? $comment->id,
             'reply_to_name' => $comment->name,
-            'name' => Setting::authorName($request->user()->name),
+            'name' => $request->user()->name,
             'email' => $request->user()->email,
             'body' => $validated['body'],
             'status' => 'approved',

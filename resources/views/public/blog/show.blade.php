@@ -199,7 +199,7 @@
                             @if ($isAdmin)
                                 <span
                                     class="text-xs px-2 py-0.5 rounded-md bg-(--color-accent) text-(--color-on-accent) font-medium">
-                                    Mode Admin — {{ $site['author_name'] ?? auth()->user()->name }}
+                                    Mode Admin — {{ auth()->user()->name }}
                                 </span>
                             @endif
                         </div>
@@ -334,7 +334,7 @@
                                             @if ($comment->is_author ?? false)
                                                 <span
                                                     class="text-xs px-2 py-0.5 rounded-md bg-(--color-accent) text-(--color-on-accent) font-medium">
-                                                    Penulis
+                                                    Admin
                                                 </span>
                                             @endif
                                             <time class="text-xs text-(--color-text-muted)"
@@ -781,7 +781,7 @@
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-1 flex-wrap">
                                 <span class="font-semibold text-sm">${escapeHtml(comment.name)}</span>
-                                ${comment.is_author ? `<span class="text-xs px-2 py-0.5 rounded-md bg-(--color-accent) text-(--color-on-accent) font-medium">Penulis</span>` : ''}
+                                ${comment.is_author ? `<span class="text-xs px-2 py-0.5 rounded-md bg-(--color-accent) text-(--color-on-accent) font-medium">Admin</span>` : ''}
                                 <time class="text-xs text-(--color-text-muted)">Baru saja</time>
                             </div>
                             <p class="comment-body text-sm text-(--color-text) leading-relaxed">${escapeHtml(comment.body)}</p>
@@ -820,7 +820,7 @@
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-1 flex-wrap">
                                 <span class="font-semibold text-sm">${escapeHtml(reply.name)}</span>
-                                ${reply.is_author ? `<span class="text-xs px-2 py-0.5 rounded-md bg-(--color-accent) text-(--color-on-accent) font-medium">Penulis</span>` : ''}
+                                ${reply.is_author ? `<span class="text-xs px-2 py-0.5 rounded-md bg-(--color-accent) text-(--color-on-accent) font-medium">Admin</span>` : ''}
                                 ${reply.reply_to_name ? `<span class="text-xs text-(--color-text-muted)">membalas ke @${escapeHtml(reply.reply_to_name)}</span>` : ''}
                                 <time class="text-xs text-(--color-text-muted)">Baru saja</time>
                             </div>

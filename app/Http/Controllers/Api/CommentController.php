@@ -90,7 +90,7 @@ class CommentController extends Controller
         $notifyReplies = isset($validated['notify_replies']) ? (bool) $validated['notify_replies'] : false;
 
         $comment = $post->comments()->create([
-            'name' => $isAdmin ? Setting::authorName($admin->name) : $validated['name'],
+            'name' => $isAdmin ? $admin->name : $validated['name'],
             'email' => $isAdmin ? $admin->email : $validated['email'],
             'body' => $validated['body'],
             'parent_id' => $parentId,

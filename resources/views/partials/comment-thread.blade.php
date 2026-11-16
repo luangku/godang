@@ -14,7 +14,7 @@
                     @if ($reply->is_author ?? false)
                         <span
                             class="text-xs px-2 py-0.5 rounded-md bg-(--color-accent) text-(--color-on-accent) font-medium">
-                            Penulis
+                            Admin
                         </span>
                     @endif
                     @if ($reply->reply_to_name)
