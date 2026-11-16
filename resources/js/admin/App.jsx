@@ -23,6 +23,7 @@ const Tags = lazy(() => import('./pages/Tags'));
 const Media = lazy(() => import('./pages/Media'));
 const MediaTrash = lazy(() => import('./pages/MediaTrash'));
 const Users = lazy(() => import('./pages/Users'));
+const Profile = lazy(() => import('./pages/Profile'));
 const Settings = lazy(() => import('./pages/Settings'));
 
 const queryClient = new QueryClient({
@@ -51,6 +52,16 @@ function AuthGate({ children }) {
 
     if (status === 'guest') {
         return <Navigate to="/admin/login" replace state={{ from: location.pathname }} />;
+    }
+
+    return children;
+}
+
+function PrimaryGate({ children }) {
+    const user = useAuth((state) => state.user);
+
+    if (!user?.is_primary) {
+        return <Navigate to="/admin" replace />;
     }
 
     return children;
@@ -103,8 +114,9 @@ export default function App() {
                             <Route path="tags" element={<Tags />} />
                             <Route path="media" element={<Media />} />
                             <Route path="media/trash" element={<MediaTrash />} />
-                            <Route path="users" element={<Users />} />
-                            <Route path="settings" element={<Settings />} />
+                            <Route path="users" element={<PrimaryGate><Users /></PrimaryGate>} />
+                            <Route path="profile" element={<Profile />} />
+                            <Route path="settings" element={<PrimaryGate><Settings /></PrimaryGate>} />
                         </Route>
                         <Route path="*" element={<Navigate to="/admin" replace />} />
                     </Routes>

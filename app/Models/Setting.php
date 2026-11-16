@@ -54,6 +54,15 @@ class Setting extends Model
      */
     public static function authorName(?string $fallback = null): string
     {
+        $primaryName = trim((string) User::query()
+            ->where('is_admin', true)
+            ->where('is_primary', true)
+            ->value('name'));
+
+        if ($primaryName !== '') {
+            return $primaryName;
+        }
+
         $name = trim((string) static::getValue('author_name', self::DEFAULTS['author_name']));
 
         return $name !== '' ? $name : ($fallback ?: (string) self::DEFAULTS['author_name']);

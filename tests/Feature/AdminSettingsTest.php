@@ -13,7 +13,7 @@ class AdminSettingsTest extends TestCase
 
     private function admin(): User
     {
-        return User::factory()->admin()->create();
+        return User::factory()->primaryAdmin()->create();
     }
 
     public function test_index_returns_all_settings_as_key_value_map(): void
@@ -121,18 +121,19 @@ class AdminSettingsTest extends TestCase
 
     public function test_index_returns_defaults_for_keys_not_stored_yet(): void
     {
-        $admin = $this->admin();
+        $admin = User::factory()->primaryAdmin()->create(['name' => 'Admin Utama']);
 
         $this->actingAs($admin)
             ->getJson('/api/admin/settings')
             ->assertOk()
-            ->assertJsonPath('author_name', 'Godang')
+            ->assertJsonPath('author_name', 'Admin Utama')
             ->assertJsonPath('about_topics_heading', 'Topik yang Dibahas');
     }
 
-    public function test_update_persists_about_content_keys(): void
+    public function test_update_persists_about_content_keys_without_changing_author_name(): void
     {
         $admin = $this->admin();
+        Setting::setValue('author_name', 'Nama Lama');
 
         $this->actingAs($admin)
             ->putJson('/api/admin/settings', [
@@ -146,10 +147,52 @@ class AdminSettingsTest extends TestCase
             ])
             ->assertOk();
 
-        $this->assertSame('Penulis Baru', Setting::getValue('author_name'));
+        $this->assertSame('Nama Lama', Setting::getValue('author_name'));
         $this->assertSame('avatar/foto.webp', Setting::getValue('author_avatar'));
         $this->assertSame('Backend Engineer', Setting::getValue('author_role'));
         $this->assertSame("Laravel\nPHP", Setting::getValue('about_topics'));
+    }
+
+    public function test_index_derives_author_name_from_the_primary_admin(): void
+    {
+        $primary = User::factory()->primaryAdmin()->create(['name' => 'Admin Utama']);
+        Setting::setValue('author_name', 'Nama Lama');
+
+        $this->actingAs($primary)
+            ->getJson('/api/admin/settings')
+            ->assertOk()
+            ->assertJsonPath('author_name', 'Admin Utama');
+    }
+
+    public function test_regular_admin_cannot_access_settings(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)
+            ->getJson('/api/admin/settings')
+            ->assertForbidden();
+
+        $this->actingAs($admin)
+            ->putJson('/api/admin/settings', [
+                'settings' => ['site_title' => 'Tidak Boleh'],
+            ])
+            ->assertForbidden();
+
+        $this->assertNull(Setting::getValue('site_title'));
+    }
+
+    public function test_update_ignores_author_name_when_a_primary_admin_exists(): void
+    {
+        $primary = User::factory()->primaryAdmin()->create(['name' => 'Admin Utama']);
+
+        $this->actingAs($primary)
+            ->putJson('/api/admin/settings', [
+                'settings' => ['author_name' => 'Coba Ganti'],
+            ])
+            ->assertOk();
+
+        $this->assertNull(Setting::getValue('author_name'));
+        $this->assertSame('Admin Utama', Setting::authorName());
     }
 
     public function test_update_accepts_a_long_bio_but_rejects_values_over_the_limit(): void

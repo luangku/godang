@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, endpoints, errorMessage } from '../api';
 import ConfirmModal from '../components/ConfirmModal';
+import PasswordInput from '../components/PasswordInput';
 import { Toast, useToast } from '../components/Toast';
 import { useAuth } from '../stores/auth';
 
@@ -98,7 +99,12 @@ export default function Users() {
 
     return (
         <div className="space-y-6">
-            <h1 className="text-xl font-bold">Pengguna</h1>
+            <div className="space-y-1">
+                <h1 className="text-xl font-bold">Pengguna</h1>
+                <p className="text-sm text-(--color-text-muted)">
+                    Hanya Admin Utama yang dapat mengelola akun admin. Admin baru selalu dibuat sebagai Admin biasa.
+                </p>
+            </div>
 
             <form onSubmit={handleSubmit} className="bg-(--color-surface) border border-(--color-border) rounded-xl p-5 space-y-4">
                 <h2 className="font-semibold text-sm">{editing ? 'Edit Admin' : 'Tambah Admin'}</h2>
@@ -126,25 +132,21 @@ export default function Users() {
                         <label className="block text-sm font-medium mb-1.5">
                             Password {editing && <span className="text-(--color-text-muted)">(kosongkan jika tidak diubah)</span>}
                         </label>
-                        <input
-                            type="password"
+                        <PasswordInput
                             value={form.password}
                             onChange={(e) => setForm({ ...form, password: e.target.value })}
                             minLength={8}
                             autoComplete="new-password"
-                            className="w-full px-3 py-2 rounded-lg bg-(--color-bg) border border-(--color-border) text-sm"
                             required={!editing}
                         />
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-1.5">Konfirmasi Password</label>
-                        <input
-                            type="password"
+                        <PasswordInput
                             value={form.password_confirmation}
                             onChange={(e) => setForm({ ...form, password_confirmation: e.target.value })}
                             minLength={8}
                             autoComplete="new-password"
-                            className="w-full px-3 py-2 rounded-lg bg-(--color-bg) border border-(--color-border) text-sm"
                             required={!editing && Boolean(form.password)}
                         />
                     </div>
@@ -175,6 +177,7 @@ export default function Users() {
                         <tr className="border-b border-(--color-border) text-left text-xs uppercase text-(--color-text-muted)">
                             <th className="px-4 py-3">Nama</th>
                             <th className="px-4 py-3">Email</th>
+                            <th className="px-4 py-3">Peran</th>
                             <th className="px-4 py-3 text-right">Artikel</th>
                             <th className="px-4 py-3 text-right">Aksi</th>
                         </tr>
@@ -182,16 +185,17 @@ export default function Users() {
                     <tbody className="divide-y divide-(--color-border)">
                         {isLoading && (
                             <tr>
-                                <td colSpan="4" className="px-4 py-4 text-center text-(--color-text-muted)">Memuat...</td>
+                                <td colSpan="5" className="px-4 py-4 text-center text-(--color-text-muted)">Memuat...</td>
                             </tr>
                         )}
                         {!isLoading && users.length === 0 && (
                             <tr>
-                                <td colSpan="4" className="px-4 py-4 text-center text-(--color-text-muted)">Belum ada admin.</td>
+                                <td colSpan="5" className="px-4 py-4 text-center text-(--color-text-muted)">Belum ada admin.</td>
                             </tr>
                         )}
                         {users.map((user) => {
                             const isSelf = user.id === currentUser?.id;
+                            const isProtectedPrimary = user.is_primary && !isSelf;
 
                             return (
                                 <tr key={user.id} className="hover:bg-(--color-accent-bg)/40">
@@ -204,13 +208,28 @@ export default function Users() {
                                         )}
                                     </td>
                                     <td className="px-4 py-3 text-(--color-text-muted)">{user.email}</td>
+                                    <td className="px-4 py-3">
+                                        <span
+                                            className={`inline-block text-xs px-2 py-0.5 rounded-md ${
+                                                user.is_primary
+                                                    ? 'bg-(--color-accent-bg) text-(--color-accent) font-medium'
+                                                    : 'bg-(--color-bg) text-(--color-text-muted) border border-(--color-border)'
+                                            }`}
+                                        >
+                                            {user.is_primary ? 'Admin Utama' : 'Admin'}
+                                        </span>
+                                    </td>
                                     <td className="px-4 py-3 text-right">{user.posts_count ?? 0}</td>
                                     <td className="px-4 py-3 text-right">
                                         <div className="flex justify-end gap-3 text-xs">
                                             <button
                                                 type="button"
                                                 onClick={() => editUser(user)}
-                                                className="text-(--color-accent) hover:underline"
+                                                disabled={isProtectedPrimary}
+                                                className="text-(--color-accent) hover:underline disabled:text-(--color-text-muted) disabled:no-underline"
+                                                title={isProtectedPrimary
+                                                    ? 'Admin Utama tidak dapat diubah oleh admin lain'
+                                                    : 'Edit admin'}
                                             >
                                                 Edit
                                             </button>
@@ -218,12 +237,14 @@ export default function Users() {
                                                 type="button"
                                                 onClick={() => deleteUser(user)}
                                                 className="text-(--color-error) hover:underline disabled:text-(--color-text-muted) disabled:no-underline"
-                                                disabled={isSelf || (user.posts_count ?? 0) > 0}
+                                                disabled={isSelf || isProtectedPrimary || (user.posts_count ?? 0) > 0}
                                                 title={isSelf
                                                     ? 'Tidak dapat menghapus akun sendiri'
-                                                    : (user.posts_count ?? 0) > 0
-                                                        ? 'Admin masih memiliki artikel'
-                                                        : 'Hapus admin'}
+                                                    : isProtectedPrimary
+                                                        ? 'Admin Utama tidak dapat dihapus oleh admin lain'
+                                                        : (user.posts_count ?? 0) > 0
+                                                            ? 'Admin masih memiliki artikel'
+                                                            : 'Hapus admin'}
                                             >
                                                 Hapus
                                             </button>

@@ -59,5 +59,6 @@ export const endpoints = {
     mediaRestore: (id) => `/admin/media/${id}/restore`,
     mediaForceDelete: (id) => `/admin/media/${id}/force`,
     users: '/admin/users',
+    profile: '/admin/profile',
     settings: '/admin/settings',
 };
