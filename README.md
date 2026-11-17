@@ -37,21 +37,21 @@ Aplikasi ini di-deploy ke InfinityFree melalui GitHub Actions.
 
 Aplikasi ini dibangun dengan menggunakan:
 
-| Komponen | Versi |
-| --- | --- |
-| Laragon | 6 |
-| PHP | 8.5.12 |
-| Laravel | 13.37.0 |
-| Composer | 2.11.1 |
-| Node.js | 26.13.0 |
-| npm | 12.2.2 |
-| Git | 2.56 |
-| VS Code | 1.146 |
-| OpenCode | 2.2.7 |
+| Komponen | Versi   |
+| -------- | ------- |
+| Laragon  | 6       |
+| PHP      | 8.5.12  |
+| Laravel  | 13.37.0 |
+| Composer | 2.11.1  |
+| Node.js  | 26.13.0 |
+| npm      | 12.2.2  |
+| Git      | 2.56    |
+| VS Code  | 1.146   |
+| OpenCode | 2.2.7   |
 
 > Versi di atas adalah versi yang dipakai saat dokumentasi ini diperbarui. Versi minimum yang dibutuhkan mengikuti `composer.json` dan `package.json`.
 
-## Instalasi
+## Instalasi di local
 
 - Buka folder `C:\laragon\www` di aplikasi VS Code (jika Laragon di-install di drive C)
 - Buka terminal di VS Code dan jalankan
@@ -207,3 +207,7 @@ Beberapa hal yang sengaja dilakukan agar cocok dengan keterbatasan hosting:
 
 - `README.md` — panduan instalasi, penggunaan, dan deployment (file ini).
 - `STRUCTURE.md` — dokumentasi teknis lengkap: arsitektur, routing, model, controller, komponen frontend, skema database, dan daftar test.
+
+## Note
+
+- kode di atas dijalankan di lokal karena Infinityfree tidak memiliki akses SSH/CLI.
