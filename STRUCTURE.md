@@ -359,7 +359,7 @@ Semua controller berada di `app/Http/Controllers`. Tidak ada service layer atau 
 | `Api/Admin/MediaController.php`         | Media library: filter, sort, pencarian, kategori, folder, status trashed/unused, upload gambar dan file, update metadata, soft delete, restore, force delete dengan proteksi usage, serta bulk operation.                                                                                                                                                                                                 |
 | `Api/Admin/MediaCategoryController.php` | CRUD kategori media; menghapus kategori membuat media terkait menjadi uncategorized (`nullOnDelete`).                                                                                                                                                                                                                                                                                                     |
 | `Api/Admin/UserController.php`          | CRUD akun admin: daftar admin beserta jumlah artikel dan status `is_primary`, tambah admin (`is_admin = true`, `is_primary = false`), edit nama/email dengan password opsional, dan hapus dengan pengaman (tidak boleh menghapus diri sendiri, Admin Utama tidak dapat diubah/dihapus admin lain, admin yang masih punya artikel termasuk di Trash tidak boleh dihapus). Akun non-admin menghasilkan 404. |
-| `Api/Admin/ProfileController.php`       | `PUT /api/admin/profile`: setiap admin dapat mengganti nama, email, dan password miliknya sendiri. Peran (`is_admin`, `is_primary`) tidak dapat diubah dari endpoint ini.                                                                                                                                                                                                                                 |
+| `Api/Admin/ProfileController.php`       | `PUT /api/admin/profile`: setiap admin dapat mengganti avatar, alt text avatar, nama, email, dan password miliknya sendiri. Peran (`is_admin`, `is_primary`) tidak dapat diubah dari endpoint ini.                                                                                                                                                                                                          |
 | `Api/Admin/SettingController.php`       | Baca semua setting dan update batch dengan whitelist key, validasi URL, boolean, dan panjang maksimum.                                                                                                                                                                                                                                                                                                    |
 
 ### 5.4 Middleware
@@ -385,14 +385,14 @@ Semua controller berada di `app/Http/Controllers`. Tidak ada service layer atau 
 
 | Model           | Tabel              | Fitur penting                                                                                                                                                                  |
 | --------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `User`          | `users`            | `HasApiTokens`, `Notifiable`, `CanResetPassword`; field `avatar`, `bio`, `is_admin`, `is_primary`; relasi `posts`.                                                             |
+| `User`          | `users`            | `HasApiTokens`, `Notifiable`, `CanResetPassword`; field `avatar`, `avatar_alt`, `bio`, `is_admin`, `is_primary`; accessor `avatar_url`; relasi `posts`, `comments`.              |
 | `Post`          | `posts`            | Soft delete; auto slug dan reading time; scope `published`; accessor `cover_url`, `og_url`; relasi author, category, tags, comments.                                           |
 | `Category`      | `categories`       | Relasi `posts`.                                                                                                                                                                |
 | `Tag`           | `tags`             | Relasi `posts` (belongsToMany).                                                                                                                                                |
-| `Comment`       | `comments`         | Threading via `parent_id`; scope `approved`, `pending`, `rootComments`; mutator `body` menyimpan teks polos; email/IP/user-agent disembunyikan; nama author mengikuti setting. |
+| `Comment`       | `comments`         | Threading via `parent_id`; relasi `user` untuk komentar admin; scope `approved`, `pending`, `rootComments`; mutator `body` menyimpan teks polos; email/IP/user-agent disembunyikan. |
 | `Media`         | `media`            | Soft delete; accessor `url`, `thumb_url`, `download_name`; normalisasi path legacy; scope `images`, `files`; relasi `category`.                                                |
 | `MediaCategory` | `media_categories` | Relasi `media`.                                                                                                                                                                |
-| `Setting`       | `settings`         | 23 key default; helper `getValue`, `setValue`, `allValues`, `authorName`.                                                                                                      |
+| `Setting`       | `settings`         | 21 key default; helper `getValue`, `setValue`, `allValues`, `primaryAdmin`, `authorName`.                                                                                       |
 
 Model memakai atribut PHP 8 milik Laravel 13: `#[Fillable([...])]`, `#[Hidden([...])]`, dan `#[Scope]`, bukan properti `$fillable`/`$hidden` atau anotasi `scopePublished`.
 
@@ -405,7 +405,8 @@ Model memakai atribut PHP 8 milik Laravel 13: `#[Fillable([...])]`, `#[Hidden([.
 | `id`                | bigint primary key                                                            |
 | `name`              | string                                                                        |
 | `email`             | string, unique                                                                |
-| `avatar`            | string, nullable                                                              |
+| `avatar`            | string, nullable (path media avatar admin)                                    |
+| `avatar_alt`        | string, nullable (alt text avatar)                                            |
 | `bio`               | text, nullable                                                                |
 | `email_verified_at` | timestamp, nullable                                                           |
 | `password`          | string (cast `hashed`)                                                        |
@@ -454,6 +455,7 @@ Index: `['status', 'published_at']`.
 | ---------------- | --------------------------------------------------------- |
 | `id`             | bigint primary key                                        |
 | `post_id`        | FK `posts`, cascade on delete                             |
+| `user_id`        | FK `users`, nullable, null on delete (penulis admin)      |
 | `parent_id`      | FK `comments`, nullable, cascade on delete                |
 | `reply_to_name`  | string, nullable                                          |
 | `name`           | string                                                    |
@@ -591,7 +593,7 @@ Media dianggap terpakai jika path-nya muncul di:
 - `posts.cover_image`
 - `posts.og_image`
 - `posts.content` (termasuk artikel soft-deleted)
-- `settings.author_avatar`
+- `users.avatar`
 - `settings.site_logo`
 - `settings.site_logo_dark`
 
@@ -769,7 +771,7 @@ php artisan tinker --execute 'User::query()->update(["is_primary" => false]); Us
 
 Setting disimpan sebagai key-value di tabel `settings` dan digabung dengan `Setting::DEFAULTS`. Nilai boolean disimpan sebagai string `"true"`/`"false"`.
 
-### 10.1 Daftar key (23)
+### 10.1 Daftar key (21)
 
 | Kelompok        | Key                                                                                         |
 | --------------- | ------------------------------------------------------------------------------------------- |
@@ -777,7 +779,7 @@ Setting disimpan sebagai key-value di tabel `settings` dan digabung dengan `Sett
 | SEO default     | `default_meta_title`, `default_meta_description`                                            |
 | Sosial          | `github_url`, `twitter_url`, `linkedin_url`                                                 |
 | Komentar        | `comment_moderation`, `comment_notification`                                                |
-| Penulis         | `author_avatar`, `author_avatar_alt`, `author_name`, `author_role`                          |
+| Penulis         | `author_name`, `author_role`                                                                |
 
 > `author_name` adalah nilai turunan, bukan input bebas. `Setting::authorName()` selalu memakai nama Admin Utama (`users.name` dengan `is_primary = true`). Nilai tersimpan di tabel `settings` hanya menjadi fallback bila belum ada Admin Utama, misalnya pada database lama. `PUT /api/admin/settings` menerima key ini untuk kompatibilitas tetapi mengabaikannya.
 > | About | `about_bio`, `about_topics_heading`, `about_topics`, `about_contact_heading`, `about_contact`, `about_meta_description` |
@@ -800,12 +802,13 @@ Default penting:
 | `Setting::setValue($key, $value)`   | `updateOrCreate` berdasarkan key.                                                                                                                                                                                              |
 | `Setting::allValues()`              | Semua default yang ditimpa nilai database.                                                                                                                                                                                     |
 | `Setting::authorName($fallback)`    | Nama penulis publik. Prioritas: nama Admin Utama (`is_primary = true`), lalu nilai `author_name` tersimpan, lalu default/fallback. Dipakai halaman About/landing dan fallback komentar author yang tidak punya nama tersimpan. |
+| `Setting::primaryAdmin()`           | Mengembalikan model `User` Admin Utama beserta `avatar` dan `avatar_alt`, dipakai sebagai sumber avatar publik.                                                                                                                 |
 
 ### 10.3 Alur ke tampilan
 
 `ShareSiteSettings` membentuk array `$site` dan `view()->share('site', $site)`. Array ini berisi nilai mentah plus:
 
-- `author_avatar_url` — URL absolut hasil `Media::urlFor()`.
+- `author_avatar_url` — URL absolut avatar Admin Utama, hasil `Media::urlFor()`. Avatar dan alt text diatur per admin di `/admin/profile`.
 - `author_initial` — huruf pertama nama penulis, uppercase.
 
 `GET /api/site/settings` hanya mengembalikan `site_title`, `site_logo`, `site_logo_dark`, dan `site_logo_alt` untuk branding login.

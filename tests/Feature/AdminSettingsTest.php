@@ -139,7 +139,6 @@ class AdminSettingsTest extends TestCase
             ->putJson('/api/admin/settings', [
                 'settings' => [
                     'author_name' => 'Penulis Baru',
-                    'author_avatar' => 'avatar/foto.webp',
                     'author_role' => 'Backend Engineer',
                     'about_bio' => 'Paragraf pertama.'.PHP_EOL.PHP_EOL.'Paragraf kedua.',
                     'about_topics' => "Laravel\nPHP",
@@ -148,9 +147,26 @@ class AdminSettingsTest extends TestCase
             ->assertOk();
 
         $this->assertSame('Nama Lama', Setting::getValue('author_name'));
-        $this->assertSame('avatar/foto.webp', Setting::getValue('author_avatar'));
         $this->assertSame('Backend Engineer', Setting::getValue('author_role'));
         $this->assertSame("Laravel\nPHP", Setting::getValue('about_topics'));
+    }
+
+    public function test_update_rejects_legacy_avatar_settings(): void
+    {
+        $admin = $this->admin();
+
+        $this->actingAs($admin)
+            ->putJson('/api/admin/settings', [
+                'settings' => [
+                    'author_avatar' => 'avatar/foto.webp',
+                    'author_avatar_alt' => 'Foto penulis',
+                ],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['settings']);
+
+        $this->assertNull(Setting::getValue('author_avatar'));
+        $this->assertNull(Setting::getValue('author_avatar_alt'));
     }
 
     public function test_index_derives_author_name_from_the_primary_admin(): void

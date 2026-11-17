@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class AdminProfileTest extends TestCase
@@ -47,6 +48,51 @@ class AdminProfileTest extends TestCase
             ->assertOk();
 
         $this->assertTrue(Hash::check('password-baru', $admin->fresh()->password));
+    }
+
+    public function test_admin_can_update_their_own_avatar_and_alt_text(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)
+            ->putJson('/api/admin/profile', [
+                'avatar' => 'avatar/saya.webp',
+                'avatar_alt' => 'Foto profil saya',
+            ])
+            ->assertOk()
+            ->assertJsonPath('user.avatar', 'avatar/saya.webp')
+            ->assertJsonPath('user.avatar_alt', 'Foto profil saya')
+            ->assertJsonPath('user.avatar_url', Storage::disk('public')->url('avatar/saya.webp'));
+
+        $this->assertDatabaseHas('users', [
+            'id' => $admin->id,
+            'avatar' => 'avatar/saya.webp',
+            'avatar_alt' => 'Foto profil saya',
+        ]);
+    }
+
+    public function test_admin_can_remove_their_avatar(): void
+    {
+        $admin = User::factory()->admin()->create([
+            'avatar' => 'avatar/lama.webp',
+            'avatar_alt' => 'Foto lama',
+        ]);
+
+        $this->actingAs($admin)
+            ->putJson('/api/admin/profile', [
+                'avatar' => '',
+                'avatar_alt' => '',
+            ])
+            ->assertOk()
+            ->assertJsonPath('user.avatar', null)
+            ->assertJsonPath('user.avatar_alt', null)
+            ->assertJsonPath('user.avatar_url', null);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $admin->id,
+            'avatar' => null,
+            'avatar_alt' => null,
+        ]);
     }
 
     public function test_password_is_left_untouched_when_omitted(): void

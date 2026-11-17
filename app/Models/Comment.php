@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
-    'post_id', 'parent_id', 'reply_to_name', 'name', 'email', 'body',
+    'post_id', 'user_id', 'parent_id', 'reply_to_name', 'name', 'email', 'body',
     'status', 'is_author', 'notify_replies', 'ip_hash', 'user_agent',
 ])]
 #[Hidden(['email', 'ip_hash', 'user_agent'])]
@@ -72,6 +72,14 @@ class Comment extends Model
     public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class);
+    }
+
+    /**
+     * The registered user who wrote this comment (usually an admin).
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     /**

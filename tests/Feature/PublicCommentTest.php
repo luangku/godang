@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class PublicCommentTest extends TestCase
@@ -138,15 +139,59 @@ class PublicCommentTest extends TestCase
             ->assertJsonPath('message', 'Komentar berhasil dikirim.')
             ->assertJsonPath('comment.name', 'Admin Utama')
             ->assertJsonPath('comment.status', 'approved')
-            ->assertJsonPath('comment.is_author', true);
+            ->assertJsonPath('comment.is_author', true)
+            ->assertJsonPath('comment.user_id', $admin->id)
+            ->assertJsonPath('comment.user.name', 'Admin Utama');
 
         $this->assertDatabaseHas('comments', [
             'post_id' => $post->id,
+            'user_id' => $admin->id,
             'name' => 'Admin Utama',
             'email' => $admin->email,
             'status' => 'approved',
             'is_author' => true,
         ]);
+    }
+
+    public function test_blog_page_shows_admin_avatar_on_author_comments(): void
+    {
+        $post = Post::factory()->published()->create();
+        $admin = User::factory()->admin()->create([
+            'name' => 'Admin Berfoto',
+            'avatar' => 'avatar/admin.webp',
+            'avatar_alt' => 'Foto Admin',
+        ]);
+        Comment::factory()->approved()->create([
+            'post_id' => $post->id,
+            'user_id' => $admin->id,
+            'name' => $admin->name,
+            'is_author' => true,
+        ]);
+
+        $this->get("/blog/{$post->slug}")
+            ->assertOk()
+            ->assertSee(Storage::disk('public')->url('avatar/admin.webp'), false)
+            ->assertSee('Foto Admin');
+    }
+
+    public function test_comment_api_exposes_admin_avatar_for_author_comments(): void
+    {
+        $post = Post::factory()->published()->create();
+        $admin = User::factory()->admin()->create([
+            'avatar' => 'avatar/admin.webp',
+            'avatar_alt' => 'Foto Admin',
+        ]);
+        Comment::factory()->approved()->create([
+            'post_id' => $post->id,
+            'user_id' => $admin->id,
+            'is_author' => true,
+        ]);
+
+        $this->getJson("/api/posts/{$post->id}/comments")
+            ->assertOk()
+            ->assertJsonPath('0.user.avatar_url', Storage::disk('public')->url('avatar/admin.webp'))
+            ->assertJsonPath('0.user.avatar_alt', 'Foto Admin')
+            ->assertJsonMissingPath('0.user.email');
     }
 
     public function test_admin_comment_uses_admin_name_instead_of_submitted_fields(): void

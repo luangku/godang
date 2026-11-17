@@ -29,8 +29,6 @@ class Setting extends Model
         'comment_notification' => 'true',
 
         // Profil penulis / halaman About.
-        'author_avatar' => null,
-        'author_avatar_alt' => null,
         'author_name' => 'Godang',
         'author_role' => 'Developer & Penulis Teknis',
         'about_bio' => "Halo! Saya seorang developer yang senang mendokumentasikan masalah teknis yang pernah saya hadapi beserta solusinya. Blog ini dibuat agar catatan-catatan tersebut bisa bermanfaat untuk orang lain yang mungkin mengalami masalah serupa.\n\nSaya percaya bahwa berbagi pengetahuan adalah cara terbaik untuk belajar. Setiap masalah yang kita selesaikan bisa menjadi jalan pintas bagi orang lain.",
@@ -50,14 +48,22 @@ class Setting extends Model
     }
 
     /**
+     * Get the primary administrator account that represents the public author.
+     */
+    public static function primaryAdmin(): ?User
+    {
+        return User::query()
+            ->where('is_admin', true)
+            ->where('is_primary', true)
+            ->first();
+    }
+
+    /**
      * Get the configured public author name.
      */
     public static function authorName(?string $fallback = null): string
     {
-        $primaryName = trim((string) User::query()
-            ->where('is_admin', true)
-            ->where('is_primary', true)
-            ->value('name'));
+        $primaryName = trim((string) static::primaryAdmin()?->name);
 
         if ($primaryName !== '') {
             return $primaryName;

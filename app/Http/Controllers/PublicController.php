@@ -83,6 +83,7 @@ class PublicController extends Controller
 
         $allComments = $post->comments()
             ->approved()
+            ->with('user:id,name,avatar,avatar_alt')
             ->latest()
             ->get();
 

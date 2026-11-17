@@ -56,6 +56,7 @@ class AdminCommentModerationTest extends TestCase
             ->assertCreated()
             ->assertJsonPath('reply.status', 'approved')
             ->assertJsonPath('reply.is_author', true)
+            ->assertJsonPath('reply.user_id', $admin->id)
             ->assertJsonPath('reply.name', 'Admin Utama')
             ->assertJsonPath('reply.parent_id', $comment->id);
     }

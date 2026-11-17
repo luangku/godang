@@ -2,12 +2,17 @@
     <div class="mt-4 ml-4 pl-4 border-l-2 border-(--color-accent)/20" id="comment-{{ $reply->id }}"
         data-created-at="{{ $reply->created_at->timestamp }}">
         <div class="flex items-start gap-2">
-            <div
-                class="w-8 h-8 rounded-full bg-gradient-to-br from-(--color-accent-bg) to-(--color-accent)/20 flex items-center justify-center flex-shrink-0">
-                <span class="text-xs font-bold text-(--color-accent)">
-                    {{ strtoupper(substr($reply->name, 0, 1)) }}
-                </span>
-            </div>
+            @if (($reply->is_author ?? false) && ($reply->user?->avatar_url))
+                <img src="{{ $reply->user->avatar_url }}" alt="{{ $reply->user->avatar_alt ?: $reply->name }}"
+                    class="w-8 h-8 rounded-full object-cover border border-(--color-border) flex-shrink-0">
+            @else
+                <div
+                    class="w-8 h-8 rounded-full bg-gradient-to-br from-(--color-accent-bg) to-(--color-accent)/20 flex items-center justify-center flex-shrink-0">
+                    <span class="text-xs font-bold text-(--color-accent)">
+                        {{ strtoupper(substr($reply->name, 0, 1)) }}
+                    </span>
+                </div>
+            @endif
             <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2 mb-1 flex-wrap">
                     <span class="font-semibold text-sm">{{ $reply->name }}</span>

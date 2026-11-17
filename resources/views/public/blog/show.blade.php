@@ -321,12 +321,18 @@
                                 data-created-at="{{ $comment->created_at->timestamp }}">
                                 <div class="flex items-start gap-3">
                                     {{-- Avatar --}}
-                                    <div
-                                        class="w-10 h-10 rounded-full bg-gradient-to-br from-(--color-accent-bg) to-(--color-accent)/20 flex items-center justify-center flex-shrink-0">
-                                        <span class="text-sm font-bold text-(--color-accent)">
-                                            {{ strtoupper(substr($comment->name, 0, 1)) }}
-                                        </span>
-                                    </div>
+                                    @if (($comment->is_author ?? false) && ($comment->user?->avatar_url))
+                                        <img src="{{ $comment->user->avatar_url }}"
+                                            alt="{{ $comment->user->avatar_alt ?: $comment->name }}"
+                                            class="w-10 h-10 rounded-full object-cover border border-(--color-border) flex-shrink-0">
+                                    @else
+                                        <div
+                                            class="w-10 h-10 rounded-full bg-gradient-to-br from-(--color-accent-bg) to-(--color-accent)/20 flex items-center justify-center flex-shrink-0">
+                                            <span class="text-sm font-bold text-(--color-accent)">
+                                                {{ strtoupper(substr($comment->name, 0, 1)) }}
+                                            </span>
+                                        </div>
+                                    @endif
 
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-center gap-2 mb-1 flex-wrap">
@@ -554,6 +560,19 @@
                 "'": '&#039;',
             })[character]);
 
+            const avatarMarkup = (comment, size = 'md') => {
+                const dimension = size === 'sm' ? 'w-8 h-8' : 'w-10 h-10';
+                const textSize = size === 'sm' ? 'text-xs' : 'text-sm';
+
+                if (comment.is_author && comment.user && comment.user.avatar_url) {
+                    return `<img src="${escapeHtml(comment.user.avatar_url)}" alt="${escapeHtml(comment.user.avatar_alt || comment.name || 'Avatar')}" class="${dimension} rounded-full object-cover border border-(--color-border) flex-shrink-0">`;
+                }
+
+                return `<div class="${dimension} rounded-full bg-gradient-to-br from-(--color-accent-bg) to-(--color-accent)/20 flex items-center justify-center flex-shrink-0">
+                    <span class="${textSize} font-bold text-(--color-accent)">${escapeHtml((comment.name || '?').substring(0, 1).toUpperCase())}</span>
+                </div>`;
+            };
+
             @if ($isAdmin)
                 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
@@ -775,9 +794,7 @@
                     card.dataset.createdAt = createdAt;
                     card.innerHTML = `
                     <div class="flex items-start gap-3">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-(--color-accent-bg) to-(--color-accent)/20 flex items-center justify-center flex-shrink-0">
-                            <span class="text-sm font-bold text-(--color-accent)">${escapeHtml((comment.name || '?').substring(0,1).toUpperCase())}</span>
-                        </div>
+                        ${avatarMarkup(comment)}
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-1 flex-wrap">
                                 <span class="font-semibold text-sm">${escapeHtml(comment.name)}</span>
@@ -814,9 +831,7 @@
                     replyEl.dataset.createdAt = createdAt;
                     replyEl.innerHTML = `
                     <div class="flex items-start gap-2">
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-(--color-accent-bg) to-(--color-accent)/20 flex items-center justify-center flex-shrink-0">
-                            <span class="text-xs font-bold text-(--color-accent)">${escapeHtml((reply.name || '?').substring(0,1).toUpperCase())}</span>
-                        </div>
+                        ${avatarMarkup(reply, 'sm')}
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-1 flex-wrap">
                                 <span class="font-semibold text-sm">${escapeHtml(reply.name)}</span>
