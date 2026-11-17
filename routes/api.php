@@ -87,6 +87,7 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->name('api.admin.'
     // Media
     Route::get('/media', [MediaController::class, 'index'])->name('media.index');
     Route::post('/media', [MediaController::class, 'store'])->name('media.store');
+    Route::post('/media/scan', [MediaController::class, 'scan'])->name('media.scan');
     Route::post('/media/bulk-delete', [MediaController::class, 'bulkDelete'])->name('media.bulk-delete');
     Route::post('/media/bulk-restore', [MediaController::class, 'bulkRestore'])->name('media.bulk-restore');
     Route::post('/media/bulk-force-delete', [MediaController::class, 'bulkForceDelete'])->name('media.bulk-force-delete');

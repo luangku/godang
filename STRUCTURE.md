@@ -45,6 +45,7 @@ Karakteristik utama:
 - Artikel mendukung `draft`, `published`, dan `scheduled`.
 - Artikel memakai soft delete; media juga memakai soft delete.
 - Upload gambar otomatis dikonversi ke WebP dan dibuatkan thumbnail.
+- Media library punya fitur **scan file lama** untuk mendaftarkan file yang sudah ada di disk tetapi belum tercatat setelah migrasi.
 - Komentar mendukung balasan dua tingkat, moderasi, honeypot, dan notifikasi email.
 - Tema gelap menjadi default, dengan toggle terang/gelap.
 - Deploy produksi memakai FTP ke InfinityFree melalui GitHub Actions.
@@ -223,7 +224,7 @@ Semua route di bawah memakai prefix `/api/admin`, name prefix `api.admin.`, dan 
 | Kategori       | `apiResource /categories`                                                                                                                                                                                                      |
 | Tag            | `apiResource /tags`                                                                                                                                                                                                            |
 | Komentar       | `GET\|POST /comments`, `PATCH /comments/{comment}` (approve), `PUT /comments/{comment}` (edit), `PATCH /comments/{comment}/spam`, `POST /comments/{comment}/reply`, `DELETE /comments/{comment}`, `POST /comments/bulk-delete` |
-| Media          | `GET\|POST /media`, `PATCH /media/{media}`, `DELETE /media/{media}`, `POST /media/{media}/restore`, `DELETE /media/{media}/force`, `POST /media/bulk-delete`, `POST /media/bulk-restore`, `POST /media/bulk-force-delete`      |
+| Media          | `GET\|POST /media`, `POST /media/scan`, `PATCH /media/{media}`, `DELETE /media/{media}`, `POST /media/{media}/restore`, `DELETE /media/{media}/force`, `POST /media/bulk-delete`, `POST /media/bulk-restore`, `POST /media/bulk-force-delete` |
 | Kategori media | `GET\|POST /media-categories`, `PATCH\|DELETE /media-categories/{mediaCategory}`                                                                                                                                               |
 | Pengguna       | `apiResource /users` (index, store, update, destroy; tanpa `show`) — middleware tambahan `primary-admin`                                                                                                                       |
 | Profil sendiri | `PUT /profile` — dapat diakses semua admin                                                                                                                                                                                     |
@@ -232,7 +233,7 @@ Semua route di bawah memakai prefix `/api/admin`, name prefix `api.admin.`, dan 
 Catatan urutan route:
 
 - `posts/bulk-delete` dan `posts/{post}/restore` didaftarkan sebelum `apiResource` agar tidak dianggap sebagai `{post}`.
-- Route bulk media didaftarkan sebelum route `{media}`.
+- Route `media/scan` dan bulk media didaftarkan sebelum route `{media}`.
 - `apiResource('posts')` memakai `withTrashed()` untuk `show`, `update`, dan `destroy`, sehingga admin tetap bisa mengelola artikel di tempat sampah.
 - Route `restore` dan `force` memakai `withTrashed()`.
 
@@ -356,7 +357,7 @@ Semua controller berada di `app/Http/Controllers`. Tidak ada service layer atau 
 | `Api/Admin/CategoryController.php`      | CRUD kategori, slug otomatis, hitungan artikel.                                                                                                                                                                                                                                                                                                                                                           |
 | `Api/Admin/TagController.php`           | CRUD tag, slug otomatis, hitungan artikel.                                                                                                                                                                                                                                                                                                                                                                |
 | `Api/Admin/CommentController.php`       | Daftar komentar dengan filter status/post/kategori, buat komentar sebagai admin, edit body, approve, spam (beserta balasan), reply, hapus (beserta balasan), bulk delete.                                                                                                                                                                                                                                 |
-| `Api/Admin/MediaController.php`         | Media library: filter, sort, pencarian, kategori, folder, status trashed/unused, upload gambar dan file, update metadata, soft delete, restore, force delete dengan proteksi usage, serta bulk operation.                                                                                                                                                                                                 |
+| `Api/Admin/MediaController.php`         | Media library: filter, sort, pencarian, kategori, folder, status trashed/unused, upload gambar dan file, scan file lama dari disk, update metadata, soft delete, restore, force delete dengan proteksi usage, serta bulk operation.                                                                                                                                                                          |
 | `Api/Admin/MediaCategoryController.php` | CRUD kategori media; menghapus kategori membuat media terkait menjadi uncategorized (`nullOnDelete`).                                                                                                                                                                                                                                                                                                     |
 | `Api/Admin/UserController.php`          | CRUD akun admin: daftar admin beserta jumlah artikel dan status `is_primary`, tambah admin (`is_admin = true`, `is_primary = false`), edit nama/email dengan password opsional, dan hapus dengan pengaman (tidak boleh menghapus diri sendiri, Admin Utama tidak dapat diubah/dihapus admin lain, admin yang masih punya artikel termasuk di Trash tidak boleh dihapus). Akun non-admin menghasilkan 404. |
 | `Api/Admin/ProfileController.php`       | `PUT /api/admin/profile`: setiap admin dapat mengganti avatar, alt text avatar, nama, email, dan password miliknya sendiri. Peran (`is_admin`, `is_primary`) tidak dapat diubah dari endpoint ini.                                                                                                                                                                                                        |
@@ -390,7 +391,7 @@ Semua controller berada di `app/Http/Controllers`. Tidak ada service layer atau 
 | `Category`      | `categories`       | Relasi `posts`.                                                                                                                                                                     |
 | `Tag`           | `tags`             | Relasi `posts` (belongsToMany).                                                                                                                                                     |
 | `Comment`       | `comments`         | Threading via `parent_id`; relasi `user` untuk komentar admin; scope `approved`, `pending`, `rootComments`; mutator `body` menyimpan teks polos; email/IP/user-agent disembunyikan. |
-| `Media`         | `media`            | Soft delete; accessor `url`, `thumb_url`, `download_name`; normalisasi path legacy; scope `images`, `files`; relasi `category`.                                                     |
+| `Media`         | `media`            | Soft delete; accessor `url`, `thumb_url`, `download_name`; normalisasi path legacy; scope `images`, `files`; scanner file disk (`scanPublicDisk`) dan validasi path servable; relasi `category`. |
 | `MediaCategory` | `media_categories` | Relasi `media`.                                                                                                                                                                     |
 | `Setting`       | `settings`         | 21 key default; helper `getValue`, `setValue`, `allValues`, `primaryAdmin`, `authorName`.                                                                                           |
 
@@ -550,6 +551,8 @@ Media selalu disimpan di disk **`public`** (`storage/app/public`), terlepas dari
 
 URL file dibentuk oleh `Storage::disk('public')->url($path)`, yang menghasilkan `APP_URL/storage/{path}`. Di lokal, `public/storage` adalah junction ke `storage/app/public`. Jika symlink tidak tersedia di hosting, route fallback `/storage/{path}` tetap menyajikan file.
 
+Route fallback tersebut memakai `Media::isServablePath()`, sehingga file lama di subfolder atau folder legacy (misalnya `legacy/2024/foto.jpg`) tetap bisa disajikan. Path traversal, file tersembunyi, dan ekstensi berbahaya tetap ditolak.
+
 ### 7.2 Upload gambar
 
 Validasi dan proses di `Api/Admin/MediaController::storeImage()`:
@@ -616,11 +619,22 @@ Aturan hapus:
 - **Bulk force delete** juga ditolak seluruhnya jika ada satu item yang masih dipakai.
 - Saat force delete berhasil, file asli dan thumbnail dihapus dari disk.
 
-### 7.6 Command media
+### 7.6 Scan file lama
+
+Fitur ini untuk file yang sudah ada di `storage/app/public` tetapi belum punya baris di tabel `media` (misalnya setelah migrasi dari aplikasi lama).
+
+- **UI:** tombol **Scan file lama** di `/admin/media` memanggil `POST /api/admin/media/scan`.
+- **Logika:** `Media::scanPublicDisk()` memindai disk, melewati file yang sudah terdaftar (termasuk path legacy `storage/...`, URL absolut, atau prefix `public/`), thumbnail `*-thumb.*`, file tersembunyi, dan ekstensi berbahaya.
+- **Yang didaftarkan:** gambar (`jpg`, `jpeg`, `png`, `gif`, `webp`, `bmp`, `avif`) dan dokumen (`pdf`, `doc`, `docx`, `xls`, `xlsx`, `ppt`, `pptx`, `txt`, `csv`, `zip`).
+- **Metadata:** `type`, `original_name`, `folder` (segmen folder teratas), `mime`, `size`, `width`, `height`, dan `alt_text` diisi otomatis. Jika memungkinkan, thumbnail WebP 480 px dibuat.
+- **Batas:** satu request memproses maksimal **50 file** (dapat diubah lewat parameter `limit`, maksimal 500). Respons menyertakan `scanned`, `created`, `skipped`, `remaining`, dan `created_paths`; jika `remaining > 0`, jalankan scan lagi.
+- **Path legacy:** file di subfolder seperti `legacy/2024/foto.webp` tetap didaftarkan dan dapat disajikan lewat route `/storage/{path}`.
+
+### 7.7 Command media
 
 | Command                        | Fungsi                                                                                                                                                                                         |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `php artisan media:backfill`   | Menormalkan path legacy (`storage/...` atau URL absolut) pada post dan media, mendaftarkan file cover orphan, dan opsional `--prune-missing` untuk membersihkan referensi yang filenya hilang. |
+| `php artisan media:backfill`   | Menormalkan path legacy (`storage/...` atau URL absolut) pada post dan media, mendaftarkan semua file orphan dari disk, dan opsional `--prune-missing` untuk membersihkan referensi yang filenya hilang. |
 | `php artisan media:thumbnails` | Membuat thumbnail WebP untuk media lama. Opsi `--force` untuk regenerasi.                                                                                                                      |
 
 ---
@@ -952,7 +966,7 @@ Semua halaman admin di-lazy-load. Path lain diarahkan ke `/admin`.
 | `Comments.jsx`      | Filter status/kategori dan urutan waktu (**Terbaru dulu** default atau **Terlama dulu**); buka thread; approve; edit; reply; spam; hapus; bulk delete.                                                                                                                                                         |
 | `Categories.jsx`    | CRUD kategori dengan slug.                                                                                                                                                                                                                                                                                     |
 | `Tags.jsx`          | CRUD tag dengan slug.                                                                                                                                                                                                                                                                                          |
-| `Media.jsx`         | Grid media, pencarian, filter folder/kategori/tipe, sort, upload gambar/file, edit alt & kategori, lihat usage, pindah ke trash.                                                                                                                                                                               |
+| `Media.jsx`         | Grid media, pencarian, filter folder/kategori/tipe, sort, upload gambar/file, **scan file lama**, edit alt & kategori, lihat usage, pindah ke trash.                                                                                                                                                           |
 | `MediaTrash.jsx`    | Restore dan force delete media dengan indikator usage.                                                                                                                                                                                                                                                         |
 | `Users.jsx`         | Daftar admin beserta peran (**Admin Utama**/**Admin**) dan jumlah artikel; form tambah/edit admin (nama, email, password opsional); hapus admin dengan konfirmasi. Hanya dapat dibuka Admin Utama. Tombol edit/hapus dinonaktifkan untuk akun sendiri, Admin Utama lain, dan admin yang masih punya artikel.   |
 | `Profile.jsx`       | Setiap admin mengganti nama, email, dan password miliknya sendiri; menampilkan peran akun.                                                                                                                                                                                                                     |
@@ -1036,7 +1050,7 @@ Sitemap: {APP_URL}/sitemap.xml
 | Command                   | Signature                                    | Fungsi                                                                                            |
 | ------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | `PublishScheduledPosts`   | `posts:publish-scheduled`                    | Mengubah artikel `scheduled` yang `published_at <= now()` menjadi `published`.                    |
-| `BackfillMediaPaths`      | `media:backfill {--force} {--prune-missing}` | Menormalkan path media legacy, mendaftarkan cover orphan, dan membersihkan referensi file hilang. |
+| `BackfillMediaPaths`      | `media:backfill {--force} {--prune-missing}` | Menormalkan path media legacy, mendaftarkan semua file orphan dari disk, dan membersihkan referensi file hilang. |
 | `GenerateMediaThumbnails` | `media:thumbnails {--force}`                 | Membuat thumbnail WebP untuk media yang belum punya thumbnail.                                    |
 | `inspire`                 | `inspire`                                    | Command bawaan Laravel di `routes/console.php`.                                                   |
 
@@ -1124,10 +1138,10 @@ Saat dokumen ini diperbarui:
 
 ```
 php artisan test --compact
-258 tests, 929 assertions, semua lulus
+268 tests, 980 assertions, semua lulus
 ```
 
-Durasi sekitar 32 detik di mesin lokal.
+Durasi sekitar 41 detik di mesin lokal.
 
 ### 16.4 Cara menjalankan
 
@@ -1432,7 +1446,7 @@ Gunakan `php artisan route:list --except-vendor` dan `php artisan test` sebagai 
 | Endpoint admin   | controller, `api.js`, halaman React                      | test + cek UI                                       |
 | Frontend admin   | `resources/js/admin/**`, `npm run build`                 | cek mode terang/gelap + mobile                      |
 | Halaman publik   | Blade, CSS, `app.js`                                     | cek meta SEO, komentar, responsif                   |
-| Media            | `MediaController`, `media.js`, command media             | upload, trash, restore, force delete                |
+| Media            | `MediaController`, `media.js`, command media             | upload, scan file lama, trash, restore, force delete |
 | Settings         | `Setting::DEFAULTS`, `SettingController`, `Settings.jsx` | update tiap tab, cek halaman publik                 |
 
 Rollback cepat:
@@ -1524,13 +1538,13 @@ Fakta yang dicek langsung saat dokumen ini dibuat:
 | Controller             | 20 file (termasuk `Controller.php`)       |
 | Seeder                 | 7 file (6 dipanggil, `MediaSeeder` tidak) |
 | Factory                | 7                                         |
-| Test                   | 258 test, 929 assertion, semua lulus      |
+| Test                   | 268 test, 980 assertion, semua lulus      |
 | File test              | 26 (24 feature, 1 unit, `TestCase.php`)   |
 | Command kustom         | 3                                         |
 | Notifikasi             | 2                                         |
 | Setting key            | 23                                        |
 | `vendor/` di git       | sekitar 9.930 file                        |
-| `public/build/` di git | 54 file                                   |
+| `public/build/` di git | 55 file                                   |
 | `tests/` di git        | 26 file                                   |
 | Branch                 | `main`                                    |
 
@@ -1548,7 +1562,7 @@ git ls-files
 
 ### Catatan kondisi working tree
 
-Dokumen ini diperbarui setelah rangkaian perbaikan: sinkronisasi versi README, UI manajemen pengguna admin, sanitasi komentar, throttle `forgot-password`, queue email berbasis database, hitungan `published_posts`, dan pencocokan usage media yang persis. Angka pada tabel di atas diambil dari kondisi working tree setelah `vendor/bin/pint --dirty`, `php artisan test --compact`, dan `npm run build` dijalankan.
+Dokumen ini diperbarui setelah rangkaian perbaikan: sinkronisasi versi README, UI manajemen pengguna admin, sanitasi komentar, throttle `forgot-password`, queue email berbasis database, hitungan `published_posts`, pencocokan usage media yang persis, serta fitur **scan file lama** untuk media hasil migrasi. Angka pada tabel di atas diambil dari kondisi working tree setelah `vendor/bin/pint --dirty`, `php artisan test --compact`, dan `npm run build` dijalankan.
 
 ---
 

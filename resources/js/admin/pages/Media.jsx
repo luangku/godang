@@ -322,6 +322,24 @@ export default function Media() {
         });
     };
 
+    const askScan = () => {
+        setConfirm({
+            title: 'Scan file lama',
+            message:
+                'Sistem akan memindai folder media di server dan mendaftarkan file yang belum ada di daftar media. File yang sudah terdaftar tidak akan diduplikasi, dan thumbnail akan dibuat otomatis bila memungkinkan.',
+            confirmLabel: 'Mulai scan',
+            action: async () => {
+                setBusy(true);
+                try {
+                    await mutation.mutateAsync({ method: 'POST', url: endpoints.mediaScan });
+                    setConfirm(null);
+                } finally {
+                    setBusy(false);
+                }
+            },
+        });
+    };
+
     const copyUrl = async (item) => {
         const url = resolveMediaUrl(item);
 
@@ -358,12 +376,22 @@ export default function Media() {
                         {data?.total ?? 0} {isFile ? 'file' : 'gambar'} {hasFilters ? 'cocok dengan filter' : 'tersimpan'}
                     </p>
                 </div>
-                <Link
-                    to="/admin/media/trash"
-                    className="inline-flex items-center gap-2 self-start rounded-lg border border-(--color-border) px-3 py-2 text-sm hover:bg-(--color-accent-bg)"
-                >
-                    Sampah media
-                </Link>
+                <div className="flex flex-wrap items-center gap-2 self-start">
+                    <button
+                        type="button"
+                        onClick={askScan}
+                        disabled={busy}
+                        className="inline-flex items-center gap-2 rounded-lg border border-(--color-border) px-3 py-2 text-sm hover:bg-(--color-accent-bg) disabled:opacity-60"
+                    >
+                        Scan file lama
+                    </button>
+                    <Link
+                        to="/admin/media/trash"
+                        className="inline-flex items-center gap-2 rounded-lg border border-(--color-border) px-3 py-2 text-sm hover:bg-(--color-accent-bg)"
+                    >
+                        Sampah media
+                    </Link>
+                </div>
             </div>
 
             <div role="tablist" aria-label="Jenis media" className="flex gap-1 border-b border-(--color-border)">

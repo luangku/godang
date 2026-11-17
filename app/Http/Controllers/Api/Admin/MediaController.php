@@ -146,6 +146,38 @@ class MediaController extends Controller
     }
 
     /**
+     * Scan the public disk and register files that have no media record yet.
+     *
+     * This is meant for files copied to storage during a migration but never
+     * inserted into the media table, which makes them invisible in the panel.
+     */
+    public function scan(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'limit' => ['nullable', 'integer', 'min:1', 'max:500'],
+            'thumbnails' => ['nullable', 'boolean'],
+        ]);
+
+        $limit = (int) ($validated['limit'] ?? 50);
+        $generateThumbnails = $request->has('thumbnails') ? $request->boolean('thumbnails') : true;
+
+        $result = Media::scanPublicDisk($limit, $generateThumbnails);
+
+        $message = $result['created'] > 0
+            ? "{$result['created']} file lama berhasil didaftarkan."
+            : 'Tidak ada file lama yang perlu didaftarkan.';
+
+        if ($result['remaining'] > 0) {
+            $message .= " Masih ada {$result['remaining']} file yang belum dipindai, jalankan scan lagi.";
+        }
+
+        return response()->json([
+            'message' => $message,
+            ...$result,
+        ]);
+    }
+
+    /**
      * Store an uploaded image or non-image file.
      */
     public function store(Request $request): JsonResponse

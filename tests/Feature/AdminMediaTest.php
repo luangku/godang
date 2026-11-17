@@ -811,6 +811,132 @@ class AdminMediaTest extends TestCase
         $this->assertDatabaseHas('media', ['id' => $media->id, 'media_category_id' => null]);
     }
 
+    public function test_scan_registers_orphaned_files_from_public_disk(): void
+    {
+        Storage::fake('public');
+        $admin = $this->admin();
+
+        $this->putWebp('uploads/lama-satu.webp', 800, 600);
+        $this->putWebp('uploads/lama-dua.webp', 640, 480);
+        $this->putWebp('uploads/lama-dua-thumb.webp', 320, 240);
+        $this->putWebp('cover/cover-lama.webp', 1200, 630);
+        $this->putWebp('legacy/2024/foto-lama.webp', 900, 500);
+        Storage::disk('public')->put('files/laporan.pdf', 'binary-pdf');
+        Storage::disk('public')->put('uploads/shell.php', '<?php echo 1;');
+        Storage::disk('public')->put('uploads/.DS_Store', 'junk');
+
+        $response = $this->actingAs($admin)
+            ->postJson('/api/admin/media/scan')
+            ->assertOk()
+            ->assertJsonPath('scanned', 5)
+            ->assertJsonPath('created', 5)
+            ->assertJsonPath('skipped', 0)
+            ->assertJsonPath('remaining', 0);
+
+        $this->assertCount(5, $response->json('created_paths'));
+
+        $first = Media::where('path', 'uploads/lama-satu.webp')->firstOrFail();
+
+        $this->assertSame('image', $first->type);
+        $this->assertSame('uploads', $first->folder);
+        $this->assertSame('lama-satu.webp', $first->original_name);
+        $this->assertSame('image/webp', $first->mime);
+        $this->assertSame(800, $first->width);
+        $this->assertSame(600, $first->height);
+        $this->assertSame('uploads/lama-satu-thumb.webp', $first->thumb_path);
+        Storage::disk('public')->assertExists('uploads/lama-satu-thumb.webp');
+
+        $second = Media::where('path', 'uploads/lama-dua.webp')->firstOrFail();
+
+        $this->assertSame('uploads/lama-dua-thumb.webp', $second->thumb_path);
+
+        $cover = Media::where('path', 'cover/cover-lama.webp')->firstOrFail();
+
+        $this->assertSame('cover', $cover->folder);
+
+        $legacy = Media::where('path', 'legacy/2024/foto-lama.webp')->firstOrFail();
+
+        $this->assertSame('legacy', $legacy->folder);
+
+        $document = Media::where('path', 'files/laporan.pdf')->firstOrFail();
+
+        $this->assertSame('file', $document->type);
+        $this->assertSame('files', $document->folder);
+        $this->assertSame('laporan.pdf', $document->original_name);
+
+        $this->assertDatabaseMissing('media', ['path' => 'uploads/lama-dua-thumb.webp']);
+        $this->assertDatabaseMissing('media', ['path' => 'uploads/shell.php']);
+        $this->assertDatabaseMissing('media', ['path' => 'uploads/.DS_Store']);
+    }
+
+    public function test_scan_does_not_duplicate_files_registered_with_legacy_path(): void
+    {
+        Storage::fake('public');
+        $admin = $this->admin();
+
+        $this->putWebp('uploads/lama.webp');
+
+        Media::create([
+            'path' => 'storage/uploads/lama.webp',
+            'folder' => 'uploads',
+            'alt_text' => 'Path lama',
+            'mime' => 'image/webp',
+            'size' => 1000,
+            'width' => 800,
+            'height' => 600,
+        ]);
+
+        $this->actingAs($admin)
+            ->postJson('/api/admin/media/scan')
+            ->assertOk()
+            ->assertJsonPath('scanned', 0)
+            ->assertJsonPath('created', 0);
+
+        $this->assertSame(1, Media::where('path', 'like', '%lama.webp')->count());
+    }
+
+    public function test_scan_respects_limit_and_reports_remaining_files(): void
+    {
+        Storage::fake('public');
+        $admin = $this->admin();
+
+        foreach (range(0, 2) as $index) {
+            $this->putWebp("uploads/scan-{$index}.webp", 400, 300);
+        }
+
+        $this->actingAs($admin)
+            ->postJson('/api/admin/media/scan', ['limit' => 2, 'thumbnails' => false])
+            ->assertOk()
+            ->assertJsonPath('scanned', 3)
+            ->assertJsonPath('created', 2)
+            ->assertJsonPath('remaining', 1)
+            ->assertJsonPath('created_paths.0', 'uploads/scan-0.webp')
+            ->assertJsonPath('created_paths.1', 'uploads/scan-1.webp');
+
+        $this->assertSame(2, Media::count());
+        $this->assertNull(Media::where('path', 'uploads/scan-0.webp')->value('thumb_path'));
+    }
+
+    public function test_scan_requires_admin(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->postJson('/api/admin/media/scan')
+            ->assertForbidden();
+    }
+
+    private function putWebp(string $path, int $width = 800, int $height = 600): void
+    {
+        $disk = Storage::disk('public');
+        $disk->makeDirectory(dirname($path));
+
+        $image = imagecreatetruecolor($width, $height);
+        imagewebp($image, $disk->path($path));
+        imagedestroy($image);
+    }
+
     public function test_thumbnail_command_backfills_existing_media(): void
     {
         Storage::fake('public');

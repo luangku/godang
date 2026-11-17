@@ -39,6 +39,32 @@ class StorageFileTest extends TestCase
             ->assertHeader('Content-Disposition', 'inline; filename="laporan.pdf"');
     }
 
+    public function test_storage_route_serves_nested_legacy_paths(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('uploads/2024/foto-lama.jpg', 'fake-image-content');
+
+        $this->get('/storage/uploads/2024/foto-lama.jpg')->assertOk();
+    }
+
+    public function test_storage_route_rejects_unsupported_file_extensions(): void
+    {
+        Storage::fake('public');
+
+        foreach (['uploads/shell.php', 'uploads/halaman.html', 'uploads/gambar.svg', 'uploads/script.js'] as $path) {
+            Storage::disk('public')->put($path, 'dangerous');
+            $this->get('/storage/'.$path)->assertNotFound();
+        }
+    }
+
+    public function test_storage_route_rejects_hidden_files(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('uploads/.rahasia.jpg', 'fake-image-content');
+
+        $this->get('/storage/uploads/.rahasia.jpg')->assertNotFound();
+    }
+
     public function test_storage_route_returns_404_for_unknown_file(): void
     {
         Storage::fake('public');
