@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 #[Signature('media:backfill {--force : Run without confirmation} {--prune-missing : Clear post image references whose local file no longer exists}')]
-#[Description('Normalize legacy media paths and register orphaned cover files.')]
+#[Description('Normalize legacy media paths and register orphaned media files.')]
 class BackfillMediaPaths extends Command
 {
     /**
@@ -18,13 +18,13 @@ class BackfillMediaPaths extends Command
      */
     public function handle(): int
     {
-        if (! $this->option('force') && ! $this->confirm('Normalize legacy media paths and register orphaned cover files?')) {
+        if (! $this->option('force') && ! $this->confirm('Normalize legacy media paths and register orphaned media files?')) {
             return self::FAILURE;
         }
 
         $postsUpdated = $this->normalizePostImages();
         $mediaUpdated = $this->normalizeMediaPaths();
-        $mediaCreated = $this->registerOrphanedCoverFiles();
+        $mediaCreated = $this->registerOrphanedFiles();
         $referencesCleared = $this->option('prune-missing') ? $this->pruneMissingPostImages() : 0;
 
         $this->info("Posts updated: {$postsUpdated}");
@@ -99,33 +99,16 @@ class BackfillMediaPaths extends Command
     }
 
     /**
-     * Insert media records for cover files that are not registered yet.
+     * Insert media records for files on the public disk that are not registered yet.
      */
-    private function registerOrphanedCoverFiles(): int
+    private function registerOrphanedFiles(): int
     {
         $created = 0;
-        $disk = Storage::disk('public');
 
-        foreach ($disk->files('cover') as $path) {
-            if (Media::where('path', $path)->exists()) {
-                continue;
-            }
-
-            $absolutePath = $disk->path($path);
-            $dimensions = @getimagesize($absolutePath);
-
-            Media::create([
-                'path' => $path,
-                'folder' => 'cover',
-                'alt_text' => basename($path),
-                'mime' => $dimensions['mime'] ?? 'image/webp',
-                'size' => $disk->size($path),
-                'width' => $dimensions[0] ?? null,
-                'height' => $dimensions[1] ?? null,
-            ]);
-
-            $created++;
-        }
+        do {
+            $result = Media::scanPublicDisk(100, false);
+            $created += $result['created'];
+        } while ($result['remaining'] > 0);
 
         return $created;
     }

@@ -52,6 +52,7 @@ export const endpoints = {
     categories: '/admin/categories',
     tags: '/admin/tags',
     media: '/admin/media',
+    mediaScan: '/admin/media/scan',
     mediaCategories: '/admin/media-categories',
     mediaBulkDelete: '/admin/media/bulk-delete',
     mediaBulkRestore: '/admin/media/bulk-restore',
