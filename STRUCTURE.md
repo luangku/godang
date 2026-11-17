@@ -189,9 +189,6 @@ Tiga route ini mengembalikan view `admin` yang sama. React Router yang menentuka
 | GET    | `/sitemap.xml`            | `seo.sitemap`   | Sitemap dinamis                                                      |
 | GET    | `/robots.txt`             | `seo.robots`    | Robots dinamis                                                       |
 | GET    | `/feed.xml`               | `seo.feed`      | RSS 20 artikel terbaru                                               |
-| GET    | `/{legacyLocale}/{path?}` | `legacy.locale` | Redirect 301 `/id/*` dan `/en/*` ke path tanpa locale                |
-
-Route legacy didaftarkan paling akhir agar tidak menangkap route nyata. Locale selain `id` dan `en` menghasilkan 404.
 
 ### 4.4 API publik
 

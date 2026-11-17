@@ -55,19 +55,3 @@ Route::get('/robots.txt', [SeoController::class, 'robots'])->name('seo.robots');
 Route::get('/feed.xml', [SeoController::class, 'feed'])
     ->middleware(ShareSiteSettings::class)
     ->name('seo.feed');
-
-/*
-|--------------------------------------------------------------------------
-| Legacy locale redirects
-|--------------------------------------------------------------------------
-| Keep old /id/* and /en/* URLs working with permanent redirects.
-| Must be registered after every real route.
-|
-*/
-Route::get('/{legacyLocale}/{path?}', function (string $legacyLocale, ?string $path = null) {
-    if (! in_array($legacyLocale, ['id', 'en'], true)) {
-        abort(404);
-    }
-
-    return redirect('/'.($path ?? ''), 301);
-})->where('path', '.*')->name('legacy.locale');

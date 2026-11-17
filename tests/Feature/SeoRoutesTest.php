@@ -113,17 +113,6 @@ class SeoRoutesTest extends TestCase
             ->assertSee('<link rel="alternate" hreflang="x-default" href="'.url('/blog/artikel-seo').'">', false);
     }
 
-    public function test_legacy_locale_urls_redirect_permanently(): void
-    {
-        $this->get('/id/blog/contoh')
-            ->assertStatus(301)
-            ->assertRedirect('/blog/contoh');
-
-        $this->get('/en/about')
-            ->assertStatus(301)
-            ->assertRedirect('/about');
-    }
-
     public function test_unknown_locale_prefix_is_not_found(): void
     {
         $this->get('/fr/blog')->assertNotFound();
