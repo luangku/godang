@@ -22,9 +22,9 @@ class Setting extends Model
         'tagline' => 'Berbagi masalah & solusi teknis',
         'default_meta_title' => 'Godang — Blog Teknis Pribadi',
         'default_meta_description' => 'Blog teknis pribadi: sharing masalah dan solusi pemrograman.',
-        'github_url' => 'https://github.com',
-        'twitter_url' => 'https://twitter.com',
-        'linkedin_url' => 'https://linkedin.com',
+        'github_url' => 'https://github.com/luangku',
+        'twitter_url' => 'https://x.com/OllaPurnomo',
+        'linkedin_url' => 'https://www.linkedin.com/in/priola-purnomo',
         'comment_moderation' => 'true',
         'comment_notification' => 'true',
 

@@ -210,4 +210,4 @@ Beberapa hal yang sengaja dilakukan agar cocok dengan keterbatasan hosting:
 
 ## Note
 
-- kode di atas dijalankan di lokal karena Infinityfree tidak memiliki akses SSH/CLI.
+- Kode di atas hanya bisa dijalankan di lokal karena Infinityfree tidak memiliki akses SSH/CLI.

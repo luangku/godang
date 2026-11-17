@@ -183,12 +183,12 @@ Tiga route ini mengembalikan view `admin` yang sama. React Router yang menentuka
 
 ### 4.3 Route utilitas dan SEO
 
-| Method | URI                       | Name            | Keterangan                                                           |
-| ------ | ------------------------- | --------------- | -------------------------------------------------------------------- |
-| GET    | `/storage/{path}`         | `storage.file`  | Fallback penyajian file jika symlink `public/storage` tidak tersedia |
-| GET    | `/sitemap.xml`            | `seo.sitemap`   | Sitemap dinamis                                                      |
-| GET    | `/robots.txt`             | `seo.robots`    | Robots dinamis                                                       |
-| GET    | `/feed.xml`               | `seo.feed`      | RSS 20 artikel terbaru                                               |
+| Method | URI               | Name           | Keterangan                                                           |
+| ------ | ----------------- | -------------- | -------------------------------------------------------------------- |
+| GET    | `/storage/{path}` | `storage.file` | Fallback penyajian file jika symlink `public/storage` tidak tersedia |
+| GET    | `/sitemap.xml`    | `seo.sitemap`  | Sitemap dinamis                                                      |
+| GET    | `/robots.txt`     | `seo.robots`   | Robots dinamis                                                       |
+| GET    | `/feed.xml`       | `seo.feed`     | RSS 20 artikel terbaru                                               |
 
 ### 4.4 API publik
 
@@ -359,7 +359,7 @@ Semua controller berada di `app/Http/Controllers`. Tidak ada service layer atau 
 | `Api/Admin/MediaController.php`         | Media library: filter, sort, pencarian, kategori, folder, status trashed/unused, upload gambar dan file, update metadata, soft delete, restore, force delete dengan proteksi usage, serta bulk operation.                                                                                                                                                                                                 |
 | `Api/Admin/MediaCategoryController.php` | CRUD kategori media; menghapus kategori membuat media terkait menjadi uncategorized (`nullOnDelete`).                                                                                                                                                                                                                                                                                                     |
 | `Api/Admin/UserController.php`          | CRUD akun admin: daftar admin beserta jumlah artikel dan status `is_primary`, tambah admin (`is_admin = true`, `is_primary = false`), edit nama/email dengan password opsional, dan hapus dengan pengaman (tidak boleh menghapus diri sendiri, Admin Utama tidak dapat diubah/dihapus admin lain, admin yang masih punya artikel termasuk di Trash tidak boleh dihapus). Akun non-admin menghasilkan 404. |
-| `Api/Admin/ProfileController.php`       | `PUT /api/admin/profile`: setiap admin dapat mengganti avatar, alt text avatar, nama, email, dan password miliknya sendiri. Peran (`is_admin`, `is_primary`) tidak dapat diubah dari endpoint ini.                                                                                                                                                                                                          |
+| `Api/Admin/ProfileController.php`       | `PUT /api/admin/profile`: setiap admin dapat mengganti avatar, alt text avatar, nama, email, dan password miliknya sendiri. Peran (`is_admin`, `is_primary`) tidak dapat diubah dari endpoint ini.                                                                                                                                                                                                        |
 | `Api/Admin/SettingController.php`       | Baca semua setting dan update batch dengan whitelist key, validasi URL, boolean, dan panjang maksimum.                                                                                                                                                                                                                                                                                                    |
 
 ### 5.4 Middleware
@@ -383,16 +383,16 @@ Semua controller berada di `app/Http/Controllers`. Tidak ada service layer atau 
 
 ### 6.1 Daftar model
 
-| Model           | Tabel              | Fitur penting                                                                                                                                                                  |
-| --------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `User`          | `users`            | `HasApiTokens`, `Notifiable`, `CanResetPassword`; field `avatar`, `avatar_alt`, `bio`, `is_admin`, `is_primary`; accessor `avatar_url`; relasi `posts`, `comments`.              |
-| `Post`          | `posts`            | Soft delete; auto slug dan reading time; scope `published`; accessor `cover_url`, `og_url`; relasi author, category, tags, comments.                                           |
-| `Category`      | `categories`       | Relasi `posts`.                                                                                                                                                                |
-| `Tag`           | `tags`             | Relasi `posts` (belongsToMany).                                                                                                                                                |
+| Model           | Tabel              | Fitur penting                                                                                                                                                                       |
+| --------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `User`          | `users`            | `HasApiTokens`, `Notifiable`, `CanResetPassword`; field `avatar`, `avatar_alt`, `bio`, `is_admin`, `is_primary`; accessor `avatar_url`; relasi `posts`, `comments`.                 |
+| `Post`          | `posts`            | Soft delete; auto slug dan reading time; scope `published`; accessor `cover_url`, `og_url`; relasi author, category, tags, comments.                                                |
+| `Category`      | `categories`       | Relasi `posts`.                                                                                                                                                                     |
+| `Tag`           | `tags`             | Relasi `posts` (belongsToMany).                                                                                                                                                     |
 | `Comment`       | `comments`         | Threading via `parent_id`; relasi `user` untuk komentar admin; scope `approved`, `pending`, `rootComments`; mutator `body` menyimpan teks polos; email/IP/user-agent disembunyikan. |
-| `Media`         | `media`            | Soft delete; accessor `url`, `thumb_url`, `download_name`; normalisasi path legacy; scope `images`, `files`; relasi `category`.                                                |
-| `MediaCategory` | `media_categories` | Relasi `media`.                                                                                                                                                                |
-| `Setting`       | `settings`         | 21 key default; helper `getValue`, `setValue`, `allValues`, `primaryAdmin`, `authorName`.                                                                                       |
+| `Media`         | `media`            | Soft delete; accessor `url`, `thumb_url`, `download_name`; normalisasi path legacy; scope `images`, `files`; relasi `category`.                                                     |
+| `MediaCategory` | `media_categories` | Relasi `media`.                                                                                                                                                                     |
+| `Setting`       | `settings`         | 21 key default; helper `getValue`, `setValue`, `allValues`, `primaryAdmin`, `authorName`.                                                                                           |
 
 Model memakai atribut PHP 8 milik Laravel 13: `#[Fillable([...])]`, `#[Hidden([...])]`, dan `#[Scope]`, bukan properti `$fillable`/`$hidden` atau anotasi `scopePublished`.
 
@@ -802,7 +802,7 @@ Default penting:
 | `Setting::setValue($key, $value)`   | `updateOrCreate` berdasarkan key.                                                                                                                                                                                              |
 | `Setting::allValues()`              | Semua default yang ditimpa nilai database.                                                                                                                                                                                     |
 | `Setting::authorName($fallback)`    | Nama penulis publik. Prioritas: nama Admin Utama (`is_primary = true`), lalu nilai `author_name` tersimpan, lalu default/fallback. Dipakai halaman About/landing dan fallback komentar author yang tidak punya nama tersimpan. |
-| `Setting::primaryAdmin()`           | Mengembalikan model `User` Admin Utama beserta `avatar` dan `avatar_alt`, dipakai sebagai sumber avatar publik.                                                                                                                 |
+| `Setting::primaryAdmin()`           | Mengembalikan model `User` Admin Utama beserta `avatar` dan `avatar_alt`, dipakai sebagai sumber avatar publik.                                                                                                                |
 
 ### 10.3 Alur ke tampilan
 
@@ -892,7 +892,6 @@ Partial yang dipakai ulang:
 - Aplikasi hanya punya satu bahasa publik: Indonesia (`APP_LOCALE=id`, `APP_FALLBACK_LOCALE=id`, `APP_FAKER_LOCALE=id_ID`).
 - Semua teks antarmuka (Blade dan React) ditulis dalam bahasa Indonesia. Komentar kode tetap bahasa Inggris.
 - Slug artikel unik secara global karena tidak ada versi bahasa lain.
-- Tidak ada kolom terjemahan atau suffix locale pada key settings. Route legacy `/id/*` dan `/en/*` hanya melakukan redirect 301 ke path tanpa locale.
 - Nama kategori dan tag adalah data bebas dari admin, bukan enum, sehingga penamaannya mengikuti kebiasaan penulis (contoh: `Laravel`, `PHP`, `Tutorial`).
 
 ---
