@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, endpoints, errorMessage } from '../api';
+import CommentAvatar from './CommentAvatar';
 import StatusBadge from './StatusBadge';
 import ConfirmModal from './ConfirmModal';
 import { Toast, useToast } from './Toast';
@@ -221,6 +222,7 @@ export default function PostComments({ postId }) {
                     <div key={comment.id} className="border border-(--color-border) rounded-lg p-3 space-y-2">
                         <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-2 min-w-0">
+                                <CommentAvatar comment={comment} size="sm" />
                                 <span className="text-xs font-semibold truncate">{comment.name}</span>
                                 <StatusBadge status={comment.status} />
                             </div>
@@ -281,6 +283,7 @@ export default function PostComments({ postId }) {
                                     <div key={reply.id} className="space-y-2">
                                         <div className="flex items-center justify-between gap-2">
                                             <div className="flex items-center gap-2 min-w-0">
+                                                <CommentAvatar comment={reply} size="sm" />
                                                 <span className="text-xs font-semibold truncate">{reply.name}</span>
                                                 <StatusBadge status={reply.status} />
                                                 {reply.is_author && (

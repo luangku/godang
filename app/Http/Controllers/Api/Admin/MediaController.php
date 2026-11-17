@@ -7,6 +7,7 @@ use App\Models\Media;
 use App\Models\MediaCategory;
 use App\Models\Post;
 use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -665,8 +666,20 @@ class MediaController extends Controller
                 }
             });
 
+        User::query()
+            ->whereNotNull('avatar')
+            ->select(['id', 'name', 'avatar'])
+            ->chunkById(200, function ($users) use (&$usage): void {
+                foreach ($users as $user) {
+                    $avatar = Media::diskPath($user->avatar);
+
+                    if ($avatar !== null) {
+                        $this->addUsage($usage, $avatar, "Avatar: {$user->name}");
+                    }
+                }
+            });
+
         $settingReferences = [
-            'author_avatar' => 'Avatar penulis',
             'site_logo' => 'Logo situs',
             'site_logo_dark' => 'Logo situs (mode gelap)',
         ];
@@ -725,7 +738,7 @@ class MediaController extends Controller
     }
 
     /**
-     * Filter out media that is still referenced by posts, the author avatar, or the site logo.
+     * Filter out media that is still referenced by posts, admin avatars, or the site logo.
      */
     private function applyUnusedFilter(Builder $query): void
     {

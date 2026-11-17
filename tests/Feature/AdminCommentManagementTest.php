@@ -95,6 +95,7 @@ class AdminCommentManagementTest extends TestCase
             ->assertCreated()
             ->assertJsonPath('comment.status', 'approved')
             ->assertJsonPath('comment.is_author', true)
+            ->assertJsonPath('comment.user_id', $admin->id)
             ->assertJsonPath('comment.name', 'Admin Utama')
             ->assertJsonPath('comment.email', 'admin@example.com')
             ->assertJsonPath('comment.post_id', $post->id)
@@ -102,6 +103,7 @@ class AdminCommentManagementTest extends TestCase
 
         $this->assertDatabaseHas('comments', [
             'post_id' => $post->id,
+            'user_id' => $admin->id,
             'name' => 'Admin Utama',
             'is_author' => true,
             'status' => 'approved',

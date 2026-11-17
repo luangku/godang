@@ -45,8 +45,6 @@ class SettingController extends Controller
         'tagline' => 255,
         'default_meta_title' => 255,
         'default_meta_description' => 300,
-        'author_avatar' => 2048,
-        'author_avatar_alt' => 255,
         'author_name' => 150,
         'author_role' => 150,
         'about_bio' => 5000,

@@ -521,13 +521,14 @@ class AdminMediaTest extends TestCase
         ]);
         $post->delete();
 
-        Setting::setValue('author_avatar', $used->path);
+        $admin->update(['avatar' => $used->path]);
         Setting::setValue('site_logo', $used->path);
 
         $all = $this->actingAs($admin)->getJson('/api/admin/media')->assertOk();
         $byPath = collect($all->json('data'))->keyBy('path');
 
         $this->assertSame(4, $byPath[$used->path]['usage_count']);
+        $this->assertContains("Avatar: {$admin->name}", $byPath[$used->path]['usage_labels']);
         $this->assertContains('Logo situs', $byPath[$used->path]['usage_labels']);
         $this->assertSame(0, $byPath[$unused->path]['usage_count']);
         $this->assertSame(1, $all->json('unused_count'));

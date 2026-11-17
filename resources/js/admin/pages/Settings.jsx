@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { api, endpoints, errorMessage } from '../api';
 import MediaPicker from '../components/MediaPicker';
 import { Toast, useToast } from '../components/Toast';
@@ -24,7 +25,6 @@ const ABOUT_FIELDS = [
         readOnly: true,
         hint: 'Nama penulis selalu mengikuti nama Admin Utama dan tidak dapat diubah dari halaman ini.',
     },
-    { key: 'author_avatar_alt', label: 'Alt Text Avatar', max: 255 },
     { key: 'author_role', label: 'Role', max: 150 },
     { key: 'about_bio', label: 'Bio', type: 'textarea', rows: 6, max: 5000, hint: 'Pisahkan paragraf dengan baris kosong.' },
     { key: 'about_topics_heading', label: 'Judul Bagian Topik', max: 150 },
@@ -95,7 +95,6 @@ export default function Settings() {
     const { toast, show } = useToast();
     const [form, setForm] = useState(null);
     const [activeTab, setActiveTab] = useState('umum');
-    const [pickerOpen, setPickerOpen] = useState(false);
     const [logoPickerOpen, setLogoPickerOpen] = useState(false);
     const [logoDarkPickerOpen, setLogoDarkPickerOpen] = useState(false);
     const [dirty, setDirty] = useState(false);
@@ -110,7 +109,6 @@ export default function Settings() {
 
         const next = {};
         for (const field of ALL_FIELDS) next[field.key] = data[field.key] ?? '';
-        next.author_avatar = data.author_avatar ?? '';
         next.site_logo = data.site_logo ?? '';
         next.site_logo_dark = data.site_logo_dark ?? '';
         next.site_logo_alt = data.site_logo_alt ?? '';
@@ -156,7 +154,6 @@ export default function Settings() {
             if (field.readOnly) continue;
             settings[field.key] = form[field.key] ?? '';
         }
-        settings.author_avatar = form.author_avatar ?? '';
         settings.site_logo = form.site_logo ?? '';
         settings.site_logo_dark = form.site_logo_dark ?? '';
         settings.site_logo_alt = form.site_logo_alt ?? '';
@@ -169,7 +166,6 @@ export default function Settings() {
         return <p className="text-sm text-(--color-text-muted)">{isLoading ? 'Memuat...' : 'Data tidak tersedia.'}</p>;
     }
 
-    const avatarUrl = resolveMediaUrl(form.author_avatar);
     const logoUrl = resolveMediaUrl(form.site_logo);
     const logoDarkUrl = resolveMediaUrl(form.site_logo_dark);
 
@@ -306,43 +302,17 @@ export default function Settings() {
 
                 {activeTab === 'about' && (
                     <>
-                        <section className="bg-(--color-surface) border border-(--color-border) rounded-xl p-5 space-y-4">
-                            <h2 className="font-semibold text-sm">Foto Profil</h2>
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-5">
-                                {avatarUrl ? (
-                                    <img
-                                        src={avatarUrl}
-                                        alt={form.author_avatar_alt || form.author_name || 'Avatar'}
-                                        className="w-20 h-20 rounded-full object-cover border border-(--color-border)"
-                                    />
-                                ) : (
-                                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-(--color-accent) to-purple-500 flex items-center justify-center text-2xl font-bold text-white">
-                                        {(form.author_name || 'G').charAt(0).toUpperCase()}
-                                    </div>
-                                )}
-                                <div className="flex flex-wrap gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => setPickerOpen(true)}
-                                        className="px-3 py-2 rounded-lg border border-(--color-border) text-sm hover:bg-(--color-accent-bg)"
-                                    >
-                                        Pilih dari Media
-                                    </button>
-                                    {form.author_avatar && (
-                                        <button
-                                            type="button"
-                                            onClick={() => updateField('author_avatar', '')}
-                                            className="px-3 py-2 rounded-lg border border-(--color-error) text-(--color-error) text-sm hover:bg-(--color-accent-bg)"
-                                        >
-                                            Hapus
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                            <p className="text-[11px] text-(--color-text-muted)">
-                                Jika avatar kosong, halaman publik akan menampilkan huruf awal nama penulis.
+                        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-(--color-border) bg-(--color-surface) px-5 py-4">
+                            <p className="text-sm text-(--color-text-muted)">
+                                Foto profil dan alt text avatar kini diatur per admin di halaman Profil.
                             </p>
-                        </section>
+                            <Link
+                                to="/admin/profile"
+                                className="px-3 py-2 rounded-lg border border-(--color-border) text-sm hover:bg-(--color-accent-bg)"
+                            >
+                                Buka Profil
+                            </Link>
+                        </div>
 
                         <section className="bg-(--color-surface) border border-(--color-border) rounded-xl p-5 space-y-4">
                             <h2 className="font-semibold text-sm">Profil & Halaman About</h2>
@@ -391,14 +361,6 @@ export default function Settings() {
                     {dirty && <span className="text-xs text-(--color-text-muted)">Ada perubahan yang belum disimpan.</span>}
                 </div>
             </form>
-
-            {pickerOpen && (
-                <MediaPicker
-                    folder="avatar"
-                    onSelect={(path) => updateField('author_avatar', path)}
-                    onClose={() => setPickerOpen(false)}
-                />
-            )}
 
             {logoPickerOpen && (
                 <MediaPicker

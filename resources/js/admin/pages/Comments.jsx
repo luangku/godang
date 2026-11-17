@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { api, endpoints, errorMessage } from '../api';
+import CommentAvatar from '../components/CommentAvatar';
 import StatusBadge from '../components/StatusBadge';
 import ConfirmModal from '../components/ConfirmModal';
 import { Toast, useToast } from '../components/Toast';
@@ -283,6 +284,7 @@ export default function Comments() {
                                     onChange={() => toggleOne(comment.id)}
                                     className="mt-1 rounded accent-(--color-accent)"
                                 />
+                                <CommentAvatar comment={comment} />
                                 <div className="min-w-0">
                                     <div className="flex items-center gap-2 flex-wrap">
                                         <span className="font-medium text-sm">{comment.name}</span>
@@ -366,6 +368,7 @@ export default function Comments() {
                                 {comment.replies.map((reply) => (
                                     <div key={reply.id} className="text-sm">
                                         <div className="flex items-center gap-2">
+                                            <CommentAvatar comment={reply} size="sm" />
                                             <span className="font-medium">{reply.name}</span>
                                             <StatusBadge status={reply.status} />
                                             {reply.is_author && (

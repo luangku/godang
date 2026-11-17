@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Media;
 use App\Models\Setting;
 use Closure;
 use Illuminate\Http\Request;
@@ -17,7 +16,9 @@ class ShareSiteSettings
     public function handle(Request $request, Closure $next): Response
     {
         $settings = Setting::allValues();
-        $authorName = Setting::authorName();
+        $author = Setting::primaryAdmin();
+        $authorName = trim((string) ($author?->name ?? ''))
+            ?: (trim((string) ($settings['author_name'] ?? '')) ?: 'Godang');
 
         $site = [
             'site_title' => trim((string) ($settings['site_title'] ?? '')) ?: 'Godang',
@@ -31,9 +32,9 @@ class ShareSiteSettings
             'github_url' => $settings['github_url'] ?? null,
             'twitter_url' => $settings['twitter_url'] ?? null,
             'linkedin_url' => $settings['linkedin_url'] ?? null,
-            'author_avatar' => $settings['author_avatar'] ?? null,
-            'author_avatar_alt' => $settings['author_avatar_alt'] ?? null,
-            'author_avatar_url' => Media::urlFor($settings['author_avatar'] ?? null),
+            'author_avatar' => $author?->avatar,
+            'author_avatar_alt' => $author?->avatar_alt,
+            'author_avatar_url' => $author?->avatar_url,
             'author_name' => $authorName,
             'author_initial' => Str::upper(Str::substr($authorName, 0, 1)),
             'author_role' => $settings['author_role'] ?? null,

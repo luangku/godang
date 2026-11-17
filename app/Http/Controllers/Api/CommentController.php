@@ -30,7 +30,12 @@ class CommentController extends Controller
         $comments = $post->comments()
             ->approved()
             ->rootComments()
-            ->with(['replies' => fn ($q) => $q->approved()->latest()])
+            ->with([
+                'user:id,name,avatar,avatar_alt',
+                'replies' => fn ($q) => $q->approved()
+                    ->latest()
+                    ->with('user:id,name,avatar,avatar_alt'),
+            ])
             ->latest()
             ->get();
 
@@ -90,6 +95,7 @@ class CommentController extends Controller
         $notifyReplies = isset($validated['notify_replies']) ? (bool) $validated['notify_replies'] : false;
 
         $comment = $post->comments()->create([
+            'user_id' => $request->user()?->id,
             'name' => $isAdmin ? $admin->name : $validated['name'],
             'email' => $isAdmin ? $admin->email : $validated['email'],
             'body' => $validated['body'],
@@ -119,7 +125,7 @@ class CommentController extends Controller
             'message' => $comment->status === 'pending'
                 ? 'Komentar berhasil dikirim dan menunggu persetujuan.'
                 : 'Komentar berhasil dikirim.',
-            'comment' => $comment,
+            'comment' => $comment->load('user:id,name,avatar,avatar_alt'),
         ], 201);
     }
 

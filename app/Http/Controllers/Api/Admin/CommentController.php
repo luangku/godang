@@ -18,10 +18,11 @@ class CommentController extends Controller
 
         $query = Comment::with([
             'post:id,title,slug',
+            'user:id,name,avatar,avatar_alt',
             'parent:id,name,email,body',
             'replies' => fn ($q) => $q->orderBy('created_at', $sort)
                 ->orderBy('id', $sort)
-                ->with('parent:id,name'),
+                ->with(['parent:id,name', 'user:id,name,avatar,avatar_alt']),
         ])
             ->withCount('replies')
             ->orderBy('created_at', $sort)
@@ -67,6 +68,7 @@ class CommentController extends Controller
 
         $comment = Comment::create([
             'post_id' => $validated['post_id'],
+            'user_id' => $request->user()->id,
             'name' => $request->user()->name,
             'email' => $request->user()->email,
             'body' => $validated['body'],
@@ -76,7 +78,7 @@ class CommentController extends Controller
 
         return response()->json([
             'message' => 'Komentar berhasil dibuat.',
-            'comment' => $comment->load('replies')->makeVisible('email'),
+            'comment' => $comment->load(['replies', 'user:id,name,avatar,avatar_alt'])->makeVisible('email'),
         ], 201);
     }
 
@@ -130,6 +132,7 @@ class CommentController extends Controller
         $reply = Comment::create([
             'post_id' => $comment->post_id,
             'parent_id' => $comment->parent_id ?? $comment->id,
+            'user_id' => $request->user()->id,
             'reply_to_name' => $comment->name,
             'name' => $request->user()->name,
             'email' => $request->user()->email,
@@ -138,7 +141,10 @@ class CommentController extends Controller
             'is_author' => true,
         ]);
 
-        return response()->json(['message' => 'Balasan berhasil dikirim.', 'reply' => $reply], 201);
+        return response()->json([
+            'message' => 'Balasan berhasil dikirim.',
+            'reply' => $reply->load('user:id,name,avatar,avatar_alt')->makeVisible('email'),
+        ], 201);
     }
 
     /**

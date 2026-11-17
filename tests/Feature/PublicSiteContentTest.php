@@ -36,9 +36,11 @@ class PublicSiteContentTest extends TestCase
 
     public function test_about_page_renders_configured_profile_content(): void
     {
-        Setting::setValue('author_name', 'Budi Santoso');
-        Setting::setValue('author_avatar', 'avatar/budi.webp');
-        Setting::setValue('author_avatar_alt', 'Foto Budi');
+        User::factory()->primaryAdmin()->create([
+            'name' => 'Budi Santoso',
+            'avatar' => 'avatar/budi.webp',
+            'avatar_alt' => 'Foto Budi',
+        ]);
         Setting::setValue('author_role', 'Backend Engineer');
         Setting::setValue('about_bio', "Paragraf pertama.\n\nParagraf kedua.");
         Setting::setValue('about_topics_heading', 'Topik Favorit');
@@ -60,6 +62,7 @@ class PublicSiteContentTest extends TestCase
             ->assertSee('Kirim email ke saya.')
             ->assertSee('Profil Budi.')
             ->assertSee('https://github.com/budi', false)
+            ->assertSee('Foto Budi')
             ->assertSee(Storage::disk('public')->url('avatar/budi.webp'), false)
             ->assertSee('"@type":"Person"', false);
     }

@@ -26,10 +26,18 @@ class ProfileController extends Controller
                 Rule::unique('users', 'email')->ignore($user->id),
             ],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'avatar' => ['sometimes', 'nullable', 'string', 'max:2048'],
+            'avatar_alt' => ['sometimes', 'nullable', 'string', 'max:255'],
         ]);
 
         if (($validated['password'] ?? null) === null) {
             unset($validated['password']);
+        }
+
+        foreach (['avatar', 'avatar_alt'] as $key) {
+            if (array_key_exists($key, $validated) && blank($validated[$key])) {
+                $validated[$key] = null;
+            }
         }
 
         $user->update($validated);
