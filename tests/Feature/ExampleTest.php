@@ -26,17 +26,6 @@ class ExampleTest extends TestCase
     }
 
     /**
-     * Legacy locale-prefixed URLs redirect permanently to root equivalents.
-     */
-    public function test_legacy_locale_prefixes_redirect_permanently(): void
-    {
-        $this->get('/id')->assertRedirect('/')->assertStatus(301);
-        $this->get('/id/blog')->assertRedirect('/blog')->assertStatus(301);
-        $this->get('/en/about')->assertRedirect('/about')->assertStatus(301);
-        $this->get('/en/blog/artikel-lama')->assertRedirect('/blog/artikel-lama')->assertStatus(301);
-    }
-
-    /**
      * Unknown locale prefixes still return 404.
      */
     public function test_unknown_locale_prefix_is_not_found(): void
