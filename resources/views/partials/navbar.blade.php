@@ -23,9 +23,11 @@
             <a href="{{ url('/') }}" class="flex items-center gap-2 group" id="nav-logo">
                 @if ($logoLight)
                     <img src="{{ $logoUrl($logoLight) }}" alt="{{ $logoAlt }}"
-                        class="h-8 max-w-[160px] object-contain transition-transform duration-200 group-hover:scale-105 dark:hidden">
+                        class="h-8 max-w-[160px] object-contain transition-transform duration-200 group-hover:scale-105 dark:hidden"
+                        fetchpriority="low" loading="lazy">
                     <img src="{{ $logoUrl($logoDark) }}" alt="{{ $logoAlt }}"
-                        class="h-8 max-w-[160px] object-contain transition-transform duration-200 group-hover:scale-105 hidden dark:block">
+                        class="h-8 max-w-[160px] object-contain transition-transform duration-200 group-hover:scale-105 hidden dark:block"
+                        fetchpriority="low" loading="lazy">
                 @else
                     <span
                         class="text-xl font-bold text-(--color-accent) transition-transform duration-200 group-hover:scale-105">
@@ -63,7 +65,7 @@
                 @endauth
 
                 {{-- Theme Toggle --}}
-                <button onclick="toggleTheme()"
+                <button type="button"
                     class="p-2 rounded-lg text-(--color-text-muted) hover:text-(--color-text) hover:bg-(--color-accent-bg) transition-all duration-200"
                     id="theme-toggle" aria-label="Ubah mode gelap">
                     {{-- Sun icon (shown in dark mode) --}}
@@ -105,10 +107,3 @@
         </div>
     </div>
 </nav>
-
-<script>
-    function toggleTheme() {
-        document.documentElement.classList.toggle('dark');
-        localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-    }
-</script>

@@ -1,5 +1,14 @@
 import 'highlight.js/styles/github.css';
 import '../css/hljs-dark.css';
+import { initThemeSync, toggleTheme } from './theme';
+
+initThemeSync();
+
+document.addEventListener('click', (event) => {
+    if (event.target.closest('#theme-toggle, #theme-toggle-404')) {
+        toggleTheme();
+    }
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     const content = document.getElementById('article-content');

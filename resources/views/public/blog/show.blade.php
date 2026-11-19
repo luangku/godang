@@ -134,7 +134,7 @@
                     @if ($post->cover_image)
                         <figure class="mb-8">
                             <img src="{{ $post->coverImageUrl() }}" alt="{{ $post->title }}" class="w-full rounded-xl"
-                                width="1200" height="630">
+                                fetchpriority="high" width="1200" height="630">
                         </figure>
                     @endif
                 </header>

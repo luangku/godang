@@ -15,13 +15,17 @@ const resetSchema = z
         path: ['password_confirmation'],
     });
 
+function describedBy(error, id) {
+    return error ? `${id}-error` : undefined;
+}
+
 export default function ResetPassword() {
     const [searchParams] = useSearchParams();
     const [serverError, setServerError] = useState(null);
     const [success, setSuccess] = useState(false);
     const token = searchParams.get('token') || '';
     const email = searchParams.get('email') || '';
-    const form = useForm({ resolver: zodResolver(resetSchema) });
+    const form = useForm({ resolver: zodResolver(resetSchema), shouldFocusError: true });
 
     const onSubmit = async (values) => {
         setServerError(null);
@@ -71,11 +75,11 @@ export default function ResetPassword() {
                     className="bg-(--color-surface) border border-(--color-border) rounded-xl p-6 space-y-4"
                     noValidate
                 >
+                    <div aria-live="polite" aria-atomic="true" className="sr-only">
+                        {serverError || (success ? 'Password berhasil direset.' : '')}
+                    </div>
                     {serverError && (
-                        <div
-                            role="alert"
-                            className="rounded-lg px-4 py-3 text-sm border border-(--color-error) text-(--color-error) bg-(--color-accent-bg)"
-                        >
+                        <div className="rounded-lg px-4 py-3 text-sm border border-(--color-error) text-(--color-error) bg-(--color-accent-bg)">
                             {serverError}
                         </div>
                     )}
@@ -93,12 +97,18 @@ export default function ResetPassword() {
                         <input
                             id="password"
                             type="password"
+                            required
+                            minLength={8}
                             autoComplete="new-password"
-                            className="w-full px-4 py-2.5 rounded-lg bg-(--color-bg) border border-(--color-border) text-sm focus:border-(--color-accent) focus:ring-1 focus:ring-(--color-accent) outline-none"
+                            aria-invalid={form.formState.errors.password ? 'true' : 'false'}
+                            aria-describedby={describedBy(form.formState.errors.password, 'reset-password')}
+                            className={`form-control w-full px-4 py-2.5 rounded-lg bg-(--color-bg) border border-(--color-border) text-sm focus:border-(--color-accent) focus:ring-1 focus:ring-(--color-accent) outline-none ${
+                                form.formState.errors.password ? 'user-invalid-fallback' : ''
+                            }`}
                             {...form.register('password')}
                         />
                         {form.formState.errors.password && (
-                            <p className="mt-1 text-xs text-(--color-error)">
+                            <p id="reset-password-error" className="mt-1 text-xs text-(--color-error)">
                                 {form.formState.errors.password.message}
                             </p>
                         )}
@@ -111,12 +121,18 @@ export default function ResetPassword() {
                         <input
                             id="password_confirmation"
                             type="password"
+                            required
+                            minLength={8}
                             autoComplete="new-password"
-                            className="w-full px-4 py-2.5 rounded-lg bg-(--color-bg) border border-(--color-border) text-sm focus:border-(--color-accent) focus:ring-1 focus:ring-(--color-accent) outline-none"
+                            aria-invalid={form.formState.errors.password_confirmation ? 'true' : 'false'}
+                            aria-describedby={describedBy(form.formState.errors.password_confirmation, 'reset-password-confirmation')}
+                            className={`form-control w-full px-4 py-2.5 rounded-lg bg-(--color-bg) border border-(--color-border) text-sm focus:border-(--color-accent) focus:ring-1 focus:ring-(--color-accent) outline-none ${
+                                form.formState.errors.password_confirmation ? 'user-invalid-fallback' : ''
+                            }`}
                             {...form.register('password_confirmation')}
                         />
                         {form.formState.errors.password_confirmation && (
-                            <p className="mt-1 text-xs text-(--color-error)">
+                            <p id="reset-password-confirmation-error" className="mt-1 text-xs text-(--color-error)">
                                 {form.formState.errors.password_confirmation.message}
                             </p>
                         )}

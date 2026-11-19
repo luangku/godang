@@ -6,6 +6,7 @@ import { api, endpoints, errorMessage } from '../api';
 import TurnstileWidget from '../components/TurnstileWidget';
 import { useAuth } from '../stores/auth';
 import { initialSiteData, readTurnstileSiteKey, resolveSiteLogo } from '../site';
+import { getTheme, toggleTheme as toggleColorTheme } from '../../theme';
 
 const loginSchema = z.object({
     email: z.string().min(1, 'Email wajib diisi.').email('Format email tidak valid.'),
@@ -15,6 +16,10 @@ const loginSchema = z.object({
 const forgotSchema = z.object({
     email: z.string().min(1, 'Email wajib diisi.').email('Format email tidak valid.'),
 });
+
+function describedBy(error, id) {
+    return error ? `${id}-error` : undefined;
+}
 
 export default function Login() {
     const login = useAuth((state) => state.login);
@@ -27,8 +32,8 @@ export default function Login() {
     const [turnstileToken, setTurnstileToken] = useState(null);
     const [turnstileResetKey, setTurnstileResetKey] = useState(0);
 
-    const loginForm = useForm({ resolver: zodResolver(loginSchema) });
-    const forgotForm = useForm({ resolver: zodResolver(forgotSchema) });
+    const loginForm = useForm({ resolver: zodResolver(loginSchema), shouldFocusError: true });
+    const forgotForm = useForm({ resolver: zodResolver(forgotSchema), shouldFocusError: true });
 
     const onSubmitLogin = async (values) => {
         setServerError(null);
@@ -63,9 +68,8 @@ export default function Login() {
     const siteLogoDark = siteData.site_logo_dark || siteData.site_logo;
 
     const toggleTheme = () => {
-        const nowDark = document.documentElement.classList.toggle('dark');
-        localStorage.setItem('theme', nowDark ? 'dark' : 'light');
-        setIsDark(nowDark);
+        toggleColorTheme();
+        setIsDark(getTheme() === 'dark');
     };
 
     return (
@@ -118,11 +122,11 @@ export default function Login() {
                         className="bg-(--color-surface) border border-(--color-border) rounded-xl p-6 space-y-4"
                         noValidate
                     >
+                        <div aria-live="polite" aria-atomic="true" className="sr-only">
+                            {serverError}
+                        </div>
                         {serverError && (
-                            <div
-                                role="alert"
-                                className="rounded-lg px-4 py-3 text-sm border border-(--color-error) text-(--color-error) bg-(--color-accent-bg)"
-                            >
+                            <div className="rounded-lg px-4 py-3 text-sm border border-(--color-error) text-(--color-error) bg-(--color-accent-bg)">
                                 {serverError}
                             </div>
                         )}
@@ -134,12 +138,19 @@ export default function Login() {
                             <input
                                 id="email"
                                 type="email"
+                                required
                                 autoComplete="email"
-                                className="w-full px-4 py-2.5 rounded-lg bg-(--color-bg) border border-(--color-border) text-sm focus:border-(--color-accent) focus:ring-1 focus:ring-(--color-accent) outline-none"
+                                aria-invalid={loginForm.formState.errors.email ? 'true' : 'false'}
+                                aria-describedby={describedBy(loginForm.formState.errors.email, 'email')}
+                                className={`form-control w-full px-4 py-2.5 rounded-lg bg-(--color-bg) border border-(--color-border) text-sm focus:border-(--color-accent) focus:ring-1 focus:ring-(--color-accent) outline-none ${
+                                    loginForm.formState.errors.email ? 'user-invalid-fallback' : ''
+                                }`}
                                 {...loginForm.register('email')}
                             />
                             {loginForm.formState.errors.email && (
-                                <p className="mt-1 text-xs text-(--color-error)">{loginForm.formState.errors.email.message}</p>
+                                <p id="email-error" className="mt-1 text-xs text-(--color-error)">
+                                    {loginForm.formState.errors.email.message}
+                                </p>
                             )}
                         </div>
 
@@ -150,12 +161,19 @@ export default function Login() {
                             <input
                                 id="password"
                                 type="password"
+                                required
                                 autoComplete="current-password"
-                                className="w-full px-4 py-2.5 rounded-lg bg-(--color-bg) border border-(--color-border) text-sm focus:border-(--color-accent) focus:ring-1 focus:ring-(--color-accent) outline-none"
+                                aria-invalid={loginForm.formState.errors.password ? 'true' : 'false'}
+                                aria-describedby={describedBy(loginForm.formState.errors.password, 'password')}
+                                className={`form-control w-full px-4 py-2.5 rounded-lg bg-(--color-bg) border border-(--color-border) text-sm focus:border-(--color-accent) focus:ring-1 focus:ring-(--color-accent) outline-none ${
+                                    loginForm.formState.errors.password ? 'user-invalid-fallback' : ''
+                                }`}
                                 {...loginForm.register('password')}
                             />
                             {loginForm.formState.errors.password && (
-                                <p className="mt-1 text-xs text-(--color-error)">{loginForm.formState.errors.password.message}</p>
+                                <p id="password-error" className="mt-1 text-xs text-(--color-error)">
+                                    {loginForm.formState.errors.password.message}
+                                </p>
                             )}
                         </div>
 
@@ -195,11 +213,11 @@ export default function Login() {
                         className="bg-(--color-surface) border border-(--color-border) rounded-xl p-6 space-y-4"
                         noValidate
                     >
+                        <div aria-live="polite" aria-atomic="true" className="sr-only">
+                            {serverError || forgotSuccess}
+                        </div>
                         {serverError && (
-                            <div
-                                role="alert"
-                                className="rounded-lg px-4 py-3 text-sm border border-(--color-error) text-(--color-error) bg-(--color-accent-bg)"
-                            >
+                            <div className="rounded-lg px-4 py-3 text-sm border border-(--color-error) text-(--color-error) bg-(--color-accent-bg)">
                                 {serverError}
                             </div>
                         )}
@@ -216,12 +234,19 @@ export default function Login() {
                             <input
                                 id="forgot-email"
                                 type="email"
+                                required
                                 autoComplete="email"
-                                className="w-full px-4 py-2.5 rounded-lg bg-(--color-bg) border border-(--color-border) text-sm focus:border-(--color-accent) focus:ring-1 focus:ring-(--color-accent) outline-none"
+                                aria-invalid={forgotForm.formState.errors.email ? 'true' : 'false'}
+                                aria-describedby={describedBy(forgotForm.formState.errors.email, 'forgot-email')}
+                                className={`form-control w-full px-4 py-2.5 rounded-lg bg-(--color-bg) border border-(--color-border) text-sm focus:border-(--color-accent) focus:ring-1 focus:ring-(--color-accent) outline-none ${
+                                    forgotForm.formState.errors.email ? 'user-invalid-fallback' : ''
+                                }`}
                                 {...forgotForm.register('email')}
                             />
                             {forgotForm.formState.errors.email && (
-                                <p className="mt-1 text-xs text-(--color-error)">{forgotForm.formState.errors.email.message}</p>
+                                <p id="forgot-email-error" className="mt-1 text-xs text-(--color-error)">
+                                    {forgotForm.formState.errors.email.message}
+                                </p>
                             )}
                         </div>
 

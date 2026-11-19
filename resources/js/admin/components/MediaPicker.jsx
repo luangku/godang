@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, endpoints, errorMessage } from '../api';
 import { Toast, useToast } from './Toast';
+import useModalDialog from './useModalDialog';
 import { resolveThumbUrl } from '../media';
 
 const FOLDER_OPTIONS = [
@@ -19,6 +20,7 @@ function countFor(folders, value) {
 export default function MediaPicker({ onSelect, onClose, folder = 'uploads', defaultFolder = '' }) {
     const queryClient = useQueryClient();
     const { toast, show } = useToast();
+    const dialogRef = useModalDialog(true, onClose);
     const fileInputRef = useRef(null);
     const [search, setSearch] = useState('');
     const [query, setQuery] = useState('');
@@ -81,10 +83,16 @@ export default function MediaPicker({ onSelect, onClose, folder = 'uploads', def
     };
 
     return (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-            <div className="bg-(--color-surface) rounded-xl border border-(--color-border) w-full max-w-3xl max-h-[85vh] overflow-hidden flex flex-col">
+        <>
+            <dialog
+                ref={dialogRef}
+                closedby="any"
+                aria-labelledby="media-picker-title"
+                className="modal-dialog w-[calc(100%_-_2rem)] max-w-3xl rounded-xl border border-(--color-border) bg-(--color-surface) p-0 shadow-xl"
+            >
+                <div className="flex max-h-[85vh] flex-col overflow-hidden rounded-xl">
                 <div className="flex items-center justify-between px-4 py-3 border-b border-(--color-border)">
-                    <h3 className="font-semibold text-sm">Pilih Media</h3>
+                    <h3 id="media-picker-title" className="font-semibold text-sm">Pilih Media</h3>
                     <button type="button" onClick={onClose} className="text-(--color-text-muted) hover:text-(--color-text)" aria-label="Tutup">
                         ✕
                     </button>
@@ -222,9 +230,10 @@ export default function MediaPicker({ onSelect, onClose, folder = 'uploads', def
                         </div>
                     </div>
                 )}
-            </div>
+                </div>
+            </dialog>
 
             <Toast toast={toast} />
-        </div>
+        </>
     );
 }

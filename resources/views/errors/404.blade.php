@@ -7,15 +7,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
     <title>404 — {{ config('app.name', 'Godang') }}</title>
     <meta name="robots" content="noindex, nofollow">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script>
-        (function() {
-            const saved = localStorage.getItem('theme');
-            if (saved !== 'light') {
-                document.documentElement.classList.add('dark');
+        (function () {
+            var theme = 'dark';
+            try {
+                theme = localStorage.getItem('theme') === 'light' ? 'light' : 'dark';
+            } catch (error) {
+                theme = 'dark';
             }
+            var scheme = document.querySelector('meta[name="color-scheme"]');
+            if (scheme) scheme.content = theme;
+            if (theme === 'dark') document.documentElement.classList.add('dark');
         })();
     </script>
 </head>
@@ -69,7 +75,6 @@
 
     {{-- Theme Toggle --}}
     <button
-        onclick="document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light')"
         class="fixed bottom-6 right-6 p-3 rounded-xl bg-(--color-surface) border border-(--color-border) text-(--color-text-muted) hover:text-(--color-accent) hover:bg-(--color-accent-bg) transition-all duration-200 shadow-lg cursor-pointer"
         aria-label="Ubah mode gelap"
         id="theme-toggle-404"

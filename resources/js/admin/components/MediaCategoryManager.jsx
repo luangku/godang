@@ -3,10 +3,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, endpoints, errorMessage } from '../api';
 import ConfirmModal from './ConfirmModal';
 import { Toast, useToast } from './Toast';
+import useModalDialog from './useModalDialog';
 
 export default function MediaCategoryManager({ onClose }) {
     const queryClient = useQueryClient();
     const { toast, show } = useToast();
+    const dialogRef = useModalDialog(true, onClose);
     const [name, setName] = useState('');
     const [editing, setEditing] = useState(null);
     const [editName, setEditName] = useState('');
@@ -103,11 +105,17 @@ export default function MediaCategoryManager({ onClose }) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-            <div className="flex max-h-[85vh] w-full max-w-xl flex-col overflow-hidden rounded-xl border border-(--color-border) bg-(--color-surface)">
+        <>
+            <dialog
+                ref={dialogRef}
+                closedby="any"
+                aria-labelledby="media-category-title"
+                className="modal-dialog w-[calc(100%_-_2rem)] max-w-xl rounded-xl border border-(--color-border) bg-(--color-surface) p-0 shadow-xl"
+            >
+                <div className="flex max-h-[85vh] flex-col overflow-hidden rounded-xl">
                 <div className="flex items-center justify-between border-b border-(--color-border) px-4 py-3">
                     <div>
-                        <h3 className="text-sm font-semibold">Kategori media</h3>
+                        <h3 id="media-category-title" className="text-sm font-semibold">Kategori media</h3>
                         <p className="text-xs text-(--color-text-muted)">
                             Kelompokkan media agar mudah difilter. Terpisah dari folder penyimpanan.
                         </p>
@@ -218,7 +226,8 @@ export default function MediaCategoryManager({ onClose }) {
                         ))}
                     </ul>
                 </div>
-            </div>
+                </div>
+            </dialog>
 
             <ConfirmModal
                 open={Boolean(confirm)}
@@ -230,6 +239,6 @@ export default function MediaCategoryManager({ onClose }) {
                 onCancel={() => setConfirm(null)}
             />
             <Toast toast={toast} />
-        </div>
+        </>
     );
 }
