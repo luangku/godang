@@ -171,15 +171,21 @@ export default function Users() {
                 </div>
             </form>
 
-            <div className="bg-(--color-surface) border border-(--color-border) rounded-xl overflow-x-auto">
-                <table className="w-full text-sm">
+            <div
+                className="admin-table-region bg-(--color-surface) border border-(--color-border) rounded-xl"
+                role="region"
+                aria-labelledby="users-table-caption"
+                tabIndex={0}
+            >
+                <table className="admin-table" data-table="users">
+                    <caption id="users-table-caption" className="sr-only">Daftar admin</caption>
                     <thead>
                         <tr className="border-b border-(--color-border) text-left text-xs uppercase text-(--color-text-muted)">
-                            <th className="px-4 py-3">Nama</th>
-                            <th className="px-4 py-3">Email</th>
-                            <th className="px-4 py-3">Peran</th>
-                            <th className="px-4 py-3 text-right">Artikel</th>
-                            <th className="px-4 py-3 text-right">Aksi</th>
+                            <th scope="col" className="px-4 py-3">Nama</th>
+                            <th scope="col" className="px-4 py-3">Email</th>
+                            <th scope="col" className="px-4 py-3">Peran</th>
+                            <th scope="col" className="px-4 py-3 text-right">Artikel</th>
+                            <th scope="col" className="px-4 py-3 text-right">Aksi</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-(--color-border)">

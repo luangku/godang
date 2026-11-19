@@ -3,7 +3,7 @@
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
-@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where(.dark, .dark *, :root:has(> head > meta[name="color-scheme"][content="dark"]) *));
 
 @theme {
     --font-sans: 'Inter', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
@@ -36,19 +36,98 @@
     --width-wide: 1200px;
 }
 
-/* ===== Dark mode overrides ===== */
+/* ===== Color scheme & theme tokens ===== */
+:root {
+    color-scheme: light dark;
+
+    /* Default is dark: the inline script always writes "dark" or "light" to the meta. */
+    &:has(> head > meta[name="color-scheme"][content="dark"]) {
+        color-scheme: dark;
+    }
+    &:has(> head > meta[name="color-scheme"][content="light"]) {
+        color-scheme: light;
+    }
+
+    --color-bg-light: #FAFAFA;
+    --color-bg-dark: #0F1115;
+    --color-surface-light: #FFFFFF;
+    --color-surface-dark: #171B23;
+    --color-border-light: #E5E7EB;
+    --color-border-dark: #232834;
+    --color-text-light: #111827;
+    --color-text-dark: #E5E7EB;
+    --color-text-muted-light: #6B7280;
+    --color-text-muted-dark: #9CA3AF;
+    --color-accent-light: #2563EB;
+    --color-accent-dark: #60A5FA;
+    --color-accent-bg-light: rgba(37,99,235,0.10);
+    --color-accent-bg-dark: rgba(96,165,250,0.14);
+    --color-on-accent-light: #FFFFFF;
+    --color-on-accent-dark: #0B0F14;
+    --color-success-light: #059669;
+    --color-success-dark: #34D399;
+    --color-warning-light: #D97706;
+    --color-warning-dark: #FBBF24;
+    --color-error-light: #DC2626;
+    --color-error-dark: #F87171;
+
+    --color-bg: var(--color-bg-light);
+    --color-surface: var(--color-surface-light);
+    --color-border: var(--color-border-light);
+    --color-text: var(--color-text-light);
+    --color-text-muted: var(--color-text-muted-light);
+    --color-accent: var(--color-accent-light);
+    --color-accent-bg: var(--color-accent-bg-light);
+    --color-on-accent: var(--color-on-accent-light);
+    --color-success: var(--color-success-light);
+    --color-warning: var(--color-warning-light);
+    --color-error: var(--color-error-light);
+
+    /* Fallback without light-dark(): follow the resolved meta value, not only the OS. */
+    &:has(> head > meta[name="color-scheme"][content="dark"]) {
+        --color-bg: var(--color-bg-dark);
+        --color-surface: var(--color-surface-dark);
+        --color-border: var(--color-border-dark);
+        --color-text: var(--color-text-dark);
+        --color-text-muted: var(--color-text-muted-dark);
+        --color-accent: var(--color-accent-dark);
+        --color-accent-bg: var(--color-accent-bg-dark);
+        --color-on-accent: var(--color-on-accent-dark);
+        --color-success: var(--color-success-dark);
+        --color-warning: var(--color-warning-dark);
+        --color-error: var(--color-error-dark);
+    }
+}
+
+@supports (color: light-dark(white, black)) {
+    :root {
+        --color-bg: light-dark(var(--color-bg-light), var(--color-bg-dark));
+        --color-surface: light-dark(var(--color-surface-light), var(--color-surface-dark));
+        --color-border: light-dark(var(--color-border-light), var(--color-border-dark));
+        --color-text: light-dark(var(--color-text-light), var(--color-text-dark));
+        --color-text-muted: light-dark(var(--color-text-muted-light), var(--color-text-muted-dark));
+        --color-accent: light-dark(var(--color-accent-light), var(--color-accent-dark));
+        --color-accent-bg: light-dark(var(--color-accent-bg-light), var(--color-accent-bg-dark));
+        --color-on-accent: light-dark(var(--color-on-accent-light), var(--color-on-accent-dark));
+        --color-success: light-dark(var(--color-success-light), var(--color-success-dark));
+        --color-warning: light-dark(var(--color-warning-light), var(--color-warning-dark));
+        --color-error: light-dark(var(--color-error-light), var(--color-error-dark));
+    }
+}
+
+/* Keeps Tailwind's dark: variant and covers browsers without :has(). */
 .dark {
-    --color-bg: #0F1115;
-    --color-surface: #171B23;
-    --color-border: #232834;
-    --color-text: #E5E7EB;
-    --color-text-muted: #9CA3AF;
-    --color-accent: #60A5FA;
-    --color-accent-bg: rgba(96,165,250,0.14);
-    --color-on-accent: #0B0F14;
-    --color-success: #34D399;
-    --color-warning: #FBBF24;
-    --color-error: #F87171;
+    --color-bg: var(--color-bg-dark);
+    --color-surface: var(--color-surface-dark);
+    --color-border: var(--color-border-dark);
+    --color-text: var(--color-text-dark);
+    --color-text-muted: var(--color-text-muted-dark);
+    --color-accent: var(--color-accent-dark);
+    --color-accent-bg: var(--color-accent-bg-dark);
+    --color-on-accent: var(--color-on-accent-dark);
+    --color-success: var(--color-success-dark);
+    --color-warning: var(--color-warning-dark);
+    --color-error: var(--color-error-dark);
 }
 
 /* ===== Base styles ===== */
@@ -56,6 +135,7 @@ html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    accent-color: var(--color-accent);
 }
 
 body {
@@ -407,36 +487,67 @@ h4:hover .heading-anchor {
 .stagger-6 { animation-delay: 0.6s; }
 
 /* ===== Scrollbar ===== */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+:root {
+    --scrollbar-thumb: var(--color-text-muted);
+    scrollbar-color: var(--scrollbar-thumb) var(--color-bg);
+    scrollbar-width: thin;
 }
 
-::-webkit-scrollbar-track {
-    background: transparent;
+/* Legacy WebKit/Blink fallback; kept out of browsers supporting the standard properties. */
+@supports not (scrollbar-color: auto) {
+    :root {
+        scrollbar-width: auto;
+    }
+
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--color-bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--scrollbar-thumb);
+        border-radius: 3px;
+    }
 }
 
-::-webkit-scrollbar-thumb {
-    background: var(--color-border);
-    border-radius: 3px;
+/* ===== Native modal dialogs ===== */
+dialog:modal {
+    overscroll-behavior: contain;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: var(--color-text-muted);
+dialog::backdrop {
+    overflow: hidden;
+    overscroll-behavior: contain;
+}
+
+.modal-dialog {
+    max-height: min(85vh, 100%);
+}
+
+.modal-dialog::backdrop {
+    background: rgb(0 0 0 / 0.5);
 }
 
 /* ===== Toast ===== */
 .toast-container {
     position: fixed;
-    top: 1rem;
     right: 1rem;
+    bottom: 1rem;
     z-index: 9999;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    pointer-events: none;
 }
 
 .toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
     padding: 0.75rem 1rem;
     border-radius: var(--radius-md);
     background-color: var(--color-surface);
@@ -445,6 +556,37 @@ h4:hover .heading-anchor {
     animation: slideDown 0.3s ease-out;
     font-size: 0.875rem;
     max-width: 360px;
+    pointer-events: auto;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition-behavior: allow-discrete;
+}
+
+.toast[popover] {
+    inset: auto 1rem 1rem auto;
+    margin: 0;
+    width: min(360px, calc(100vw - 2rem));
+    max-width: none;
+}
+
+.toast-close {
+    flex: 0 0 auto;
+    margin: -0.15rem -0.35rem -0.15rem 0;
+    padding: 0.15rem 0.35rem;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    line-height: 1;
+}
+
+.toast-close:hover {
+    background-color: var(--color-accent-bg);
+    color: var(--color-text);
+}
+
+@starting-style {
+    .toast[popover]:popover-open {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
 }
 
 .toast-success { border-left: 3px solid var(--color-success); }
@@ -452,7 +594,148 @@ h4:hover .heading-anchor {
 .toast-warning { border-left: 3px solid var(--color-warning); }
 .toast-info { border-left: 3px solid var(--color-accent); }
 
+@media (prefers-reduced-motion: reduce) {
+    .toast {
+        animation: none;
+        transition: none;
+        transition-behavior: auto;
+    }
+}
+
+/* ===== Form validation ===== */
+.form-control:user-invalid {
+    border-color: var(--color-error);
+    box-shadow: 0 0 0 1px var(--color-error);
+}
+
+@supports not selector(:user-invalid) {
+    .form-control.user-invalid-fallback {
+        border-color: var(--color-error);
+        box-shadow: 0 0 0 1px var(--color-error);
+    }
+}
+
 /* ===== Admin specific ===== */
+.admin-table-region {
+    container-type: inline-size;
+    overflow: auto;
+    overscroll-behavior-x: contain;
+}
+
+.admin-table {
+    width: 100%;
+    font-size: 0.875rem;
+}
+
+.admin-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: var(--color-surface);
+}
+
+.admin-table tbody tr > :first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background-color: var(--color-surface);
+}
+
+.admin-table tbody tr:hover > :first-child {
+    background-color: color-mix(in oklab, var(--color-accent-bg) 40%, var(--color-surface));
+}
+
+/* Stack rows only when the widget itself is narrow, not the viewport. */
+@container (width < 600px) {
+    .admin-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    .admin-table,
+    .admin-table tbody,
+    .admin-table tr,
+    .admin-table td,
+    .admin-table tbody th {
+        display: block;
+        width: 100%;
+    }
+
+    .admin-table tbody tr {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .admin-table tbody tr > :first-child {
+        position: static;
+        background-color: transparent;
+    }
+
+    .admin-table tbody tr:hover > :first-child {
+        background-color: transparent;
+    }
+
+    .admin-table td,
+    .admin-table tbody th {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.5rem 1rem;
+        border: 0;
+        text-align: left !important;
+    }
+
+    .admin-table td::before,
+    .admin-table tbody th::before {
+        content: attr(data-label);
+        flex: 0 0 auto;
+        color: var(--color-text-muted);
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .admin-table td[colspan]::before {
+        display: none;
+    }
+
+    .admin-table[data-table="categories"] td:nth-child(1)::before { content: "Nama"; }
+    .admin-table[data-table="categories"] td:nth-child(2)::before { content: "Slug"; }
+    .admin-table[data-table="categories"] td:nth-child(3)::before { content: "Posts"; }
+    .admin-table[data-table="categories"] td:nth-child(4)::before { content: "Aksi"; }
+
+    .admin-table[data-table="posts"] td:nth-child(2)::before { content: "Judul"; }
+    .admin-table[data-table="posts"] td:nth-child(3)::before { content: "Status"; }
+    .admin-table[data-table="posts"] td:nth-child(4)::before { content: "Views"; }
+    .admin-table[data-table="posts"] td:nth-child(5)::before { content: "Diperbarui"; }
+    .admin-table[data-table="posts"] td:nth-child(6)::before { content: "Aksi"; }
+
+    .admin-table[data-table="tags"] td:nth-child(1)::before { content: "Nama"; }
+    .admin-table[data-table="tags"] td:nth-child(2)::before { content: "Slug"; }
+    .admin-table[data-table="tags"] td:nth-child(3)::before { content: "Posts"; }
+    .admin-table[data-table="tags"] td:nth-child(4)::before { content: "Aksi"; }
+
+    .admin-table[data-table="trash"] td:nth-child(2)::before { content: "Judul"; }
+    .admin-table[data-table="trash"] td:nth-child(3)::before { content: "Status"; }
+    .admin-table[data-table="trash"] td:nth-child(4)::before { content: "Dihapus"; }
+    .admin-table[data-table="trash"] td:nth-child(5)::before { content: "Aksi"; }
+
+    .admin-table[data-table="users"] td:nth-child(1)::before { content: "Nama"; }
+    .admin-table[data-table="users"] td:nth-child(2)::before { content: "Email"; }
+    .admin-table[data-table="users"] td:nth-child(3)::before { content: "Peran"; }
+    .admin-table[data-table="users"] td:nth-child(4)::before { content: "Artikel"; }
+    .admin-table[data-table="users"] td:nth-child(5)::before { content: "Aksi"; }
+}
+
 .admin-sidebar {
     width: 260px;
     min-height: 100vh;

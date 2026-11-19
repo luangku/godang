@@ -195,11 +195,17 @@ export default function Trash() {
             )}
 
             {/* Table */}
-            <div className="bg-(--color-surface) border border-(--color-border) rounded-xl overflow-x-auto">
-                <table className="w-full text-sm">
+            <div
+                className="admin-table-region bg-(--color-surface) border border-(--color-border) rounded-xl"
+                role="region"
+                aria-labelledby="trash-table-caption"
+                tabIndex={0}
+            >
+                <table className="admin-table" data-table="trash">
+                    <caption id="trash-table-caption" className="sr-only">Daftar artikel di sampah</caption>
                     <thead>
                         <tr className="border-b border-(--color-border) text-left text-xs uppercase tracking-wider text-(--color-text-muted)">
-                            <th className="px-4 py-3 w-10">
+                            <th scope="col" className="px-4 py-3 w-10">
                                 <input
                                     type="checkbox"
                                     checked={Boolean(allSelected)}
@@ -209,10 +215,10 @@ export default function Trash() {
                                     aria-label="Pilih semua"
                                 />
                             </th>
-                            <th className="px-4 py-3">Judul</th>
-                            <th className="px-4 py-3">Status</th>
-                            <th className="px-4 py-3">Dihapus</th>
-                            <th className="px-4 py-3 text-right">Aksi</th>
+                            <th scope="col" className="px-4 py-3">Judul</th>
+                            <th scope="col" className="px-4 py-3">Status</th>
+                            <th scope="col" className="px-4 py-3">Dihapus</th>
+                            <th scope="col" className="px-4 py-3 text-right">Aksi</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-(--color-border)">

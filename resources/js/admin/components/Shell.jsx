@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { initialSiteData, resolveSiteLogo } from '../site';
 import { useAuth } from '../stores/auth';
+import { getTheme, toggleTheme as toggleColorTheme } from '../../theme';
 
 const navItems = [
     {
@@ -39,9 +40,8 @@ export default function Shell() {
     }, []);
 
     const toggleTheme = () => {
-        const nowDark = document.documentElement.classList.toggle('dark');
-        localStorage.setItem('theme', nowDark ? 'dark' : 'light');
-        setIsDark(nowDark);
+        toggleColorTheme();
+        setIsDark(getTheme() === 'dark');
     };
 
     const handleLogout = async () => {

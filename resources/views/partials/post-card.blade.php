@@ -23,7 +23,12 @@
         <a href="{{ url('/blog/' . $post->slug) }}" class="block aspect-[16/9] overflow-hidden">
             <img src="{{ method_exists($post, 'coverImageUrl') ? $post->coverImageUrl() : (str_starts_with($post->cover_image, 'http') ? $post->cover_image : \Illuminate\Support\Facades\Storage::disk('public')->url(ltrim($post->cover_image, '/'))) }}"
                 alt="{{ $post->title }}"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                @if ($featured ?? false)
+                    fetchpriority="high"
+                @else
+                    loading="lazy"
+                @endif
                 width="640" height="360">
         </a>
     @else

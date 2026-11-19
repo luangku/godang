@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#0b1026">
+    <script>
+        (function () {
+            var theme = 'dark';
+            try {
+                theme = localStorage.getItem('theme') === 'light' ? 'light' : 'dark';
+            } catch (error) {
+                theme = 'dark';
+            }
+            var scheme = document.querySelector('meta[name="color-scheme"]');
+            if (scheme) scheme.content = theme;
+            if (theme === 'dark') document.documentElement.classList.add('dark');
+            var themeColor = document.querySelector('meta[name="theme-color"]');
+            if (themeColor) themeColor.content = theme === 'dark' ? '#0b1026' : '#fafafa';
+        })();
+    </script>
 
     @php
         $siteTitle = $site['site_title'] ?? config('app.name', 'Godang');
@@ -47,19 +64,8 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}?v={{ $faviconVersion }}">
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}?v={{ $faviconVersion }}">
     <link rel="apple-touch-icon" href="{{ asset('icon-192.png') }}?v={{ $faviconVersion }}">
-    <meta name="theme-color" content="#0b1026">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    {{-- Prevent FOUC for dark mode (default: dark) --}}
-    <script>
-        (function() {
-            const saved = localStorage.getItem('theme');
-            if (saved !== 'light') {
-                document.documentElement.classList.add('dark');
-            }
-        })();
-    </script>
 </head>
 <body class="min-h-screen bg-(--color-bg) text-(--color-text) transition-colors duration-300">
 

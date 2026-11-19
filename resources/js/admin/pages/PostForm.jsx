@@ -552,6 +552,9 @@ export default function PostForm() {
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
                                         e.preventDefault();
+                                        if (e.nativeEvent.isComposing || e.nativeEvent.keyCode === 229) {
+                                            return;
+                                        }
                                         addTagChip(tagInput);
                                     } else if (e.key === 'Tab' && tagInput.trim()) {
                                         e.preventDefault();

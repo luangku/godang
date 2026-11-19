@@ -33,7 +33,7 @@
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <input type="search" name="q" value="{{ request('q') }}"
-                    placeholder="Cari artikel..."
+                    placeholder="Cari artikel..." aria-label="Cari artikel"
                     class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-(--color-surface) border border-(--color-border) text-sm text-(--color-text) placeholder:text-(--color-text-muted) focus:border-(--color-accent) focus:ring-1 focus:ring-(--color-accent) outline-none transition-all duration-200"
                     id="search-input">
             </div>
@@ -50,6 +50,7 @@
                         </option>
                     @endforeach
                 </select>
+                <button type="submit" class="sr-only">Cari artikel</button>
                 <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-(--color-text-muted) pointer-events-none"
                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -73,13 +74,6 @@
                     });
 
                     if (search) {
-                        search.addEventListener('keydown', function(e) {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                form.submit();
-                            }
-                        });
-
                         // Tombol "x" pada input search memicu event "search"; menghapus
                         // teks secara manual memicu event "input". Keduanya langsung
                         // menampilkan semua artikel tanpa reload halaman.
@@ -193,7 +187,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="posts-grid">
             @forelse($posts ?? [] as $index => $post)
                 <div class="opacity-0 animate-fade-in-up stagger-{{ ($index % 6) + 1 }}">
-                    @include('partials.post-card', ['post' => $post])
+                    @include('partials.post-card', ['post' => $post, 'featured' => $index === 0])
                 </div>
             @empty
                 <div class="col-span-full text-center py-16">

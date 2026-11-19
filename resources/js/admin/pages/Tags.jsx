@@ -127,14 +127,20 @@ export default function Tags() {
                 </div>
             </form>
 
-            <div className="bg-(--color-surface) border border-(--color-border) rounded-xl overflow-x-auto">
-                <table className="w-full text-sm">
+            <div
+                className="admin-table-region bg-(--color-surface) border border-(--color-border) rounded-xl"
+                role="region"
+                aria-labelledby="tags-table-caption"
+                tabIndex={0}
+            >
+                <table className="admin-table" data-table="tags">
+                    <caption id="tags-table-caption" className="sr-only">Daftar tag artikel</caption>
                     <thead>
                         <tr className="border-b border-(--color-border) text-left text-xs uppercase text-(--color-text-muted)">
-                            <th className="px-4 py-3">Nama</th>
-                            <th className="px-4 py-3">Slug</th>
-                            <th className="px-4 py-3 text-right">Posts</th>
-                            <th className="px-4 py-3 text-right">Aksi</th>
+                            <th scope="col" className="px-4 py-3">Nama</th>
+                            <th scope="col" className="px-4 py-3">Slug</th>
+                            <th scope="col" className="px-4 py-3 text-right">Posts</th>
+                            <th scope="col" className="px-4 py-3 text-right">Aksi</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-(--color-border)">

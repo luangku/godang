@@ -214,11 +214,17 @@ export default function Posts() {
             )}
 
             {/* Table */}
-            <div className="bg-(--color-surface) border border-(--color-border) rounded-xl overflow-x-auto">
-                <table className="w-full text-sm">
+            <div
+                className="admin-table-region bg-(--color-surface) border border-(--color-border) rounded-xl"
+                role="region"
+                aria-labelledby="posts-table-caption"
+                tabIndex={0}
+            >
+                <table className="admin-table" data-table="posts">
+                    <caption id="posts-table-caption" className="sr-only">Daftar artikel</caption>
                     <thead>
                         <tr className="border-b border-(--color-border) text-left text-xs uppercase tracking-wider text-(--color-text-muted)">
-                            <th className="px-4 py-3 w-10">
+                            <th scope="col" className="px-4 py-3 w-10">
                                 <input
                                     type="checkbox"
                                     checked={Boolean(allSelected)}
@@ -228,11 +234,11 @@ export default function Posts() {
                                     aria-label="Pilih semua"
                                 />
                             </th>
-                            <th className="px-4 py-3">Judul</th>
-                            <th className="px-4 py-3">Status</th>
-                            <th className="px-4 py-3 text-right">Views</th>
-                            <th className="px-4 py-3">Diperbarui</th>
-                            <th className="px-4 py-3 text-right">Aksi</th>
+                            <th scope="col" className="px-4 py-3">Judul</th>
+                            <th scope="col" className="px-4 py-3">Status</th>
+                            <th scope="col" className="px-4 py-3 text-right">Views</th>
+                            <th scope="col" className="px-4 py-3">Diperbarui</th>
+                            <th scope="col" className="px-4 py-3 text-right">Aksi</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-(--color-border)">
